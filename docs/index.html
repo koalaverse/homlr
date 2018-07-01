@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Hands-on Machine Learning with R</title>
+  <meta name="description" content="A Machine Learning Algorithmic Deep Dive Using R.">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Hands-on Machine Learning with R" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A Machine Learning Algorithmic Deep Dive Using R." />
+  <meta name="github-repo" content="bradleyboehmke/hands-on-machine-learning-with-r" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Hands-on Machine Learning with R" />
+  
+  <meta name="twitter:description" content="A Machine Learning Algorithmic Deep Dive Using R." />
+  
+
+
+
+<meta name="date" content="2018-07-01">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Hands-on Machine Learning with R</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path=""><a href="#preface"><i class="fa fa-check"></i>Preface</a><ul>
+<li class="chapter" data-level="" data-path=""><a href="#who-should-read-this"><i class="fa fa-check"></i>Who should read this</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#why-r"><i class="fa fa-check"></i>Why R</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#structure-of-the-book"><i class="fa fa-check"></i>Structure of the book</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#conventions-used-in-this-book"><i class="fa fa-check"></i>Conventions used in this book</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#software-information"><i class="fa fa-check"></i>Software information</a></li>
+<li class="chapter" data-level="" data-path=""><a href="#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Hands-on Machine Learning with R</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Hands-on Machine Learning with R</h1>
+<h4 class="date"><em>2018-07-01</em></h4>
+</div>
+<div id="preface" class="section level1 unnumbered">
+<h1>Preface</h1>
+<p><img src="images/mlr.png"  style="float:right; margin: 0px 0px 0px 0px; width: 40%; height: 40%;" /> Welcome to Hands-on Machine Learning with R. This book provides hands-on modules for the most common machine learning methods to include:</p>
+<ul>
+<li>Regularized models</li>
+<li>Random Forests (RF)</li>
+<li>Gradient Boosting Machines (GBM)</li>
+<li>Deep Neural Networks (DNN)</li>
+<li>Stacking / Super Learner (SL)</li>
+<li>and more!</li>
+</ul>
+<p>You will learn how to build and tune these various models with R packages that have been tested and approved due to their ability to scale well. However, my motivation in almost every case is to describe the techniques in a way that helps develop intuition for its strengths and weaknesses. For the most part, I minimize mathematical complexity when possible but also provide resources to get deeper into the details if desired.</p>
+<div id="who-should-read-this" class="section level2 unnumbered">
+<h2>Who should read this</h2>
+<p>I intend this work to be a practitioner’s guide to the machine learning process and a place where one can come to learn about the approach and to gain intuition about the many commonly used and modern, powerful methods accepted in the R community. If you are familiar with the analytic methodologies, this book may still serve as a reference for how to work with the various R packages for implementation While an abundance of videos, blog posts, and tutorials exist online, I’ve long been frustrated by the lack of consistency, completeness, and bias towards singular packages for implementation. This is what inspired this book.</p>
+<p>This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiary with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks. If not, I would refer you to <a href="http://r4ds.had.co.nz/index.html">R for Data Science</a> to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to <a href="http://adv-r.had.co.nz/">Advanced R</a>. Instead, this book is meant to help R users learn to use the machine learning stack within R, which includes using various R packages such as <code>glmnet</code>, <code>h20</code>, <code>ranger</code>, <code>xgboost</code>, <code>lime</code>, and others to effectively model and gain insight from your data.</p>
+</div>
+<div id="why-r" class="section level2 unnumbered">
+<h2>Why R</h2>
+<p>R has emerged over the last couple decades as a first-class tool for scientific computing tasks, and has been a consistent leader in implementing statistical methodologies for analyzing data. The usefulness of R for data science stems from the large, active, and growing ecosystem of third-party packages: <code>tidyverse</code> for common data analysis activities; <code>h2o</code>, <code>ranger</code>, <code>xgboost</code>, and others for fast and scalable machine learning; <code>lime</code>, <code>pdp</code>, <code>DALEX</code>, and others for machine learning interpretability; and many more tools will be mentioned throughout the pages that follow.</p>
+</div>
+<div id="structure-of-the-book" class="section level2 unnumbered">
+<h2>Structure of the book</h2>
+<p>Each chapter of this book focuses on a particular part of the machine learning process along with various packages to perform that process.</p>
+<p>TBD…</p>
+</div>
+<div id="conventions-used-in-this-book" class="section level2 unnumbered">
+<h2>Conventions used in this book</h2>
+<p>TBD…</p>
+</div>
+<div id="software-information" class="section level2 unnumbered">
+<h2>Software information</h2>
+<p>An online version of this book is available at xxxx. The source of the book is available at <a href="https://github.com/bradleyboehmke/hands-on-machine-learning-with-r" class="uri">https://github.com/bradleyboehmke/hands-on-machine-learning-with-r</a>. The book is powered by <a href="https://bookdown.org" class="uri">https://bookdown.org</a> which makes it easy to turn R markdown files into HTML, PDF, and EPUB.</p>
+<p>This book was built with:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sessionInfo</span>()
+<span class="co">#&gt; R version 3.5.0 (2018-04-23)</span>
+<span class="co">#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)</span>
+<span class="co">#&gt; Running under: macOS High Sierra 10.13.5</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; Matrix products: default</span>
+<span class="co">#&gt; BLAS: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRblas.0.dylib</span>
+<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.5/Resources/lib/libRlapack.dylib</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; locale:</span>
+<span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; attached base packages:</span>
+<span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; loaded via a namespace (and not attached):</span>
+<span class="co">#&gt;  [1] compiler_3.5.0  backports_1.1.2 bookdown_0.7    magrittr_1.5   </span>
+<span class="co">#&gt;  [5] rprojroot_1.3-2 tools_3.5.0     htmltools_0.3.6 yaml_2.1.19    </span>
+<span class="co">#&gt;  [9] Rcpp_0.12.17    stringi_1.2.2   rmarkdown_1.9   knitr_1.20     </span>
+<span class="co">#&gt; [13] xfun_0.1        stringr_1.3.1   digest_0.6.15   evaluate_0.10.1</span></code></pre></div>
+</div>
+<div id="acknowledgments" class="section level2 unnumbered">
+<h2>Acknowledgments</h2>
+<p>TBD</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/index.rmd",
+"text": "Edit"
+},
+"download": ["hands-on-machine-learning-with-R.pdf", "hands-on-machine-learning-with-R.epub"],
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

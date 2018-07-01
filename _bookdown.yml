@@ -1,0 +1,12 @@
+book_filename: "hands-on-machine-learning-with-R"
+chapter_name: "Chapter "
+repo: https://github.com/bradleyboehmke/hands-on-machine-learning-with-r
+output_dir: docs
+clean: [packages.bib, bookdown.bbl]
+new_session: yes
+
+rmd_files: [
+  "index.rmd",
+
+
+]

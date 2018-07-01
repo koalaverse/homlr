@@ -1,0 +1,65 @@
+--- 
+title: "Hands-on Machine Learning with R"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: bradleyboehmke/hands-on-machine-learning-with-r
+description: "A Machine Learning Algorithmic Deep Dive Using R."
+---
+
+
+# Preface {-}
+
+<img src="images/mlr.png"  style="float:right; margin: 0px 0px 0px 0px; width: 40%; height: 40%;" />
+Welcome to Hands-on Machine Learning with R.  This book provides hands-on modules for the most common machine learning methods to include:
+
+- Regularized models
+- Random Forests (RF)
+- Gradient Boosting Machines (GBM)
+- Deep Neural Networks (DNN)
+- Stacking / Super Learner (SL)
+- and more!
+
+You will learn how to build and tune these various models with R packages that have been tested and approved due to their ability to scale well. However, my motivation in almost every case is to describe the techniques in a way that helps develop intuition for its strengths and weaknesses.  For the most part, I minimize mathematical complexity when possible but also provide resources to get deeper into the details if desired.
+
+
+## Who should read this {-}
+
+I intend this work to be a practitioner's guide to the machine learning process and a place where one can come to learn about the approach and to gain intuition about the many commonly used and modern, powerful methods accepted in the R community. If you are familiar with the analytic methodologies, this book may still serve as a reference for how to work with the various R packages for implementation  While an abundance of videos, blog posts, and tutorials exist online, I've long been frustrated by the lack of consistency, completeness, and bias towards singular packages for implementation. This is what inspired this book. 
+
+This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiary with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks.  If not, I would refer you to [R for Data Science](http://r4ds.had.co.nz/index.html) to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to [Advanced R](http://adv-r.had.co.nz/). Instead, this book is meant to help R users learn to use the machine learning stack within R, which includes using various R packages such as `glmnet`, `h20`, `ranger`, `xgboost`, `lime`, and others to effectively model and gain insight from your data.
+
+## Why R {-}
+
+R has emerged over the last couple decades as a first-class tool for scientific computing tasks, and has been a consistent leader in implementing statistical methodologies for analyzing data. The usefulness of R for data science stems from the large, active, and growing ecosystem of third-party packages: `tidyverse` for common data analysis activities; `h2o`, `ranger`, `xgboost`, and others for fast and scalable machine learning; `lime`, `pdp`, `DALEX`, and others for machine learning interpretability; and many more tools will be mentioned throughout the pages that follow.
+
+## Structure of the book {-} 
+
+Each chapter of this book focuses on a particular part of the machine learning process along with various packages to perform that process.
+
+TBD...
+
+
+## Conventions used in this book {-}
+
+TBD...
+
+## Software information {-} 
+
+An online version of this book is available at xxxx.  The source of the book is available at https://github.com/bradleyboehmke/hands-on-machine-learning-with-r. The book is powered by https://bookdown.org which makes it easy to turn R markdown files into HTML, PDF, and EPUB.
+
+This book was built with:
+
+```{r, collapse=TRUE, comment = "#>"}
+sessionInfo()
+```
+
+
+## Acknowledgments {-} 
+
+TBD
+
