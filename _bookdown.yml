@@ -7,6 +7,6 @@ new_session: yes
 
 rmd_files: [
   "index.rmd",
-
+  "01-introduction.rmd",
 
 ]
