@@ -34,7 +34,7 @@ You will learn how to build and tune these various models with R packages that h
 
 I intend this work to be a practitioner's guide to the machine learning process and a place where one can come to learn about the approach and to gain intuition about the many commonly used, modern, and powerful methods accepted in the machine learning community. If you are familiar with the analytic methodologies, this book may still serve as a reference for how to work with the various R packages for implementation.  While an abundance of videos, blog posts, and tutorials exist online, I've long been frustrated by the lack of consistency, completeness, and bias towards singular packages for implementation. This is what inspired this book. 
 
-This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiarity with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks.  If not, I would refer you to [R for Data Science](http://r4ds.had.co.nz/index.html) to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to [Advanced R](http://adv-r.had.co.nz/). 
+This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiarity with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks.  If not, I would refer you to [R for Data Science](http://r4ds.had.co.nz/index.html) [@wickham2016r] to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to [Advanced R](http://adv-r.had.co.nz/) [@wickham2014advanced]. 
 
 Instead, this book is meant to help R users learn to use the machine learning stack within R, which includes using various R packages such as `glmnet`, `h20`, `ranger`, `xgboost`, `lime`, and others to effectively model and gain insight from your data. The book favors a hands-on approach, growing an intuitive understanding of machine learning through concrete examples and just a little bit of theory.  While you can read this book without opening R, I highly recommend you experiment with the code examples provided throughout.
 
@@ -101,7 +101,9 @@ This book was built with the following packages and R version.  All code was exe
 ```{r, collapse=TRUE, comment = "#>"}
 # packages used
 pkgs <- c(
-  "h2o"
+  "AmesHousing",             
+  "h2o",
+  "rsample"
 )
 
 # package & session info

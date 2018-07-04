@@ -1,6 +1,6 @@
 --- 
 title: "Hands-on Machine Learning with R"
-date: "2018-07-03"
+date: "2018-07-04"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -34,7 +34,7 @@ You will learn how to build and tune these various models with R packages that h
 
 I intend this work to be a practitioner's guide to the machine learning process and a place where one can come to learn about the approach and to gain intuition about the many commonly used, modern, and powerful methods accepted in the machine learning community. If you are familiar with the analytic methodologies, this book may still serve as a reference for how to work with the various R packages for implementation.  While an abundance of videos, blog posts, and tutorials exist online, I've long been frustrated by the lack of consistency, completeness, and bias towards singular packages for implementation. This is what inspired this book. 
 
-This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiarity with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks.  If not, I would refer you to [R for Data Science](http://r4ds.had.co.nz/index.html) to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to [Advanced R](http://adv-r.had.co.nz/). 
+This book is not meant to be an introduction to R or to programming in general; as I assume the reader has familiarity with the R language to include defining functions, managing R objects, controlling the flow of a program, and other basic tasks.  If not, I would refer you to [R for Data Science](http://r4ds.had.co.nz/index.html) [@wickham2016r] to learn the fundamentals of data science with R such as importing, cleaning, transforming, visualizing, and exploring your data. For those looking to advance their R programming skills and knowledge of the languge, I would refer you to [Advanced R](http://adv-r.had.co.nz/) [@wickham2014advanced]. 
 
 Instead, this book is meant to help R users learn to use the machine learning stack within R, which includes using various R packages such as `glmnet`, `h20`, `ranger`, `xgboost`, `lime`, and others to effectively model and gain insight from your data. The book favors a hands-on approach, growing an intuitive understanding of machine learning through concrete examples and just a little bit of theory.  While you can read this book without opening R, I highly recommend you experiment with the code examples provided throughout.
 
@@ -104,7 +104,9 @@ This book was built with the following packages and R version.  All code was exe
 ```r
 # packages used
 pkgs <- c(
-  "h2o"
+  "AmesHousing",             
+  "h2o",
+  "rsample"
 )
 
 # package & session info
@@ -117,19 +119,83 @@ devtools::session_info(pkgs)
 #>  language (EN)                        
 #>  collate  en_US.UTF-8                 
 #>  tz       America/New_York            
-#>  date     2018-07-03
+#>  date     2018-07-04
 #> Packages -----------------------------------------------------------------
-#>  package   * version   date       source        
-#>  bitops      1.0-6     2013-08-17 CRAN (R 3.5.0)
-#>  graphics  * 3.5.0     2018-04-24 local         
-#>  grDevices * 3.5.0     2018-04-24 local         
-#>  h2o         3.18.0.11 2018-05-24 CRAN (R 3.5.0)
-#>  jsonlite    1.5       2017-06-01 CRAN (R 3.5.0)
-#>  methods   * 3.5.0     2018-04-24 local         
-#>  RCurl       1.95-4.10 2018-01-04 CRAN (R 3.5.0)
-#>  stats     * 3.5.0     2018-04-24 local         
-#>  tools       3.5.0     2018-04-24 local         
-#>  utils     * 3.5.0     2018-04-24 local
+#>  package     * version    date       source        
+#>  abind         1.4-5      2016-07-21 CRAN (R 3.5.0)
+#>  AmesHousing   0.0.3      2017-12-17 CRAN (R 3.5.0)
+#>  assertthat    0.2.0      2017-04-11 CRAN (R 3.5.0)
+#>  BH            1.66.0-1   2018-02-13 CRAN (R 3.5.0)
+#>  bindr         0.1.1      2018-03-13 CRAN (R 3.5.0)
+#>  bindrcpp      0.2.2      2018-03-29 CRAN (R 3.5.0)
+#>  bitops        1.0-6      2013-08-17 CRAN (R 3.5.0)
+#>  broom         0.4.4      2018-03-29 CRAN (R 3.5.0)
+#>  class         7.3-14     2015-08-30 CRAN (R 3.5.0)
+#>  cli           1.0.0      2017-11-05 CRAN (R 3.5.0)
+#>  compiler      3.5.0      2018-04-24 local         
+#>  crayon        1.3.4      2017-09-16 CRAN (R 3.5.0)
+#>  CVST          0.2-2      2018-05-26 CRAN (R 3.5.0)
+#>  ddalpha       1.3.3      2018-04-30 CRAN (R 3.5.0)
+#>  DEoptimR      1.0-8      2016-11-19 CRAN (R 3.5.0)
+#>  dimRed        0.1.0      2017-05-04 CRAN (R 3.5.0)
+#>  dplyr         0.7.5      2018-05-19 CRAN (R 3.5.0)
+#>  DRR           0.0.3      2018-01-06 CRAN (R 3.5.0)
+#>  foreign       0.8-70     2017-11-28 CRAN (R 3.5.0)
+#>  geometry      0.3-6      2015-09-09 CRAN (R 3.5.0)
+#>  glue          1.2.0      2017-10-29 CRAN (R 3.5.0)
+#>  gower         0.1.2      2017-02-23 CRAN (R 3.5.0)
+#>  graphics    * 3.5.0      2018-04-24 local         
+#>  grDevices   * 3.5.0      2018-04-24 local         
+#>  grid          3.5.0      2018-04-24 local         
+#>  h2o           3.18.0.11  2018-05-24 CRAN (R 3.5.0)
+#>  ipred         0.9-6      2017-03-01 CRAN (R 3.5.0)
+#>  jsonlite      1.5        2017-06-01 CRAN (R 3.5.0)
+#>  kernlab       0.9-26     2018-04-30 CRAN (R 3.5.0)
+#>  KernSmooth    2.23-15    2015-06-29 CRAN (R 3.5.0)
+#>  lattice       0.20-35    2017-03-25 CRAN (R 3.5.0)
+#>  lava          1.6.1      2018-03-28 CRAN (R 3.5.0)
+#>  lubridate     1.7.4      2018-04-11 CRAN (R 3.5.0)
+#>  magic         1.5-8      2018-01-26 CRAN (R 3.5.0)
+#>  magrittr      1.5        2014-11-22 CRAN (R 3.5.0)
+#>  MASS          7.3-49     2018-02-23 CRAN (R 3.5.0)
+#>  Matrix        1.2-14     2018-04-13 CRAN (R 3.5.0)
+#>  methods     * 3.5.0      2018-04-24 local         
+#>  mnormt        1.5-5      2016-10-15 CRAN (R 3.5.0)
+#>  nlme          3.1-137    2018-04-07 CRAN (R 3.5.0)
+#>  nnet          7.3-12     2016-02-02 CRAN (R 3.5.0)
+#>  numDeriv      2016.8-1   2016-08-27 CRAN (R 3.5.0)
+#>  parallel      3.5.0      2018-04-24 local         
+#>  pillar        1.2.3      2018-05-25 CRAN (R 3.5.0)
+#>  pkgconfig     2.0.1      2017-03-21 CRAN (R 3.5.0)
+#>  plogr         0.2.0      2018-03-25 CRAN (R 3.5.0)
+#>  plyr          1.8.4      2016-06-08 CRAN (R 3.5.0)
+#>  prodlim       2018.04.18 2018-04-18 CRAN (R 3.5.0)
+#>  psych         1.8.4      2018-05-06 CRAN (R 3.5.0)
+#>  purrr         0.2.5      2018-05-29 CRAN (R 3.5.0)
+#>  R6            2.2.2      2017-06-17 CRAN (R 3.5.0)
+#>  Rcpp          0.12.17    2018-05-18 CRAN (R 3.5.0)
+#>  RcppRoll      0.2.2      2015-04-05 CRAN (R 3.5.0)
+#>  RCurl         1.95-4.10  2018-01-04 CRAN (R 3.5.0)
+#>  recipes       0.1.2      2018-01-11 CRAN (R 3.5.0)
+#>  reshape2      1.4.3      2017-12-11 CRAN (R 3.5.0)
+#>  rlang         0.2.1      2018-05-30 CRAN (R 3.5.0)
+#>  robustbase    0.93-0     2018-04-24 CRAN (R 3.5.0)
+#>  rpart         4.1-13     2018-02-23 CRAN (R 3.5.0)
+#>  rsample       0.0.2      2017-11-12 CRAN (R 3.5.0)
+#>  sfsmisc       1.1-2      2018-03-05 CRAN (R 3.5.0)
+#>  splines       3.5.0      2018-04-24 local         
+#>  SQUAREM       2017.10-1  2017-10-07 CRAN (R 3.5.0)
+#>  stats       * 3.5.0      2018-04-24 local         
+#>  stringi       1.2.2      2018-05-02 CRAN (R 3.5.0)
+#>  stringr       1.3.1      2018-05-10 CRAN (R 3.5.0)
+#>  survival      2.41-3     2017-04-04 CRAN (R 3.5.0)
+#>  tibble        1.4.2      2018-01-22 CRAN (R 3.5.0)
+#>  tidyr         0.8.1      2018-05-18 CRAN (R 3.5.0)
+#>  tidyselect    0.2.4      2018-02-26 CRAN (R 3.5.0)
+#>  timeDate      3043.102   2018-02-21 CRAN (R 3.5.0)
+#>  tools         3.5.0      2018-04-24 local         
+#>  utf8          1.1.4      2018-05-24 CRAN (R 3.5.0)
+#>  utils       * 3.5.0      2018-04-24 local
 ```
 
 

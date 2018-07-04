@@ -295,7 +295,8 @@ Although the chapters that follow will go into detail on each algorithm, the fol
   <a  href="">h2o.gbm</a>
 </td>
 <td align="left" valign="top"> 
-  <a  href="">h2o.deeplearning</a><br>
+  <a  href="">keras</a><br>
+  <a  href="">h2o.deeplearning</a>
 </td>
 </tr>
 
@@ -395,7 +396,77 @@ All of this is an obstacle to data scientists.  On one hand, different models ca
 This book will provide you with a fundamental understanding to compare and contrast models and even package implementations of similiar algorithms.  Several machine learning interpretability techniques will be demonstrated to help you understand what is driving model and prediction performance.  This will allow you to be more effective and efficient in applying and understanding mutliple good models. 
 
 
-## Example data sets
+## The data sets
+
+The __XX__ data sets chosen for this book allow us to illustrate the different features of our machine learning algorithms.  They are all freely available and include:
+
+* Property sales information as described in @de2011ames.
+    - __problem type__: supervised regression
+    - __response variable__: sale price (i.e. \$195,000, \$215,000)
+    - __features__: 81 
+    - __observations__: 2,930
+    - __objective__: use property attributes to predict the sale price of a home
+    - __access__: provided by the `AmesHousing` package
+    - __more details__: See `?AmesHousing::ames_raw`
+    
+    ```{r import-ames-data}
+    # access data
+    ames <- AmesHousing::ames_raw
+
+    # initial dimension
+    dim(ames)
+
+    # response variable
+    head(ames$SalePrice)
+    ```
+    
+    
+* Employee attrition information originally provided by [IBM Watson Analytics Lab](https://www.ibm.com/communities/analytics/watson-analytics-blog/hr-employee-attrition/).
+    - __problem type__: supervised binomial classification
+    - __response variable__: `Attrition` (i.e. "Yes", "No")
+    - __features__: 30 
+    - __observations__: 1,470
+    - __objective__: use employee attributes to predict if they will attrit (leave the company)
+    - __access__: provided by the `rsample` package
+    - __more details__: See `?rsample::attrition`
+    
+    ```{r import-attrition-data}
+    # access data
+    attrition <- rsample::attrition
+
+    # initial dimension
+    dim(attrition)
+
+    # response variable
+    head(attrition$Attrition)
+    ```    
+    
+* Image information for handwritten numbers originally presented to AT&T Bell Lab’s to help build automatic mail-sorting machines for the USPS. Has been used since early 1990s to compare machine learning performance on pattern recognition (i.e. @lecun1990handwritten; @lecun1998gradient; @cirecsan2012multi).
+    - Problem type: supervised multinomial classification
+    - __response variable__: `V785` (i.e. numbers to predict: 0, 1, ..., 9)
+    - __features__: 784 
+    - __observations__: 60,000 (train) / 10,000 (test)
+    - __objective__: use attributes about the "darkness" of each of the 784 pixels in images of handwritten numbers to predict if the number is 0, 1, ..., or 9.
+    - access: see the code chunk that follows for download instructions
+    - more details: See [online MNIST documentation](http://yann.lecun.com/exdb/mnist/)
+
+    ```{r import-mnist-data}
+    # load training data https://h2o-public-test-data.s3.amazonaws.com/bigdata/laptop/mnist/train.csv.gz
+    train <- data.table::fread("../data/mnist_train.csv", data.table = FALSE)
+
+    # load test data https://h2o-public-test-data.s3.amazonaws.com/bigdata/laptop/mnist/test.csv.gz
+    test <- data.table::fread("../data/mnist_test.csv", data.table = FALSE)
+
+    # initial dimension
+    dim(train)
+
+    # response variable
+    head(train$V785)
+    ```   
+
+__TODO__: get unsupervised data sets for clustering and dimension reduction examples
+
+
 
 
 
