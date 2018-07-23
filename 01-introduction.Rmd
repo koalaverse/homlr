@@ -1,4 +1,4 @@
-# Introduction
+# Introduction {#intro}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
@@ -23,7 +23,7 @@ In essence, these tasks all seek to learn from data.  To address each scenario, 
 
 ## Supervised Learning
 
-A ___predictive model___ is used for tasks that involve the prediction of a given output using other variables and their values (_features_) in the data set. Or as stated by @apm, predictive modeling is _"the process of developing a mathematical tool or model that generates an accurate prediction_ (p. 2).  The learning algorithm in a predictive attempts to discover and model the relationship among the ___target___ response (the variable being predicted) and the other features (aka predictor variables). Examples of predictive modeling include:
+A ___predictive model___ is used for tasks that involve the prediction of a given output using other variables and their values (_features_) in the data set. Or as stated by @apm, predictive modeling is _"the process of developing a mathematical tool or model that generates an accurate prediction"_ (p. 2).  The learning algorithm in a predictive model attempts to discover and model the relationship among the ___target___ response (the variable being predicted) and the other features (aka predictor variables). Examples of predictive modeling include:
 
 * using customer attributes to predict the probability of the customer churning in the next 6 weeks,
 * using home attributes to predict the sales price,
@@ -31,7 +31,7 @@ A ___predictive model___ is used for tasks that involve the prediction of a give
 * using patient attributes and symptoms to predict the risk of readmission,
 * using production attributes to predict time to market.
 
-Each of these examples have a defined learning task.  They each inted to use attributes $X$ to predict an outcome measurement $Y$.
+Each of these examples have a defined learning task.  They each intend to use attributes ($X$) to predict an outcome measurement ($Y$).
 
 ```{block, type = "rmdnote"}
 Throughout this text I will use various terms interchangeably for:
@@ -44,19 +44,19 @@ Throughout this text I will use various terms interchangeably for:
 The predictive modeling examples above describe what is known as _supervised learning_.  The supervision refers to the fact that the target values provide a supervisory role, which indicates to the learner the task it needs to learn. Specifically, given a set of data, the learning algorithm attempts to optimize a function (the algorithmic steps) to find the combination of feature values that results in a predicted value that is as close to the actual target output as possible.
 
 ```{block, type = "rmdnote"}
-In supervised learning, the training data you feed to the algorithm includes the desired solutions.  Consequently, the solutions can be used to help _supervise_ the training process to find the optimal algorithm parameters.
+In supervised learning, the training data you feed the algorithm includes the desired solutions.  Consequently, the solutions can be used to help _supervise_ the training process to find the optimal algorithm parameters.
 ```
 
 Supervised learning problems revolve around two primary themes: regression and classification.
 
 ### Regression problems
 
-When the objective of our supervised learning is to predict a numeric outcome, we refer to this as a ___regression problem___ (not to be confused with linear regression modeling).  Regression problems revolve around predicting output that falls on a continuous numeric spectrum. In the examples above predicting home sales prices and time to market reflect a regression problem because the output is numeric and continuous.  This means, given the combination of predictor values, the response value could fall anywhere along the continuous spectrum.  The following illustrates average home sales prices as a function of two home features: year built and total square footage. Depending on the combination of these two features, the expected home sales price could fall anywhere along the plane.
+When the objective of our supervised learning is to predict a numeric outcome, we refer to this as a ___regression problem___ (not to be confused with linear regression modeling).  Regression problems revolve around predicting output that falls on a continuous numeric spectrum. In the examples above predicting home sales prices and time to market reflect a regression problem because the output is numeric and continuous.  This means, given the combination of predictor values, the response value could fall anywhere along the continuous spectrum.  Figure \@ref(fig:regression-problem) illustrates average home sales prices as a function of two home features: year built and total square footage. Depending on the combination of these two features, the expected home sales price could fall anywhere along the plane.
 
 ```{r regression-problem, echo=FALSE, fig.cap="Average home sales price as a function of year built and total square footage."}
 library(plotly)
 df <- AmesHousing::make_ames()
-x <-  matrix(sort(df$Gr_Liv_Area)[floor(seq(1, nrow(df), length.out = 15))], 15, 1)
+x <- matrix(sort(df$Gr_Liv_Area)[floor(seq(1, nrow(df), length.out = 15))], 15, 1)
 y <- matrix(sort(df$Year_Built)[floor(seq(1, nrow(df), length.out = 15))], 1, 15)
 z <- 25051 + 3505*(log(x^.9) %*% log(y)) - 5*as.vector(x) 
 c <- matrix(c(.92, .95, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, .95), 1, 15)
@@ -105,14 +105,14 @@ grViz("
 ```
 
 
-However, when we apply machine learning models for classification problems, rather than predict a particular class (i.e. "yes" or "no"), we often predict the _probability_ of a particular class (i.e. yes: .65, no: .35).  Then the class with the highest probability becomes the predicted class.  Consequently, even though we are performing a classification problem, we are still predicting a numeric output (probability).  However, the essence of the problem still makes is a classification problem.
+However, when we apply machine learning models for classification problems, rather than predict a particular class (i.e. "yes" or "no"), we often predict the _probability_ of a particular class (i.e. yes: .65, no: .35).  Then the class with the highest probability becomes the predicted class.  Consequently, even though we are performing a classification problem, we are still predicting a numeric output (probability).  However, the essence of the problem still makes it a classification problem.
 
 
 ### Algorithm Comparison Guide
 
 __TODO: keep this here or move reference guide to back???__
 
-Although there are machine learning algorithms that can be applied to regression problems but not classification and vice versa, the supervised learning algorithms I cover in this both can be applied to both.  These algorithms have become the most popular machine learning applications in recent years. 
+Although there are machine learning algorithms that can be applied to regression problems but not classification and vice versa, the supervised learning algorithms I cover in this book can be applied to both.  These algorithms have become the most popular machine learning applications in recent years. 
 
 Although the chapters that follow will go into detail on each algorithm, the following provides a quick reference guide that compares and contrasts some of their features.  Moreover, I provide recommended base learner packages that I have found to scale well with typical rectangular data analyzed by organizations.
 
@@ -396,22 +396,28 @@ All of this is an obstacle to data scientists.  On one hand, different models ca
 This book will provide you with a fundamental understanding to compare and contrast models and even package implementations of similiar algorithms.  Several machine learning interpretability techniques will be demonstrated to help you understand what is driving model and prediction performance.  This will allow you to be more effective and efficient in applying and understanding mutliple good models. 
 
 
-## The data sets
+## The data sets {#data}
 
-The __XX__ data sets chosen for this book allow us to illustrate the different features of our machine learning algorithms.  They are all freely available and include:
+The __XX__ data sets chosen for this book allow us to illustrate the different features of our machine learning algorithms.  Since the goal of this book is to demonstrate how to implement R's ML stack, I make the assumption that you have already spent significant time cleaning and getting to know your data via exploratory data analysis. This would allow you to perform many necessary tasks prior to the ML tasks outlined in this book such as:
+
+* feature selection: removing unnecessary variables and retaining only those variables you wish to include in your modeling process,
+* recoding variable names and values so that they are meaningful and interpretable,
+* recoding or removing missing values.
+
+Consequently, the exemplar data sets I use throughout this book have, for the most part, gone through the necessary cleaning process.  These data sets are all freely available and include:
 
 * Property sales information as described in @de2011ames.
     - __problem type__: supervised regression
     - __response variable__: sale price (i.e. \$195,000, \$215,000)
-    - __features__: 81 
+    - __features__: 80 
     - __observations__: 2,930
     - __objective__: use property attributes to predict the sale price of a home
-    - __access__: provided by the `AmesHousing` package
+    - __access__: provided by the `AmesHousing` package [@R-ames]
     - __more details__: See `?AmesHousing::ames_raw`
     
     ```{r import-ames-data}
     # access data
-    ames <- AmesHousing::ames_raw
+    ames <- AmesHousing::make_ames()
 
     # initial dimension
     dim(ames)
@@ -420,6 +426,12 @@ The __XX__ data sets chosen for this book allow us to illustrate the different f
     head(ames$SalePrice)
     ```
     
+    ```{block, type = "rmdcomment"}
+    You can see the entire data cleaning process to transform the raw Ames housing data (`AmesHousing::ames_raw`) to the final clean  data (`AmesHousing::make_ames`) that we will use in machine learning algorithms throughout this book at:
+
+    https://github.com/topepo/AmesHousing/blob/master/R/make_ames.R
+
+    ```
     
 * Employee attrition information originally provided by [IBM Watson Analytics Lab](https://www.ibm.com/communities/analytics/watson-analytics-blog/hr-employee-attrition/).
     - __problem type__: supervised binomial classification
@@ -427,7 +439,7 @@ The __XX__ data sets chosen for this book allow us to illustrate the different f
     - __features__: 30 
     - __observations__: 1,470
     - __objective__: use employee attributes to predict if they will attrit (leave the company)
-    - __access__: provided by the `rsample` package
+    - __access__: provided by the `rsample` package [@R-rsample]
     - __more details__: See `?rsample::attrition`
     
     ```{r import-attrition-data}
@@ -442,13 +454,13 @@ The __XX__ data sets chosen for this book allow us to illustrate the different f
     ```    
     
 * Image information for handwritten numbers originally presented to AT&T Bell Lab’s to help build automatic mail-sorting machines for the USPS. Has been used since early 1990s to compare machine learning performance on pattern recognition (i.e. @lecun1990handwritten; @lecun1998gradient; @cirecsan2012multi).
-    - Problem type: supervised multinomial classification
+    - __Problem type__: supervised multinomial classification
     - __response variable__: `V785` (i.e. numbers to predict: 0, 1, ..., 9)
     - __features__: 784 
     - __observations__: 60,000 (train) / 10,000 (test)
     - __objective__: use attributes about the "darkness" of each of the 784 pixels in images of handwritten numbers to predict if the number is 0, 1, ..., or 9.
-    - access: see the code chunk that follows for download instructions
-    - more details: See [online MNIST documentation](http://yann.lecun.com/exdb/mnist/)
+    - __access__: see the code chunk that follows for download instructions
+    - __more details__: See [online MNIST documentation](http://yann.lecun.com/exdb/mnist/)
 
     ```{r import-mnist-data}
     # load training data https://h2o-public-test-data.s3.amazonaws.com/bigdata/laptop/mnist/train.csv.gz

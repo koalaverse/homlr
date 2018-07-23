@@ -1,0 +1,42 @@
+
+# Linear Regression {#linear-regression}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.align = "center"
+)
+```
+
+
+## Prerequisites
+
+Testing...
+
+## Why?
+
+Testing...
+
+## XXX
+
+Testing...
+
+## Tuning
+
+Testing...
+
+## Predicting
+
+Testing...
+
+## Other Package Implementations
+
+Testing...
+
+## Why Not?
+
+Testing...
+
+## Learn More
+
+Testing...

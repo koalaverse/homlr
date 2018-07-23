@@ -8,7 +8,8 @@ new_session: yes
 rmd_files: [
   "index.rmd",
   "01-introduction.rmd",
-  
+  "02-ml-strategy.rmd",
+  "03-regularized-glm-models.rmd",
   "10-references.rmd"
 
 ]

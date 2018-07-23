@@ -3,9 +3,12 @@
 
 This repository is the home of the Hands-on Machine Learning with R book, which covers commonly applied supervised and unsupervised methods to include:
 
-- Generalized Linear Models (GLM)
-- Random Forests (RF)
-- Gradient Boosting Machines (GBM)
-- Deep Neural Networks (DNN)
-- Stacking / Super Learner (SL)
+- Generalized low rank models
+- Clustering algorithms
+- Autoencoders
+- Regularized models
+- Random forests 
+- Gradient boosting machines 
+- Deep neural networks
+- Stacking / super learner
 - and more!

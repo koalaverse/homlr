@@ -24,14 +24,14 @@
 
 
 
-<meta name="date" content="2018-07-04">
+<meta name="date" content="2018-07-23">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="introduction.html">
+<link rel="prev" href="regularized-regression.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -119,17 +119,99 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#acknowledgments"><i class="fa fa-check"></i>Acknowledgments</a></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html#software-information"><i class="fa fa-check"></i>Software information</a></li>
 </ul></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#supervised-learning"><i class="fa fa-check"></i><b>1.1</b> Supervised Learning</a><ul>
-<li class="chapter" data-level="1.1.1" data-path="introduction.html"><a href="introduction.html#regression-problems"><i class="fa fa-check"></i><b>1.1.1</b> Regression problems</a></li>
-<li class="chapter" data-level="1.1.2" data-path="introduction.html"><a href="introduction.html#classification-problems"><i class="fa fa-check"></i><b>1.1.2</b> Classification problems</a></li>
-<li class="chapter" data-level="1.1.3" data-path="introduction.html"><a href="introduction.html#algorithm-comparison-guide"><i class="fa fa-check"></i><b>1.1.3</b> Algorithm Comparison Guide</a></li>
+<li class="chapter" data-level="1" data-path="intro.html"><a href="intro.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="intro.html"><a href="intro.html#supervised-learning"><i class="fa fa-check"></i><b>1.1</b> Supervised Learning</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="intro.html"><a href="intro.html#regression-problems"><i class="fa fa-check"></i><b>1.1.1</b> Regression problems</a></li>
+<li class="chapter" data-level="1.1.2" data-path="intro.html"><a href="intro.html#classification-problems"><i class="fa fa-check"></i><b>1.1.2</b> Classification problems</a></li>
+<li class="chapter" data-level="1.1.3" data-path="intro.html"><a href="intro.html#algorithm-comparison-guide"><i class="fa fa-check"></i><b>1.1.3</b> Algorithm Comparison Guide</a></li>
 </ul></li>
-<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#unsupervised-learning"><i class="fa fa-check"></i><b>1.2</b> Unsupervised Learning</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="introduction.html"><a href="introduction.html#algorithm-decision-guide"><i class="fa fa-check"></i><b>1.2.1</b> Algorithm Decision Guide</a></li>
+<li class="chapter" data-level="1.2" data-path="intro.html"><a href="intro.html#unsupervised-learning"><i class="fa fa-check"></i><b>1.2</b> Unsupervised Learning</a><ul>
+<li class="chapter" data-level="1.2.1" data-path="intro.html"><a href="intro.html#algorithm-decision-guide"><i class="fa fa-check"></i><b>1.2.1</b> Algorithm Decision Guide</a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#machine-learning-interpretability"><i class="fa fa-check"></i><b>1.3</b> Machine learning interpretability</a></li>
-<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#the-data-sets"><i class="fa fa-check"></i><b>1.4</b> The data sets</a></li>
+<li class="chapter" data-level="1.3" data-path="intro.html"><a href="intro.html#machine-learning-interpretability"><i class="fa fa-check"></i><b>1.3</b> Machine learning interpretability</a></li>
+<li class="chapter" data-level="1.4" data-path="intro.html"><a href="intro.html#data"><i class="fa fa-check"></i><b>1.4</b> The data sets</a></li>
+</ul></li>
+<li class="part"><span><b>I Supervised Learning</b></span></li>
+<li class="chapter" data-level="2" data-path="regression-performance.html"><a href="regression-performance.html"><i class="fa fa-check"></i><b>2</b> Preparing for Supervised Machine Learning</a><ul>
+<li class="chapter" data-level="2.1" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_prereq"><i class="fa fa-check"></i><b>2.1</b> Prerequisites</a></li>
+<li class="chapter" data-level="2.2" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_split"><i class="fa fa-check"></i><b>2.2</b> Data splitting</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="regression-performance.html"><a href="regression-performance.html#spending-our-data-wisely"><i class="fa fa-check"></i><b>2.2.1</b> Spending our data wisely</a></li>
+<li class="chapter" data-level="2.2.2" data-path="regression-performance.html"><a href="regression-performance.html#simple-random-sampling"><i class="fa fa-check"></i><b>2.2.2</b> Simple random sampling</a></li>
+<li class="chapter" data-level="2.2.3" data-path="regression-performance.html"><a href="regression-performance.html#stratified-sampling"><i class="fa fa-check"></i><b>2.2.3</b> Stratified sampling</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_feat"><i class="fa fa-check"></i><b>2.3</b> Feature engineering</a><ul>
+<li class="chapter" data-level="2.3.1" data-path="regression-performance.html"><a href="regression-performance.html#response-transformation"><i class="fa fa-check"></i><b>2.3.1</b> Response Transformation</a></li>
+<li class="chapter" data-level="2.3.2" data-path="regression-performance.html"><a href="regression-performance.html#predictor-transformation"><i class="fa fa-check"></i><b>2.3.2</b> Predictor Transformation</a></li>
+<li class="chapter" data-level="2.3.3" data-path="regression-performance.html"><a href="regression-performance.html#one-hot-encoding"><i class="fa fa-check"></i><b>2.3.3</b> One-hot encoding</a></li>
+<li class="chapter" data-level="2.3.4" data-path="regression-performance.html"><a href="regression-performance.html#standardizing"><i class="fa fa-check"></i><b>2.3.4</b> Standardizing</a></li>
+<li class="chapter" data-level="2.3.5" data-path="regression-performance.html"><a href="regression-performance.html#alternative-feature-transformation"><i class="fa fa-check"></i><b>2.3.5</b> Alternative Feature Transformation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.4" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_model"><i class="fa fa-check"></i><b>2.4</b> Basic model formulation</a></li>
+<li class="chapter" data-level="2.5" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_tune"><i class="fa fa-check"></i><b>2.5</b> Model tuning</a></li>
+<li class="chapter" data-level="2.6" data-path="regression-performance.html"><a href="regression-performance.html#cv"><i class="fa fa-check"></i><b>2.6</b> Cross Validation for Generalization</a></li>
+<li class="chapter" data-level="2.7" data-path="regression-performance.html"><a href="regression-performance.html#reg_perf_eval"><i class="fa fa-check"></i><b>2.7</b> Model evaluation</a><ul>
+<li class="chapter" data-level="2.7.1" data-path="regression-performance.html"><a href="regression-performance.html#regression-models"><i class="fa fa-check"></i><b>2.7.1</b> Regression models</a></li>
+<li class="chapter" data-level="2.7.2" data-path="regression-performance.html"><a href="regression-performance.html#classification-models"><i class="fa fa-check"></i><b>2.7.2</b> Classification models</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="regularized-regression.html"><a href="regularized-regression.html"><i class="fa fa-check"></i><b>3</b> Regularized Regression</a><ul>
+<li class="chapter" data-level="3.1" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-req"><i class="fa fa-check"></i><b>3.1</b> Prerequisites</a></li>
+<li class="chapter" data-level="3.2" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-pros-cons"><i class="fa fa-check"></i><b>3.2</b> Advantages &amp; Disadvantages</a></li>
+<li class="chapter" data-level="3.3" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-why"><i class="fa fa-check"></i><b>3.3</b> The Idea</a><ul>
+<li class="chapter" data-level="3.3.1" data-path="regularized-regression.html"><a href="regularized-regression.html#multicollinearity"><i class="fa fa-check"></i><b>3.3.1</b> 1. Multicollinearity</a></li>
+<li class="chapter" data-level="3.3.2" data-path="regularized-regression.html"><a href="regularized-regression.html#insufficient-solution"><i class="fa fa-check"></i><b>3.3.2</b> 2. Insufficient solution</a></li>
+<li class="chapter" data-level="3.3.3" data-path="regularized-regression.html"><a href="regularized-regression.html#interpretability"><i class="fa fa-check"></i><b>3.3.3</b> 3. Interpretability</a></li>
+<li class="chapter" data-level="3.3.4" data-path="regularized-regression.html"><a href="regularized-regression.html#regularized_regress"><i class="fa fa-check"></i><b>3.3.4</b> Regularized Models</a><ul>
+<li class="chapter" data-level="3.3.4.1" data-path="regularized-regression.html"><a href="regularized-regression.html#ridge"><i class="fa fa-check"></i><b>3.3.4.1</b> Ridge penalty</a></li>
+<li class="chapter" data-level="3.3.4.2" data-path="regularized-regression.html"><a href="regularized-regression.html#lasso"><i class="fa fa-check"></i><b>3.3.4.2</b> Lasso penalty</a></li>
+<li class="chapter" data-level="3.3.4.3" data-path="regularized-regression.html"><a href="regularized-regression.html#elastic"><i class="fa fa-check"></i><b>3.3.4.3</b> Elastic nets</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3.5" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-tuning"><i class="fa fa-check"></i><b>3.3.5</b> Tuning</a></li>
+<li class="chapter" data-level="3.3.6" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-pkg-implementation"><i class="fa fa-check"></i><b>3.3.6</b> Package implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-regression"><i class="fa fa-check"></i><b>3.4</b> Implementation: Regression</a><ul>
+<li class="chapter" data-level="3.4.1" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-glm-glmnet"><i class="fa fa-check"></i><b>3.4.1</b> <code>glmnet</code></a><ul>
+<li class="chapter" data-level="3.4.1.1" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-glmnet-basic"><i class="fa fa-check"></i><b>3.4.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.4.1.2" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-glmnet-tune"><i class="fa fa-check"></i><b>3.4.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.4.1.3" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-glmnet-visualizing"><i class="fa fa-check"></i><b>3.4.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="3.4.1.4" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-glmnet-predict"><i class="fa fa-check"></i><b>3.4.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4.2" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-regularize-h2o"><i class="fa fa-check"></i><b>3.4.2</b> <code>h2o</code></a><ul>
+<li class="chapter" data-level="3.4.2.1" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-h2o-basic"><i class="fa fa-check"></i><b>3.4.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.4.2.2" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-h2o-tune"><i class="fa fa-check"></i><b>3.4.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.4.2.3" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-h2o-viz"><i class="fa fa-check"></i><b>3.4.2.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="3.4.2.4" data-path="regularized-regression.html"><a href="regularized-regression.html#regression-h2o-predict"><i class="fa fa-check"></i><b>3.4.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.5" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-binary-classification"><i class="fa fa-check"></i><b>3.5</b> Implementation: Binary Classification</a><ul>
+<li class="chapter" data-level="3.5.1" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binary-glm-glmnet"><i class="fa fa-check"></i><b>3.5.1</b> <code>glmnet</code></a><ul>
+<li class="chapter" data-level="3.5.1.1" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binary-glmnet-basic"><i class="fa fa-check"></i><b>3.5.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.5.1.2" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binaryglmnet-tune"><i class="fa fa-check"></i><b>3.5.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.5.1.3" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binary-glmnet-visualizing"><i class="fa fa-check"></i><b>3.5.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="3.5.1.4" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binary-glmnet-predict"><i class="fa fa-check"></i><b>3.5.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="3.5.2" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-binaryglm-h2o"><i class="fa fa-check"></i><b>3.5.2</b> <code>h2o</code></a><ul>
+<li class="chapter" data-level="3.5.2.1" data-path="regularized-regression.html"><a href="regularized-regression.html#h2o-glm-classification-binary-basic"><i class="fa fa-check"></i><b>3.5.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.5.2.2" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-binary-tune"><i class="fa fa-check"></i><b>3.5.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.5.2.3" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-binary-viz"><i class="fa fa-check"></i><b>3.5.2.3</b> Visual Interpretation</a></li>
+<li class="chapter" data-level="3.5.2.4" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-binary-predict"><i class="fa fa-check"></i><b>3.5.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-multinomial-classification"><i class="fa fa-check"></i><b>3.6</b> Implementation: Multinomial Classification</a><ul>
+<li class="chapter" data-level="3.6.1" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multi-glm-glmnet"><i class="fa fa-check"></i><b>3.6.1</b> <code>glmnet</code></a><ul>
+<li class="chapter" data-level="3.6.1.1" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multi-glmnet-basic"><i class="fa fa-check"></i><b>3.6.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.6.1.2" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multi-glmnet-tune"><i class="fa fa-check"></i><b>3.6.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.6.1.3" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multi-glmnet-visualizing"><i class="fa fa-check"></i><b>3.6.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="3.6.1.4" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multi-glmnet-predict"><i class="fa fa-check"></i><b>3.6.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6.2" data-path="regularized-regression.html"><a href="regularized-regression.html#classification-multinomial-glm-h2o"><i class="fa fa-check"></i><b>3.6.2</b> <code>h2o</code></a><ul>
+<li class="chapter" data-level="3.6.2.1" data-path="regularized-regression.html"><a href="regularized-regression.html#h2o-glm-classification-multinomial-basic"><i class="fa fa-check"></i><b>3.6.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="3.6.2.2" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-multinomial-tune"><i class="fa fa-check"></i><b>3.6.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="3.6.2.3" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-multinomial-viz"><i class="fa fa-check"></i><b>3.6.2.3</b> Visual Interpretation</a></li>
+<li class="chapter" data-level="3.6.2.4" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-h2o-classification-multinomial-predict"><i class="fa fa-check"></i><b>3.6.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3.7" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-learning"><i class="fa fa-check"></i><b>3.7</b> Learning More</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
@@ -160,7 +242,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>De Cock, Dean. 2011. “Ames, Iowa: Alternative to the Boston Housing Data as an End of Semester Regression Project.” <em>Journal of Statistics Education</em> 19 (3). Taylor &amp; Francis.</p>
 </div>
 <div>
+<p>Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2001. <em>The Elements of Statistical Learning</em>. Vol. 1. 10. Springer series in statistics New York, NY, USA:</p>
+</div>
+<div>
+<p>———. 2010. <em>Regularization Paths for Generalized Linear Models via Coordinate Descent</em>. <em>Journal of Statistical Software</em>. Vol. 33. <a href="http://www.jstatsoft.org/v33/i01/" class="uri">http://www.jstatsoft.org/v33/i01/</a>.</p>
+</div>
+<div>
+<p>Goodfellow, Ian, Yoshua Bengio, Aaron Courville, and Yoshua Bengio. 2016. <em>Deep Learning</em>. Vol. 1. MIT press Cambridge.</p>
+</div>
+<div>
+<p>Hoerl, Arthur E, and Robert W Kennard. 1970. “Ridge Regression: Biased Estimation for Nonorthogonal Problems.” <em>Technometrics</em> 12 (1). Taylor &amp; Francis Group: 55–67.</p>
+</div>
+<div>
+<p>Kraljevic, Tom. 2018. <em>H2o: R Interface for ’H2o’</em>. <a href="https://CRAN.R-project.org/package=h2o" class="uri">https://CRAN.R-project.org/package=h2o</a>.</p>
+</div>
+<div>
+<p>Kuhn, Max. 2017. <em>AmesHousing: The Ames Iowa Housing Data</em>. <a href="https://CRAN.R-project.org/package=AmesHousing" class="uri">https://CRAN.R-project.org/package=AmesHousing</a>.</p>
+</div>
+<div>
 <p>Kuhn, Max, and Kjell Johnson. 2013. <em>Applied Predictive Modeling</em>. Vol. 26. Springer.</p>
+</div>
+<div>
+<p>Kuhn, Max, and Hadley Wickham. 2017. <em>Rsample: General Resampling Infrastructure</em>. <a href="https://CRAN.R-project.org/package=rsample" class="uri">https://CRAN.R-project.org/package=rsample</a>.</p>
 </div>
 <div>
 <p>LeCun, Yann, Bernhard E Boser, John S Denker, Donnie Henderson, Richard E Howard, Wayne E Hubbard, and Lawrence D Jackel. 1990. “Handwritten Digit Recognition with a Back-Propagation Network.” In <em>Advances in Neural Information Processing Systems</em>, 396–404.</p>
@@ -169,19 +272,38 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>LeCun, Yann, Léon Bottou, Yoshua Bengio, and Patrick Haffner. 1998. “Gradient-Based Learning Applied to Document Recognition.” <em>Proceedings of the IEEE</em> 86 (11). IEEE: 2278–2324.</p>
 </div>
 <div>
+<p>Myers, Raymond H. 1990. “Classical and Modern Regression with Applications.”</p>
+</div>
+<div>
+<p>Tibshirani, Robert. 1996. “Regression Shrinkage and Selection via the Lasso.” <em>Journal of the Royal Statistical Society. Series B (Methodological)</em>. JSTOR, 267–88.</p>
+</div>
+<div>
 <p>Wickham, Hadley. 2014. <em>Advanced R</em>. Chapman; Hall/CRC.</p>
 </div>
 <div>
 <p>Wickham, Hadley, and Garrett Grolemund. 2016. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. “ O’Reilly Media, Inc.”</p>
 </div>
+<div>
+<p>Zheng, Alice, and Amanda Casari. 2018. <em>Feature Engineering for Machine Learning: Principles and Techniques for Data Scientists</em>. “ O’Reilly Media, Inc.”</p>
+</div>
+<div>
+<p>Zou, Hui, and Trevor Hastie. 2005. “Regularization and Variable Selection via the Elastic Net.” <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 67 (2). Wiley Online Library: 301–20.</p>
 </div>
 </div>
+</div>
+
+
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="introduction.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="regularized-regression.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
     </div>
   </div>
