@@ -30,19 +30,19 @@ h2o.init()
 ## H2O is not running yet, starting it now...
 ## 
 ## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp1Kquos/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp1Kquos/h2o_bradboehmke_started_from_r.err
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp0ENAPo/h2o_bradboehmke_started_from_r.out
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp0ENAPo/h2o_bradboehmke_started_from_r.err
 ## 
 ## 
 ## Starting H2O JVM and connecting: .. Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 254 milliseconds 
+##     H2O cluster uptime:         2 seconds 750 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    1 month and 29 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_zuy007 
+##     H2O cluster version age:    2 months and 8 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_cki800 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   1.78 GB 
 ##     H2O cluster total cores:    4 
@@ -53,7 +53,7 @@ h2o.init()
 ##     H2O Connection proxy:       NA 
 ##     H2O Internal Security:      FALSE 
 ##     H2O API Extensions:         XGBoost, Algos, AutoML, Core V3, Core V4 
-##     R Version:                  R version 3.5.0 (2018-04-23)
+##     R Version:                  R version 3.5.1 (2018-07-02)
 ```
 
 To illustrate some of the concepts, we will use the Ames Housing data and employee attrition data introduced in Chapter \@ref(intro).  Throughout this book, I'll demonstrate approaches with regular data frames.  However, since many of the supervised machine learning chapters leverage the __h2o__ package, we'll also show how to do some of the tasks with H2O objects.  This requires your data to be in an H2O object, which you can convert any data frame easily with `as.h2o`.  

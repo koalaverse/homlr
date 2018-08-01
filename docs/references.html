@@ -24,14 +24,14 @@
 
 
 
-<meta name="date" content="2018-07-23">
+<meta name="date" content="2018-08-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="regularized-regression.html">
+<link rel="prev" href="random-forest.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -213,6 +213,58 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="3.7" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-learning"><i class="fa fa-check"></i><b>3.7</b> Learning More</a></li>
 </ul></li>
+<li class="chapter" data-level="4" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>4</b> Random Forest</a><ul>
+<li class="chapter" data-level="4.1" data-path="random-forest.html"><a href="random-forest.html#rf-requirements"><i class="fa fa-check"></i><b>4.1</b> Prerequisites</a></li>
+<li class="chapter" data-level="4.2" data-path="random-forest.html"><a href="random-forest.html#rf-proscons"><i class="fa fa-check"></i><b>4.2</b> Advantages &amp; Disadvantages</a></li>
+<li class="chapter" data-level="4.3" data-path="random-forest.html"><a href="random-forest.html#rf-idea"><i class="fa fa-check"></i><b>4.3</b> The Idea</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="random-forest.html"><a href="random-forest.html#rf-oob"><i class="fa fa-check"></i><b>4.3.1</b> OOB error vs. test set error</a></li>
+<li class="chapter" data-level="4.3.2" data-path="random-forest.html"><a href="random-forest.html#rf-tune"><i class="fa fa-check"></i><b>4.3.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.3.3" data-path="random-forest.html"><a href="random-forest.html#rf-pkgs"><i class="fa fa-check"></i><b>4.3.3</b> Package implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="random-forest.html"><a href="random-forest.html#rf-regression"><i class="fa fa-check"></i><b>4.4</b> Implementation: Regression</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="random-forest.html"><a href="random-forest.html#ranger-regression"><i class="fa fa-check"></i><b>4.4.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.4.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-basic"><i class="fa fa-check"></i><b>4.4.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.4.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-tune"><i class="fa fa-check"></i><b>4.4.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.4.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-viz"><i class="fa fa-check"></i><b>4.4.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.4.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-predic"><i class="fa fa-check"></i><b>4.4.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-regression"><i class="fa fa-check"></i><b>4.4.2</b> <code>h20</code></a><ul>
+<li class="chapter" data-level="4.4.2.1" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-basic"><i class="fa fa-check"></i><b>4.4.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.4.2.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-tune"><i class="fa fa-check"></i><b>4.4.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.4.2.3" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-viz"><i class="fa fa-check"></i><b>4.4.2.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.4.2.4" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-predict"><i class="fa fa-check"></i><b>4.4.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="random-forest.html"><a href="random-forest.html#rf-binary-classification"><i class="fa fa-check"></i><b>4.5</b> Implementation: Binary Classification</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification"><i class="fa fa-check"></i><b>4.5.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.5.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-binary-classification-basic"><i class="fa fa-check"></i><b>4.5.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.5.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-tune"><i class="fa fa-check"></i><b>4.5.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.5.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-viz"><i class="fa fa-check"></i><b>4.5.1.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.5.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-predict"><i class="fa fa-check"></i><b>4.5.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification"><i class="fa fa-check"></i><b>4.5.2</b> <code>h20</code></a><ul>
+<li class="chapter" data-level="4.5.2.1" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-basic"><i class="fa fa-check"></i><b>4.5.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.5.2.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-multi-classification-tune"><i class="fa fa-check"></i><b>4.5.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.5.2.3" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-viz"><i class="fa fa-check"></i><b>4.5.2.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.5.2.4" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-predict"><i class="fa fa-check"></i><b>4.5.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="random-forest.html"><a href="random-forest.html#rf-multi"><i class="fa fa-check"></i><b>4.6</b> Implementation: Multinomial Classification</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="random-forest.html"><a href="random-forest.html#rf-ranger-multi"><i class="fa fa-check"></i><b>4.6.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.6.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-basic"><i class="fa fa-check"></i><b>4.6.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.6.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-tune"><i class="fa fa-check"></i><b>4.6.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.6.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-viz"><i class="fa fa-check"></i><b>4.6.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.6.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-predict"><i class="fa fa-check"></i><b>4.6.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi"><i class="fa fa-check"></i><b>4.6.2</b> <code>h2o</code></a><ul>
+<li class="chapter" data-level="4.6.2.1" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-basic"><i class="fa fa-check"></i><b>4.6.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.6.2.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-tune"><i class="fa fa-check"></i><b>4.6.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.6.2.3" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-viz"><i class="fa fa-check"></i><b>4.6.2.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.6.2.4" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-predict"><i class="fa fa-check"></i><b>4.6.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="random-forest.html"><a href="random-forest.html#rf-learn"><i class="fa fa-check"></i><b>4.7</b> Learning More</a></li>
+</ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
 
@@ -248,7 +300,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>———. 2010. <em>Regularization Paths for Generalized Linear Models via Coordinate Descent</em>. <em>Journal of Statistical Software</em>. Vol. 33. <a href="http://www.jstatsoft.org/v33/i01/" class="uri">http://www.jstatsoft.org/v33/i01/</a>.</p>
 </div>
 <div>
+<p>Goldstein, Alex, Adam Kapelner, Justin Bleich, and Emil Pitkin. 2015. “Peeking Inside the Black Box: Visualizing Statistical Learning with Plots of Individual Conditional Expectation.” <em>Journal of Computational and Graphical Statistics</em> 24 (1). Taylor &amp; Francis: 44–65.</p>
+</div>
+<div>
 <p>Goodfellow, Ian, Yoshua Bengio, Aaron Courville, and Yoshua Bengio. 2016. <em>Deep Learning</em>. Vol. 1. MIT press Cambridge.</p>
+</div>
+<div>
+<p>Harrison Jr, David, and Daniel L Rubinfeld. 1978. “Hedonic Housing Prices and the Demand for Clean Air.” <em>Journal of Environmental Economics and Management</em> 5 (1). Elsevier: 81–102.</p>
 </div>
 <div>
 <p>Hoerl, Arthur E, and Robert W Kennard. 1970. “Ridge Regression: Biased Estimation for Nonorthogonal Problems.” <em>Technometrics</em> 12 (1). Taylor &amp; Francis Group: 55–67.</p>
@@ -284,6 +342,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Wickham, Hadley, and Garrett Grolemund. 2016. <em>R for Data Science: Import, Tidy, Transform, Visualize, and Model Data</em>. “ O’Reilly Media, Inc.”</p>
 </div>
 <div>
+<p>Wright, Marvin N., and Andreas Ziegler. 2017. “ranger: A Fast Implementation of Random Forests for High Dimensional Data in C++ and R.” <em>Journal of Statistical Software</em> 77 (1): 1–17. doi:<a href="https://doi.org/10.18637/jss.v077.i01">10.18637/jss.v077.i01</a>.</p>
+</div>
+<div>
 <p>Zheng, Alice, and Amanda Casari. 2018. <em>Feature Engineering for Machine Learning: Principles and Techniques for Data Scientists</em>. “ O’Reilly Media, Inc.”</p>
 </div>
 <div>
@@ -298,12 +359,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 
 
+
+
+
+
+
             </section>
 
           </div>
         </div>
       </div>
-<a href="regularized-regression.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="random-forest.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 
     </div>
   </div>

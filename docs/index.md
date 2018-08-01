@@ -1,6 +1,6 @@
 --- 
 title: "Hands-on Machine Learning with R"
-date: "2018-07-23"
+date: "2018-08-01"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -121,30 +121,30 @@ pkgs <- c(
 devtools::session_info(pkgs)
 #> Session info -------------------------------------------------------------
 #>  setting  value                       
-#>  version  R version 3.5.0 (2018-04-23)
+#>  version  R version 3.5.1 (2018-07-02)
 #>  system   x86_64, darwin15.6.0        
 #>  ui       X11                         
 #>  language (EN)                        
 #>  collate  en_US.UTF-8                 
 #>  tz       America/New_York            
-#>  date     2018-07-23
+#>  date     2018-08-01
 #> Packages -----------------------------------------------------------------
 #>  package      * version    date       source                         
 #>  abind          1.4-5      2016-07-21 CRAN (R 3.5.0)                 
 #>  AmesHousing    0.0.3      2017-12-17 CRAN (R 3.5.0)                 
 #>  assertthat     0.2.0      2017-04-11 CRAN (R 3.5.0)                 
+#>  backports      1.1.2      2017-12-13 CRAN (R 3.5.0)                 
 #>  BH             1.66.0-1   2018-02-13 CRAN (R 3.5.0)                 
 #>  bindr          0.1.1      2018-03-13 CRAN (R 3.5.0)                 
 #>  bindrcpp       0.2.2      2018-03-29 CRAN (R 3.5.0)                 
 #>  bitops         1.0-6      2013-08-17 CRAN (R 3.5.0)                 
-#>  broom          0.4.4      2018-03-29 CRAN (R 3.5.0)                 
+#>  broom          0.5.0      2018-07-17 CRAN (R 3.5.0)                 
 #>  caret          6.0-80     2018-05-26 CRAN (R 3.5.0)                 
 #>  caTools        1.17.1     2014-09-10 CRAN (R 3.5.0)                 
-#>  class          7.3-14     2015-08-30 CRAN (R 3.5.0)                 
+#>  class          7.3-14     2015-08-30 CRAN (R 3.5.1)                 
 #>  cli            1.0.0      2017-11-05 CRAN (R 3.5.0)                 
-#>  codetools      0.2-15     2016-10-05 CRAN (R 3.5.0)                 
+#>  codetools      0.2-15     2016-10-05 CRAN (R 3.5.1)                 
 #>  colorspace     1.3-2      2016-12-14 CRAN (R 3.5.0)                 
-#>  compiler       3.5.0      2018-04-24 local                          
 #>  crayon         1.3.4      2017-09-16 CRAN (R 3.5.0)                 
 #>  CVST           0.2-2      2018-05-26 CRAN (R 3.5.0)                 
 #>  data.table     1.11.4     2018-05-27 CRAN (R 3.5.0)                 
@@ -153,20 +153,20 @@ devtools::session_info(pkgs)
 #>  dichromat      2.0-0      2013-01-24 CRAN (R 3.5.0)                 
 #>  digest         0.6.15     2018-01-28 CRAN (R 3.5.0)                 
 #>  dimRed         0.1.0      2017-05-04 CRAN (R 3.5.0)                 
-#>  dplyr          0.7.5      2018-05-19 CRAN (R 3.5.0)                 
+#>  dplyr          0.7.6      2018-06-29 cran (@0.7.6)                  
 #>  DRR            0.0.3      2018-01-06 CRAN (R 3.5.0)                 
+#>  fansi          0.2.3      2018-05-06 cran (@0.2.3)                  
 #>  foreach        1.4.4      2017-12-12 CRAN (R 3.5.0)                 
-#>  foreign        0.8-70     2017-11-28 CRAN (R 3.5.0)                 
 #>  gdata          2.18.0     2017-06-06 CRAN (R 3.5.0)                 
 #>  geometry       0.3-6      2015-09-09 CRAN (R 3.5.0)                 
-#>  ggplot2        2.2.1      2016-12-30 CRAN (R 3.5.0)                 
+#>  ggplot2        3.0.0      2018-07-03 CRAN (R 3.5.0)                 
 #>  glmnet         2.0-16     2018-04-02 CRAN (R 3.5.0)                 
-#>  glue           1.2.0.9000 2018-07-04 Github (tidyverse/glue@a2c0f8b)
+#>  glue           1.3.0      2018-07-23 Github (tidyverse/glue@66de125)
 #>  gower          0.1.2      2017-02-23 CRAN (R 3.5.0)                 
 #>  gplots         3.0.1      2016-03-30 CRAN (R 3.5.0)                 
-#>  graphics     * 3.5.0      2018-04-24 local                          
-#>  grDevices    * 3.5.0      2018-04-24 local                          
-#>  grid           3.5.0      2018-04-24 local                          
+#>  graphics     * 3.5.1      2018-07-05 local                          
+#>  grDevices    * 3.5.1      2018-07-05 local                          
+#>  grid           3.5.1      2018-07-05 local                          
 #>  gtable         0.2.0      2016-02-26 CRAN (R 3.5.0)                 
 #>  gtools         3.5.0      2015-05-29 CRAN (R 3.5.0)                 
 #>  h2o            3.18.0.11  2018-05-24 CRAN (R 3.5.0)                 
@@ -174,31 +174,29 @@ devtools::session_info(pkgs)
 #>  iterators      1.0.9      2017-12-12 CRAN (R 3.5.0)                 
 #>  jsonlite       1.5        2017-06-01 CRAN (R 3.5.0)                 
 #>  kernlab        0.9-26     2018-04-30 CRAN (R 3.5.0)                 
-#>  KernSmooth     2.23-15    2015-06-29 CRAN (R 3.5.0)                 
+#>  KernSmooth     2.23-15    2015-06-29 CRAN (R 3.5.1)                 
 #>  labeling       0.3        2014-08-23 CRAN (R 3.5.0)                 
-#>  lattice        0.20-35    2017-03-25 CRAN (R 3.5.0)                 
+#>  lattice        0.20-35    2017-03-25 CRAN (R 3.5.1)                 
 #>  lava           1.6.1      2018-03-28 CRAN (R 3.5.0)                 
 #>  lazyeval       0.2.1      2017-10-29 CRAN (R 3.5.0)                 
 #>  lubridate      1.7.4      2018-04-11 CRAN (R 3.5.0)                 
 #>  magic          1.5-8      2018-01-26 CRAN (R 3.5.0)                 
 #>  magrittr       1.5        2014-11-22 CRAN (R 3.5.0)                 
-#>  MASS           7.3-49     2018-02-23 CRAN (R 3.5.0)                 
-#>  Matrix         1.2-14     2018-04-13 CRAN (R 3.5.0)                 
-#>  methods      * 3.5.0      2018-04-24 local                          
-#>  mnormt         1.5-5      2016-10-15 CRAN (R 3.5.0)                 
+#>  MASS           7.3-50     2018-04-30 CRAN (R 3.5.1)                 
+#>  Matrix         1.2-14     2018-04-13 CRAN (R 3.5.1)                 
+#>  methods      * 3.5.1      2018-07-05 local                          
+#>  mgcv           1.8-24     2018-06-23 CRAN (R 3.5.1)                 
 #>  ModelMetrics   1.1.0      2016-08-26 CRAN (R 3.5.0)                 
 #>  munsell        0.4.3      2016-02-13 CRAN (R 3.5.0)                 
-#>  nlme           3.1-137    2018-04-07 CRAN (R 3.5.0)                 
-#>  nnet           7.3-12     2016-02-02 CRAN (R 3.5.0)                 
+#>  nlme           3.1-137    2018-04-07 CRAN (R 3.5.1)                 
+#>  nnet           7.3-12     2016-02-02 CRAN (R 3.5.1)                 
 #>  numDeriv       2016.8-1   2016-08-27 CRAN (R 3.5.0)                 
-#>  parallel       3.5.0      2018-04-24 local                          
-#>  pillar         1.2.3      2018-05-25 CRAN (R 3.5.0)                 
+#>  pillar         1.3.0      2018-07-14 cran (@1.3.0)                  
 #>  pkgconfig      2.0.1      2017-03-21 CRAN (R 3.5.0)                 
 #>  plogr          0.2.0      2018-03-25 CRAN (R 3.5.0)                 
 #>  plyr           1.8.4      2016-06-08 CRAN (R 3.5.0)                 
 #>  pROC           1.12.1     2018-05-06 CRAN (R 3.5.0)                 
 #>  prodlim        2018.04.18 2018-04-18 CRAN (R 3.5.0)                 
-#>  psych          1.8.4      2018-05-06 CRAN (R 3.5.0)                 
 #>  purrr          0.2.5      2018-05-29 CRAN (R 3.5.0)                 
 #>  R6             2.2.2      2017-06-17 CRAN (R 3.5.0)                 
 #>  RColorBrewer   1.1-2      2014-12-07 CRAN (R 3.5.0)                 
@@ -210,24 +208,24 @@ devtools::session_info(pkgs)
 #>  rlang          0.2.1      2018-05-30 CRAN (R 3.5.0)                 
 #>  robustbase     0.93-0     2018-04-24 CRAN (R 3.5.0)                 
 #>  ROCR           1.0-7      2015-03-26 CRAN (R 3.5.0)                 
-#>  rpart          4.1-13     2018-02-23 CRAN (R 3.5.0)                 
+#>  rpart          4.1-13     2018-02-23 CRAN (R 3.5.1)                 
 #>  rsample        0.0.2      2017-11-12 CRAN (R 3.5.0)                 
 #>  scales         0.5.0      2017-08-24 CRAN (R 3.5.0)                 
 #>  sfsmisc        1.1-2      2018-03-05 CRAN (R 3.5.0)                 
-#>  splines        3.5.0      2018-04-24 local                          
+#>  splines        3.5.1      2018-07-05 local                          
 #>  SQUAREM        2017.10-1  2017-10-07 CRAN (R 3.5.0)                 
-#>  stats        * 3.5.0      2018-04-24 local                          
-#>  stats4         3.5.0      2018-04-24 local                          
-#>  stringi        1.2.2      2018-05-02 CRAN (R 3.5.0)                 
+#>  stats        * 3.5.1      2018-07-05 local                          
+#>  stats4         3.5.1      2018-07-05 local                          
+#>  stringi        1.2.4      2018-07-20 cran (@1.2.4)                  
 #>  stringr        1.3.1      2018-05-10 CRAN (R 3.5.0)                 
-#>  survival       2.41-3     2017-04-04 CRAN (R 3.5.0)                 
+#>  survival       2.42-3     2018-04-16 CRAN (R 3.5.1)                 
 #>  tibble         1.4.2      2018-01-22 CRAN (R 3.5.0)                 
 #>  tidyr          0.8.1      2018-05-18 CRAN (R 3.5.0)                 
 #>  tidyselect     0.2.4      2018-02-26 CRAN (R 3.5.0)                 
 #>  timeDate       3043.102   2018-02-21 CRAN (R 3.5.0)                 
-#>  tools          3.5.0      2018-04-24 local                          
+#>  tools          3.5.1      2018-07-05 local                          
 #>  utf8           1.1.4      2018-05-24 CRAN (R 3.5.0)                 
-#>  utils        * 3.5.0      2018-04-24 local                          
+#>  utils        * 3.5.1      2018-07-05 local                          
 #>  viridisLite    0.3.0      2018-02-01 CRAN (R 3.5.0)                 
 #>  withr          2.1.2      2018-03-15 CRAN (R 3.5.0)
 ```

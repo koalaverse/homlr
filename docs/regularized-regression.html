@@ -24,7 +24,7 @@
 
 
 
-<meta name="date" content="2018-07-23">
+<meta name="date" content="2018-08-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -32,7 +32,7 @@
   
   
 <link rel="prev" href="regression-performance.html">
-<link rel="next" href="references.html">
+<link rel="next" href="random-forest.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -212,6 +212,58 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="3.7" data-path="regularized-regression.html"><a href="regularized-regression.html#glm-learning"><i class="fa fa-check"></i><b>3.7</b> Learning More</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>4</b> Random Forest</a><ul>
+<li class="chapter" data-level="4.1" data-path="random-forest.html"><a href="random-forest.html#rf-requirements"><i class="fa fa-check"></i><b>4.1</b> Prerequisites</a></li>
+<li class="chapter" data-level="4.2" data-path="random-forest.html"><a href="random-forest.html#rf-proscons"><i class="fa fa-check"></i><b>4.2</b> Advantages &amp; Disadvantages</a></li>
+<li class="chapter" data-level="4.3" data-path="random-forest.html"><a href="random-forest.html#rf-idea"><i class="fa fa-check"></i><b>4.3</b> The Idea</a><ul>
+<li class="chapter" data-level="4.3.1" data-path="random-forest.html"><a href="random-forest.html#rf-oob"><i class="fa fa-check"></i><b>4.3.1</b> OOB error vs. test set error</a></li>
+<li class="chapter" data-level="4.3.2" data-path="random-forest.html"><a href="random-forest.html#rf-tune"><i class="fa fa-check"></i><b>4.3.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.3.3" data-path="random-forest.html"><a href="random-forest.html#rf-pkgs"><i class="fa fa-check"></i><b>4.3.3</b> Package implementation</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="random-forest.html"><a href="random-forest.html#rf-regression"><i class="fa fa-check"></i><b>4.4</b> Implementation: Regression</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="random-forest.html"><a href="random-forest.html#ranger-regression"><i class="fa fa-check"></i><b>4.4.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.4.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-basic"><i class="fa fa-check"></i><b>4.4.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.4.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-tune"><i class="fa fa-check"></i><b>4.4.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.4.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-viz"><i class="fa fa-check"></i><b>4.4.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.4.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-regression-predic"><i class="fa fa-check"></i><b>4.4.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.4.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-regression"><i class="fa fa-check"></i><b>4.4.2</b> <code>h20</code></a><ul>
+<li class="chapter" data-level="4.4.2.1" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-basic"><i class="fa fa-check"></i><b>4.4.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.4.2.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-tune"><i class="fa fa-check"></i><b>4.4.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.4.2.3" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-viz"><i class="fa fa-check"></i><b>4.4.2.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.4.2.4" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-regression-predict"><i class="fa fa-check"></i><b>4.4.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.5" data-path="random-forest.html"><a href="random-forest.html#rf-binary-classification"><i class="fa fa-check"></i><b>4.5</b> Implementation: Binary Classification</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification"><i class="fa fa-check"></i><b>4.5.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.5.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-binary-classification-basic"><i class="fa fa-check"></i><b>4.5.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.5.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-tune"><i class="fa fa-check"></i><b>4.5.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.5.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-viz"><i class="fa fa-check"></i><b>4.5.1.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.5.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-rf-binary-classification-predict"><i class="fa fa-check"></i><b>4.5.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.5.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification"><i class="fa fa-check"></i><b>4.5.2</b> <code>h20</code></a><ul>
+<li class="chapter" data-level="4.5.2.1" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-basic"><i class="fa fa-check"></i><b>4.5.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.5.2.2" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-multi-classification-tune"><i class="fa fa-check"></i><b>4.5.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.5.2.3" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-viz"><i class="fa fa-check"></i><b>4.5.2.3</b> Visualizing results</a></li>
+<li class="chapter" data-level="4.5.2.4" data-path="random-forest.html"><a href="random-forest.html#h2o-rf-binary-classification-predict"><i class="fa fa-check"></i><b>4.5.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="random-forest.html"><a href="random-forest.html#rf-multi"><i class="fa fa-check"></i><b>4.6</b> Implementation: Multinomial Classification</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="random-forest.html"><a href="random-forest.html#rf-ranger-multi"><i class="fa fa-check"></i><b>4.6.1</b> <code>ranger</code></a><ul>
+<li class="chapter" data-level="4.6.1.1" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-basic"><i class="fa fa-check"></i><b>4.6.1.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.6.1.2" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-tune"><i class="fa fa-check"></i><b>4.6.1.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.6.1.3" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-viz"><i class="fa fa-check"></i><b>4.6.1.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.6.1.4" data-path="random-forest.html"><a href="random-forest.html#ranger-multi-predict"><i class="fa fa-check"></i><b>4.6.1.4</b> Predicting</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi"><i class="fa fa-check"></i><b>4.6.2</b> <code>h2o</code></a><ul>
+<li class="chapter" data-level="4.6.2.1" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-basic"><i class="fa fa-check"></i><b>4.6.2.1</b> Basic implementation</a></li>
+<li class="chapter" data-level="4.6.2.2" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-tune"><i class="fa fa-check"></i><b>4.6.2.2</b> Tuning</a></li>
+<li class="chapter" data-level="4.6.2.3" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-viz"><i class="fa fa-check"></i><b>4.6.2.3</b> Visual interpretation</a></li>
+<li class="chapter" data-level="4.6.2.4" data-path="random-forest.html"><a href="random-forest.html#rf-h2o-multi-predict"><i class="fa fa-check"></i><b>4.6.2.4</b> Predicting</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4.7" data-path="random-forest.html"><a href="random-forest.html#rf-learn"><i class="fa fa-check"></i><b>4.7</b> Learning More</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 </ul>
@@ -735,18 +787,18 @@ caret<span class="op">::</span><span class="kw">RMSE</span>(<span class="kw">exp
 ## H2O is not running yet, starting it now...
 ## 
 ## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpypM9G9/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpypM9G9/h2o_bradboehmke_started_from_r.err
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpDYDdAT/h2o_bradboehmke_started_from_r.out
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpDYDdAT/h2o_bradboehmke_started_from_r.err
 ## 
 ## 
 ## Starting H2O JVM and connecting: .. Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 250 milliseconds 
+##     H2O cluster uptime:         2 seconds 373 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    1 month and 29 days  
+##     H2O cluster version age:    2 months and 8 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   4.44 GB 
@@ -758,7 +810,7 @@ caret<span class="op">::</span><span class="kw">RMSE</span>(<span class="kw">exp
 ##     H2O Connection proxy:       NA 
 ##     H2O Internal Security:      FALSE 
 ##     H2O API Extensions:         XGBoost, Algos, AutoML, Core V3, Core V4 
-##     R Version:                  R version 3.5.0 (2018-04-23)</code></pre>
+##     R Version:                  R version 3.5.1 (2018-07-02)</code></pre>
 <p>Next, we do not need to one-hot encode or standardize our variables as <strong>h2o</strong> will do this for us. However, we do want to normalize our response variable due to its skewness and then convert our training and test data to <strong>h2o</strong> objects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># convert training data to h2o object</span>
 train_h2o &lt;-<span class="st"> </span>ames_train <span class="op">%&gt;%</span>
@@ -1479,11 +1531,11 @@ The <code>positive</code> argument allows you to specify which value corresponds
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 14 milliseconds 
+##     H2O cluster uptime:         3 seconds 259 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    1 month and 29 days  
+##     H2O cluster version age:    2 months and 8 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   4.44 GB 
@@ -1495,7 +1547,7 @@ The <code>positive</code> argument allows you to specify which value corresponds
 ##     H2O Connection proxy:       NA 
 ##     H2O Internal Security:      FALSE 
 ##     H2O API Extensions:         XGBoost, Algos, AutoML, Core V3, Core V4 
-##     R Version:                  R version 3.5.0 (2018-04-23)</code></pre></div>
+##     R Version:                  R version 3.5.1 (2018-07-02)</code></pre></div>
 <p>Next, we do not need to one-hot encode or standardize our variables as <strong>h2o</strong> will do this for us. However, we do need to convert our training and test data to <strong>h2o</strong> objects.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create training and testing sets</span>
 <span class="kw">set.seed</span>(<span class="dv">123</span>)
@@ -2164,11 +2216,11 @@ pred_class &lt;-<span class="st"> </span><span class="kw">predict</span>(elastic
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 545 milliseconds 
+##     H2O cluster uptime:         3 seconds 820 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    1 month and 29 days  
+##     H2O cluster version age:    2 months and 8 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   4.44 GB 
@@ -2180,7 +2232,7 @@ pred_class &lt;-<span class="st"> </span><span class="kw">predict</span>(elastic
 ##     H2O Connection proxy:       NA 
 ##     H2O Internal Security:      FALSE 
 ##     H2O API Extensions:         XGBoost, Algos, AutoML, Core V3, Core V4 
-##     R Version:                  R version 3.5.0 (2018-04-23)</code></pre></div>
+##     R Version:                  R version 3.5.1 (2018-07-02)</code></pre></div>
 <p>Since our data is already split into a training test set, to prepare for modeling, we just need to convert our training and test data to <strong>h2o</strong> objects and identify the response and predictor variables.</p>
 <div class="rmdwarning">
 <p>
@@ -2505,7 +2557,7 @@ pred &lt;-<span class="st"> </span><span class="kw">h2o.predict</span>(<span cla
         </div>
       </div>
 <a href="regression-performance.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="random-forest.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
