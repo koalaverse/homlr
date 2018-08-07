@@ -609,25 +609,17 @@ To perform regularized regression with __h2o__, we first need to initiate our __
 
 
 ```
-## 
-## H2O is not running yet, starting it now...
-## 
-## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpGOvEr1/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpGOvEr1/h2o_bradboehmke_started_from_r.err
-## 
-## 
-## Starting H2O JVM and connecting: .. Connection successful!
+##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 363 milliseconds 
+##     H2O cluster uptime:         6 minutes 32 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -967,7 +959,6 @@ caret::RMSE(as.vector(exp(pred)), ames_test$Sale_Price)
 h2o.removeAll()
 ## [1] 0
 h2o.shutdown(prompt = FALSE)
-## [1] TRUE
 ```
 
 
@@ -1502,14 +1493,14 @@ h2o.init(max_mem_size = "5g")
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 203 milliseconds 
+##     H2O cluster uptime:         6 minutes 32 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -2318,14 +2309,14 @@ h2o.init(max_mem_size = "5g")
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 740 milliseconds 
+##     H2O cluster uptime:         6 minutes 33 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 

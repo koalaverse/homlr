@@ -24,7 +24,7 @@
 
 
 
-<meta name="date" content="2018-08-06">
+<meta name="date" content="2018-08-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -783,25 +783,17 @@ caret<span class="op">::</span><span class="kw">RMSE</span>(<span class="kw">exp
 <div id="regression-regularize-h2o" class="section level3">
 <h3><span class="header-section-number">3.4.2</span> <code>h2o</code></h3>
 <p>To perform regularized regression with <strong>h2o</strong>, we first need to initiate our <strong>h2o</strong> session.</p>
-<pre><code>## 
-## H2O is not running yet, starting it now...
-## 
-## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpGOvEr1/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpGOvEr1/h2o_bradboehmke_started_from_r.err
-## 
-## 
-## Starting H2O JVM and connecting: .. Connection successful!
+<pre><code>##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 363 milliseconds 
+##     H2O cluster uptime:         6 minutes 32 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -1077,8 +1069,7 @@ caret<span class="op">::</span><span class="kw">RMSE</span>(<span class="kw">as.
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># shutdown h2o</span>
 <span class="kw">h2o.removeAll</span>()
 ## [1] 0
-<span class="kw">h2o.shutdown</span>(<span class="dt">prompt =</span> <span class="ot">FALSE</span>)
-## [1] TRUE</code></pre></div>
+<span class="kw">h2o.shutdown</span>(<span class="dt">prompt =</span> <span class="ot">FALSE</span>)</code></pre></div>
 </div>
 </div>
 </div>
@@ -1531,14 +1522,14 @@ The <code>positive</code> argument allows you to specify which value corresponds
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 203 milliseconds 
+##     H2O cluster uptime:         6 minutes 32 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -2216,14 +2207,14 @@ pred_class &lt;-<span class="st"> </span><span class="kw">predict</span>(elastic
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 740 milliseconds 
+##     H2O cluster uptime:         6 minutes 33 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_fmw129 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   1.58 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 

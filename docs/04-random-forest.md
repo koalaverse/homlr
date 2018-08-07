@@ -607,8 +607,8 @@ h2o.init(max_mem_size = "5g")
 ## H2O is not running yet, starting it now...
 ## 
 ## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpF70TJP/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpF70TJP/h2o_bradboehmke_started_from_r.err
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp46ZKM1/h2o_bradboehmke_started_from_r.out
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp46ZKM1/h2o_bradboehmke_started_from_r.err
 ## 
 ## 
 ## Starting H2O JVM and connecting: .. Connection successful!
@@ -618,7 +618,7 @@ h2o.init(max_mem_size = "5g")
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
+##     H2O cluster version age:    2 months and 14 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_ply740 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   4.44 GB 
@@ -1605,14 +1605,14 @@ h2o.init(max_mem_size = "5g")
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 828 milliseconds 
+##     H2O cluster uptime:         3 seconds 514 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 13 days  
+##     H2O cluster version age:    2 months and 14 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_ply740 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.39 GB 
+##     H2O cluster total memory:   4.44 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -1699,7 +1699,7 @@ h2o.performance(m1_h2o, xval = TRUE)
 ## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
 ```
 
-The results above used all 250 trees but to make sure we are providing enough trees to stabilize the OOB error we can include automatic stopping. Also, when dealing with classification problems, if your response variable is significantly imbalanced, you can achieve additional predictive accuracy by over/under sampling.  We can over/under sample our classes to achieved balanced class counts by incorporating the `balance_classes` argument.  However, we do not achieve any performance improvement by balancing our attrition classes.
+The results above used all 250 trees but to make sure we are providing enough trees to stabilize the OOB error we can include automatic stopping. Also, when dealing with classification problems, if your response variable is significantly imbalanced, you can achieve additional predictive accuracy by over/under sampling.  We can over/under sample our classes to achieve balanced class counts by incorporating the `balance_classes` argument.  However, in this example we do not achieve any performance improvement by balancing our attrition classes.
 
 <div class="rmdnote">
 <p>You will, typically, achieve performance improvements by over/under sampling when you binary response variable has a 90/10 or worse class imbalance.</p>
@@ -2295,12 +2295,12 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 <p class="caption">(\#fig:rf-multi-classification-ranger-top10-vip)Top 25 most important variables based on impurity (left) and permutation (right).</p>
 </div>
 
-##### Partial dependence plots {ranger-multi-pdp}
+##### Partial dependence plots {#ranger-multi-pdp}
 
 After the most relevant variables have been identified, we can assess the relationship between these influential predictors and the response variable with PDP plots and ICE curves. As with the binary classification model, to generate PDPs and ICE curves we need to use the probability model (`probability = TRUE`) so that can extract the class probabilities.
 
 <div class="rmdnote">
-<p>To produce a PDP with multi-classification problems, we need to create a custom prediction function that will return a data frame of the <strong><em>mean predicted probability</em></strong> for each response class. We supply this custom prediction function</p>
+<p>To produce a PDP with multi-nomial classification problems, we need to create a custom prediction function that will return a data frame of the <strong><em>mean predicted probability</em></strong> for each response class. We supply this custom prediction function to the <code>pdp::partial</code> function call.</p>
 </div>
 
 In this example, we assess the PDP of each response category with variable `V379`, which ranked first as the most influential variable.  We can see those response categories where this variable has a large impact (stronger changes in the predicted value $\hat y$ as `V379` changes) versus those that are less influnced by this predictor (mostly flat-lined plots).
@@ -2424,16 +2424,496 @@ caret::confusionMatrix(factor(pred_class$predictions), factor(test$V785))
 
 ### `h2o` {#rf-h2o-multi}
 
+To perform regularized multinomial logistic regression with __h2o__, we first need to initiate our __h2o__ session. 
+
+
+```r
+h2o::h2o.no_progress()
+h2o.init(max_mem_size = "5g")
+##  Connection successful!
+## 
+## R is connected to the H2O cluster: 
+##     H2O cluster uptime:         5 seconds 955 milliseconds 
+##     H2O cluster timezone:       America/New_York 
+##     H2O data parsing timezone:  UTC 
+##     H2O cluster version:        3.18.0.11 
+##     H2O cluster version age:    2 months and 14 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_ply740 
+##     H2O cluster total nodes:    1 
+##     H2O cluster total memory:   4.39 GB 
+##     H2O cluster total cores:    4 
+##     H2O cluster allowed cores:  4 
+##     H2O cluster healthy:        TRUE 
+##     H2O Connection ip:          localhost 
+##     H2O Connection port:        54321 
+##     H2O Connection proxy:       NA 
+##     H2O Internal Security:      FALSE 
+##     H2O API Extensions:         XGBoost, Algos, AutoML, Core V3, Core V4 
+##     R Version:                  R version 3.5.1 (2018-07-02)
+```
+
+
+
+
+Since our data is already split into a training test set, to prepare for modeling, we just need to convert our training and test data to __h2o__ objects and identify the response and predictor variables.
+
+<div class="rmdwarning">
+<p>One key difference compared to prior classification procedures, to perform a multinomial modeling with <strong>h2o</strong> we need to convert the response variable to a factor.</p>
+</div>
+
+
+```r
+# convert training data to h2o object
+train_h2o <- train %>%
+  mutate(V785 = factor(V785)) %>%
+  as.h2o()
+
+# convert test data to h2o object
+test_h2o <- test %>%
+  mutate(V785 = factor(V785)) %>%
+  as.h2o()
+
+# set the response column to V785
+response <- "V785"
+
+# set the predictor names
+predictors <- setdiff(colnames(train), response)
+```
+
 #### Basic implementation {#rf-h2o-multi-basic}
 
+Following the previous H2O random forest sections, we use `h2o.randomForest`; however, we need to set `distribution = "multinomial"`.  The following trains a 5-fold cross-validated random forest with default settings but we increase the number of trees to 500 and incorporate early stopping (stopping if the logloss objective function does not improve over the past 10 additional trees).
+
+
+```r
+# train your model, where you specify alpha (performs 5-fold CV)
+h2o_fit1 <- h2o.randomForest(
+  x = predictors, 
+  y = response, 
+  training_frame = train_h2o,
+  distribution = "multinomial",
+  ntrees = 500,
+  seed = 123,
+  nfolds = 5,
+  keep_cross_validation_predictions = TRUE,
+  stopping_metric = "logloss",     
+  stopping_rounds = 10,        
+  stopping_tolerance = 0
+)
+```
+
+Our results show that early stopping kicks in at 397 trees and our cross-validated logloss is 0.241 with an average accuracy of 0.967 (similar to our __ranger__ model performance). Looking at the confusion matrix, we see that our model does the best at predicting the numbers 0, 1, 2, and 6 but performs the worst when predicting the numbers 3, 8, and 9.
+
+
+```r
+h2o_fit1
+## Model Details:
+## ==============
+## 
+## H2OMultinomialModel: drf
+## Model ID:  DRF_model_R_1533607021291_1 
+## Model Summary: 
+##   number_of_trees number_of_internal_trees model_size_in_bytes min_depth max_depth mean_depth min_leaves max_leaves mean_leaves
+## 1             397                     3970            49473256        15        20   19.79975        395       1599   984.52640
+## 
+## 
+## H2OMultinomialMetrics: drf
+## ** Reported on training data. **
+## ** Metrics reported on Out-Of-Bag training samples **
+## 
+## Training Set Metrics: 
+## =====================
+## 
+## Extract training frame with `h2o.getFrame("file12e3866a06dc9_sid_a8e8_2")`
+## MSE: (Extract with `h2o.mse`) 0.06306652
+## RMSE: (Extract with `h2o.rmse`) 0.2511305
+## Logloss: (Extract with `h2o.logloss`) 0.2298843
+## Mean Per-Class Error: 0.03121473
+## Confusion Matrix: Extract with `h2o.confusionMatrix(<model>,train = TRUE)`)
+## =========================================================================
+## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
+##           0    1    2    3    4    5    6    7    8    9  Error             Rate
+## 0      5851    1    6    1    4    5   16    2   34    3 0.0122 =     72 / 5,923
+## 1         2 6636   44   15   11    0    8   10    9    7 0.0157 =    106 / 6,742
+## 2        24    9 5782   35   22    0    8   26   45    7 0.0295 =    176 / 5,958
+## 3         4    6   79 5839    5   39    6   52   62   39 0.0476 =    292 / 6,131
+## 4         5   10   14    1 5674    0   23    9   14   92 0.0288 =    168 / 5,842
+## 5        24    6    9   51    7 5216   55    8   26   19 0.0378 =    205 / 5,421
+## 6        16    8    3    0    7   50 5809    0   25    0 0.0184 =    109 / 5,918
+## 7         7   22   50    6   21    2    0 6068    9   80 0.0314 =    197 / 6,265
+## 8        10   28   31   36   23   42   34    8 5590   49 0.0446 =    261 / 5,851
+## 9        20    9   10   65   57   14    3   61   35 5675 0.0461 =    274 / 5,949
+## Totals 5963 6735 6028 6049 5831 5368 5962 6244 5849 5971 0.0310 = 1,860 / 60,000
+## 
+## Hit Ratio Table: Extract with `h2o.hit_ratio_table(<model>,train = TRUE)`
+## =======================================================================
+## Top-10 Hit Ratios: 
+##     k hit_ratio
+## 1   1  0.969000
+## 2   2  0.990133
+## 3   3  0.995917
+## 4   4  0.998217
+## 5   5  0.999067
+## 6   6  0.999300
+## 7   7  0.999500
+## 8   8  0.999600
+## 9   9  0.999683
+## 10 10  1.000000
+## 
+## 
+## 
+## H2OMultinomialMetrics: drf
+## ** Reported on cross-validation data. **
+## ** 5-fold cross-validation on training data (Metrics computed for combined holdout predictions) **
+## 
+## Cross-Validation Set Metrics: 
+## =====================
+## 
+## Extract cross-validation frame with `h2o.getFrame("file12e3866a06dc9_sid_a8e8_2")`
+## MSE: (Extract with `h2o.mse`) 0.06701525
+## RMSE: (Extract with `h2o.rmse`) 0.258873
+## Logloss: (Extract with `h2o.logloss`) 0.2413819
+## Mean Per-Class Error: 0.03299157
+## Hit Ratio Table: Extract with `h2o.hit_ratio_table(<model>,xval = TRUE)`
+## =======================================================================
+## Top-10 Hit Ratios: 
+##     k hit_ratio
+## 1   1  0.967250
+## 2   2  0.990100
+## 3   3  0.995750
+## 4   4  0.998100
+## 5   5  0.999117
+## 6   6  0.999600
+## 7   7  0.999850
+## 8   8  0.999900
+## 9   9  0.999950
+## 10 10  1.000000
+## 
+## 
+## Cross-Validation Metrics Summary: 
+##                                mean           sd  cv_1_valid  cv_2_valid  cv_3_valid  cv_4_valid  cv_5_valid
+## accuracy                  0.9672536 0.0015155711  0.97094333     0.96793   0.9645565  0.96675926  0.96607906
+## err                      0.03274637 0.0015155711 0.029056698  0.03206997 0.035443455 0.033240765 0.033920962
+## err_count                     393.0    18.820202       349.0       385.0       430.0       395.0       406.0
+## logloss                  0.24139565  0.002679856  0.23648557  0.24019359  0.23914783  0.24380569  0.24734557
+## max_per_class_error     0.052197315  0.002844122  0.04480135 0.054357205 0.055464927  0.05107084  0.05529226
+## mean_per_class_accuracy  0.96702486 0.0015379025  0.97068304  0.96770495  0.96408165  0.96661985   0.9660349
+## mean_per_class_error    0.032975126 0.0015379025 0.029316958 0.032295052 0.035918355 0.033380147 0.033965122
+## mse                      0.06701857  9.877497E-4 0.065272674 0.066462636  0.06653778  0.06733827  0.06948148
+## r2                        0.9919707 1.3911341E-4   0.9921999  0.99204344   0.9920536  0.99194384   0.9916128
+## rmse                     0.25886548 0.0019011803  0.25548518  0.25780347  0.25794917  0.25949618   0.2635934
+```
 
 #### Tuning {#rf-h2o-multi-tune}
+
+To find the near-optimal model we'll perform a grid search over the common hyperparameters.  Since the mnist data is large, a full cartesian grid search takes significant time. Consequently, the following jumps straight to performing a random discrete grid search across 144 hyperparameter combinations of varying `mtry`, `max_depth`, `min_rows`, and `sample_rate`. Our grid search seeks to optimize the logloss cost function but will stop search if the last 10 models do not improve by 0.01% or if training time reaches 3 hours.  
+
+<div class="rmdtip">
+<p>This grid search ran for 3 hours and only evaluated 6 models!</p>
+</div>
+
+
+
+```r
+# create training & validation frame
+split <- h2o.splitFrame(train_h2o, ratios = .75)
+train_h2o_v2 <- split[[1]]
+valid_h2o <- split[[2]]
+
+# create hyperparameter grid
+hyper_grid.h2o <- list(
+  mtries      = c(20, 28, 35, 45),
+  max_depth   = seq(10, 40, by = 10),
+  min_rows    = c(1, 3, 5),
+  sample_rate = c(.632, .8, .95)
+)
+
+# random grid search criteria
+search_criteria <- list(
+  strategy = "RandomDiscrete",
+  stopping_metric = "logloss",
+  stopping_tolerance = 0.0001,
+  stopping_rounds = 10,
+  max_runtime_secs = 60*60*3
+  )
+
+# build grid search 
+random_grid <- h2o.grid(
+  algorithm = "randomForest",
+  grid_id = "mnist_random_rf_grid",
+  x = predictors, 
+  y = response, 
+  training_frame = train_h2o_v2,
+  validation_frame = valid_h2o,
+  distribution = "multinomial",
+  hyper_params = hyper_grid.h2o,
+  search_criteria = search_criteria,
+  ntrees = 500,
+  seed = 123,
+  stopping_metric = "logloss",     
+  stopping_rounds = 10,        
+  stopping_tolerance = 0.0001
+  )
+
+# collect the results and sort by our model performance metric of choice
+sorted_grid <- h2o.getGrid("mnist_random_rf_grid", sort_by = "logloss", decreasing = FALSE)
+sorted_grid
+## H2O Grid Details
+## ================
+## 
+## Grid ID: mnist_random_rf_grid 
+## Used hyper parameters: 
+##   -  max_depth 
+##   -  min_rows 
+##   -  mtries 
+##   -  sample_rate 
+## Number of models: 6 
+## Number of failed models: 0 
+## 
+## Hyper-Parameter Search Summary: ordered by increasing logloss
+##   max_depth min_rows mtries sample_rate                    model_ids             logloss
+## 1        30      1.0     45         0.8 mnist_random_rf_grid_model_4 0.21216531556485124
+## 2        30      3.0     35        0.95 mnist_random_rf_grid_model_5 0.22417350102146627
+## 3        30      5.0     35        0.95 mnist_random_rf_grid_model_0 0.23136887656231625
+## 4        30      5.0     35         0.8 mnist_random_rf_grid_model_1 0.24136703713063676
+## 5        30      5.0     28         0.8 mnist_random_rf_grid_model_2  0.2509863265325691
+## 6        10      1.0     20       0.632 mnist_random_rf_grid_model_3 0.35384506436712415
+```
+
+Although are model only evaluated six models, the logloss was reduced to 0.21 (compared to 0.24 in our initial model) but our accuracy of 3% is not much lower than before.
+
+
+```r
+# grab top model id
+best_h2o_model <- sorted_grid@model_ids[[1]]
+best_model <- h2o.getModel(best_h2o_model)
+
+# check out confusion matrix
+h2o.confusionMatrix(best_model)
+## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
+##           0    1    2    3    4    5    6    7    8    9  Error             Rate
+## 0      4391    1    5    0    3    3    7    1   30    2 0.0117 =     52 / 4,443
+## 1         1 4920   34    8    8    0    6    8    4    5 0.0148 =     74 / 4,994
+## 2        21    6 4365   23   15    2    5   24   31    4 0.0291 =    131 / 4,496
+## 3         3    5   59 4315    5   28    6   42   50   28 0.0498 =    226 / 4,541
+## 4         6    8   11    1 4255    0   20   10   12   66 0.0305 =    134 / 4,389
+## 5        17    1    7   32    7 4016   46    2   27   15 0.0369 =    154 / 4,170
+## 6         6    4    3    0    6   37 4325    0   19    0 0.0170 =     75 / 4,400
+## 7         4   12   48    7   21    0    0 4470    5   55 0.0329 =    152 / 4,622
+## 8         7   17   22   31   14   26   20    6 4196   37 0.0411 =    180 / 4,376
+## 9        11    6    8   47   35   11    0   48   20 4271 0.0417 =    186 / 4,457
+## Totals 4467 4980 4562 4464 4369 4123 4435 4611 4394 4483 0.0304 = 1,364 / 44,888
+```
+
+Since we used a simple validation procedure to find the near-optimal parameter settings, we need to rerun the model with best parameters.  here I perform a 5-fold CV model to get a more robust measure of our model's performance with the identified parameter settings.  We see our CV logloss and accuracy rate are 0.219 and 3.1% respectively.
+
+
+```r
+h2o_final <- h2o.randomForest(
+  x = predictors, 
+  y = response, 
+  training_frame = train_h2o,
+  distribution = "multinomial",
+  ntrees = 500,
+  mtries = 45,
+  max_depth = 30,
+  min_rows = 1,
+  sample_rate = 0.8,
+  seed = 123,
+  nfolds = 5,
+  keep_cross_validation_predictions = TRUE,
+  stopping_metric = "logloss",     
+  stopping_rounds = 10,        
+  stopping_tolerance = 0
+)
+
+h2o.performance(h2o_final, xval = TRUE)
+## H2OMultinomialMetrics: drf
+## ** Reported on cross-validation data. **
+## ** 5-fold cross-validation on training data (Metrics computed for combined holdout predictions) **
+## 
+## Cross-Validation Set Metrics: 
+## =====================
+## 
+## MSE: (Extract with `h2o.mse`) 0.05791091
+## RMSE: (Extract with `h2o.rmse`) 0.2406469
+## Logloss: (Extract with `h2o.logloss`) 0.2188368
+## Mean Per-Class Error: 0.03141614
+## Hit Ratio Table: Extract with `h2o.hit_ratio_table(<model>,xval = TRUE)`
+## =======================================================================
+## Top-10 Hit Ratios: 
+##     k hit_ratio
+## 1   1  0.968817
+## 2   2  0.989500
+## 3   3  0.994550
+## 4   4  0.996567
+## 5   5  0.997400
+## 6   6  0.997717
+## 7   7  0.997917
+## 8   8  0.997933
+## 9   9  0.997933
+## 10 10  1.000000
+```
+
+
 
 
 #### Visual interpretation {#rf-h2o-multi-viz}
 
+In the regularized regression chapter, we saw that 67 predictors were not used because they contained zero variance and in our __ranger__ model there were 102 variables not used for any splits.  Similarly, for our __h2o__ model we can assess how many variables have zero importance.  Since __h2o__ uses the impurity method for variable importance, this implies that these variables were not used for any splits.  We see there are XX variables that have zero importance.  
+
+
+```r
+# how many variables not used for a split
+h2o.varimp(h2o_final) %>%
+  filter(percentage == 0)
+##    variable relative_importance scaled_importance percentage
+## 1       V13                   0                 0          0
+## 2       V16                   0                 0          0
+## 3       V33                   0                 0          0
+## 4       V34                   0                 0          0
+## 5       V59                   0                 0          0
+## 6      V114                   0                 0          0
+## 7      V197                   0                 0          0
+## 8      V281                   0                 0          0
+## 9      V309                   0                 0          0
+## 10     V337                   0                 0          0
+## 11     V365                   0                 0          0
+## 12     V393                   0                 0          0
+## 13     V449                   0                 0          0
+## 14     V533                   0                 0          0
+## 15     V588                   0                 0          0
+## 16     V589                   0                 0          0
+## 17     V617                   0                 0          0
+## 18     V618                   0                 0          0
+## 19     V644                   0                 0          0
+## 20     V754                   0                 0          0
+## 21     V761                   0                 0          0
+## 22     V762                   0                 0          0
+## 23     V780                   0                 0          0
+```
+
+
+Alternatively, to find important variables we can extract the top 25 influential variables using `vip`.  Figure \@ref(fig:rf-multi-classification-h2o-top25-vip) illustrates the top 25 influential variables in our __h2o__ random forest model. We see many of the same variables that we saw with the __ranger__ model but in slightly different order (i.e. `V407`, `V379`, `V406`, `V435`, `v324`). 
+
+
+```r
+vip(h2o_final, num_features = 25, bar = FALSE)
+```
+
+<div class="figure" style="text-align: center">
+<img src="04-random-forest_files/figure-html/rf-multi-classification-h2o-top25-vip-1.png" alt="Top 25 most important variables based on impurity (left) and permutation (right)." width="960" />
+<p class="caption">(\#fig:rf-multi-classification-h2o-top25-vip)Top 25 most important variables based on impurity (left) and permutation (right).</p>
+</div>
+
+##### Partial dependence plots {rf-h20-multi-pdp}
+
+Similar to the __ranger__ section, next we assess the relationship between these influential predictors and the response variable with PDP plots. In this example, we assess the PDP of each response category with variable `V407`, which ranked first as the most influential variable.  We can see those response categories where this variable has a large impact (stronger changes in the predicted value $\hat y$ as `V407` changes) versus those that are less influnced by this predictor (mostly flat-lined plots).
+
+<div class="rmdnote">
+<p>To produce a PDP with multi-classification problems, we need to create a custom prediction function that will return a data frame of the <strong><em>mean predicted probability</em></strong> for each response class. We supply this custom prediction function</p>
+</div>
+
+
+
+```r
+# custom prediction function
+custom_pred <- function(object, newdata) {
+  pred <- predict(object, as.h2o(newdata))[[-1]]
+  avg <- purrr::map_df(as.data.frame(pred), mean)
+  return(avg)
+}
+
+# partial dependence of V407
+pd <- partial(h2o_final, pred.var = "V407", pred.fun = custom_pred, train = train)
+ggplot(pd, aes(V407, yhat, color = factor(yhat.id))) + 
+  geom_line(show.legend = FALSE) +
+  facet_wrap(~ yhat.id, nrow = 2)
+```
+
+<div class="figure" style="text-align: center">
+<img src="images/rf-h20-multi-classification-pdp.png" alt="Partial dependence plots of our most influential variable (`V407`) across the 10 response levels. This variable appears to be most influential in predicting the number 0, 1, 7, and 8."  />
+<p class="caption">(\#fig:rf-h20-multi-classification-pdp-plot)Partial dependence plots of our most influential variable (`V407`) across the 10 response levels. This variable appears to be most influential in predicting the number 0, 1, 7, and 8.</p>
+</div>
+
 
 #### Predicting {#rf-h2o-multi-predict}
+
+Lastly, we can predict values for an unseen data set with `predict` or `h2o.predict`.  Both options produce the same output, the predicted class and the predicted probability for each class.  We also produce our test set performance results with `h2o.performance`.  Comparing to our __ranger__ model we see a similar overall error rate of just under 3%. Also, similar to our __ranger__ model, __h2o__ does a much better job predicting across all number relative to regularize regression; however, our random forest models still lack predictive accuracy for numbers 2, 7, 8, and 9 compared to when predicting the numbers 0, 1, and 6.  Maybe we can improve upon this with more advanced algorithms 🤷.
+
+<div class="rmdtip">
+<p>Note the Top-10 Hit Ratios. With our regularized regression <strong>h2o</strong> model, it took 4 &quot;guesses&quot; or tries until we achieved a 99% accuracy rate. With our random forest model, it only takes 2 tries for our model to accurately predict 99% on our test data!</p>
+</div>
+
+
+
+```r
+# predict with `predict`
+pred1 <- predict(h2o_final, test_h2o)
+head(pred1)
+##   predict        p0         p1           p2         p3         p4         p5         p6           p7        p8         p9
+## 1       8 0.0000000 0.00000000 0.0000574597 0.02325448 0.00000000 0.01162724 0.00000000 0.000000e+00 0.9650608 0.00000000
+## 2       3 0.0000000 0.00000000 0.0002050103 0.87078918 0.03225145 0.01075048 0.00000000 2.150097e-02 0.0000000 0.06450290
+## 3       8 0.1711703 0.00000000 0.0270268942 0.08108068 0.00000000 0.09909861 0.07207172 4.912864e-06 0.5495468 0.00000000
+## 4       0 0.8247423 0.00000000 0.0103092784 0.00000000 0.00000000 0.04123711 0.11340206 0.000000e+00 0.0000000 0.01030928
+## 5       1 0.0000000 0.99974901 0.0001758430 0.00000000 0.00000000 0.00000000 0.00000000 7.514232e-05 0.0000000 0.00000000
+## 6       5 0.0000000 0.01030917 0.0000000000 0.00000000 0.01030917 0.81442428 0.02061834 1.069344e-05 0.1340192 0.01030917
+
+# predict with `h2o.predict`
+pred2 <- h2o.predict(h2o_final, test_h2o)
+head(pred2)
+##   predict        p0         p1           p2         p3         p4         p5         p6           p7        p8         p9
+## 1       8 0.0000000 0.00000000 0.0000574597 0.02325448 0.00000000 0.01162724 0.00000000 0.000000e+00 0.9650608 0.00000000
+## 2       3 0.0000000 0.00000000 0.0002050103 0.87078918 0.03225145 0.01075048 0.00000000 2.150097e-02 0.0000000 0.06450290
+## 3       8 0.1711703 0.00000000 0.0270268942 0.08108068 0.00000000 0.09909861 0.07207172 4.912864e-06 0.5495468 0.00000000
+## 4       0 0.8247423 0.00000000 0.0103092784 0.00000000 0.00000000 0.04123711 0.11340206 0.000000e+00 0.0000000 0.01030928
+## 5       1 0.0000000 0.99974901 0.0001758430 0.00000000 0.00000000 0.00000000 0.00000000 7.514232e-05 0.0000000 0.00000000
+## 6       5 0.0000000 0.01030917 0.0000000000 0.00000000 0.01030917 0.81442428 0.02061834 1.069344e-05 0.1340192 0.01030917
+
+# assess performance
+h2o.performance(h2o_final, newdata = test_h2o)
+## H2OMultinomialMetrics: drf
+## 
+## Test Set Metrics: 
+## =====================
+## 
+## MSE: (Extract with `h2o.mse`) 0.05332193
+## RMSE: (Extract with `h2o.rmse`) 0.2309154
+## Logloss: (Extract with `h2o.logloss`) 0.2025038
+## Mean Per-Class Error: 0.02985019
+## Confusion Matrix: Extract with `h2o.confusionMatrix(<model>, <data>)`)
+## =========================================================================
+## Confusion Matrix: Row labels: Actual class; Column labels: Predicted class
+##           0    1    2    3   4   5   6    7   8    9  Error           Rate
+## 0       971    0    0    0   0   1   3    1   3    1 0.0092 =      9 / 980
+## 1         0 1124    3    2   1   1   3    0   1    0 0.0097 =   11 / 1,135
+## 2         6    0  992    9   4   0   0    8  13    0 0.0388 =   40 / 1,032
+## 3         1    0    5  978   0   3   1   11   7    4 0.0317 =   32 / 1,010
+## 4         2    0    2    0 951   0   6    0   4   17 0.0316 =     31 / 982
+## 5         3    0    1    8   1 865   7    2   4    1 0.0303 =     27 / 892
+## 6         5    2    0    1   2   5 939    0   4    0 0.0198 =     19 / 958
+## 7         1    4   23    3   0   0   0  986   2    9 0.0409 =   42 / 1,028
+## 8         5    1    7    7   2   4   3    5 934    6 0.0411 =     40 / 974
+## 9         7    5    3   11   9   1   1    5   4  963 0.0456 =   46 / 1,009
+## Totals 1001 1136 1036 1019 970 880 963 1018 976 1001 0.0297 = 297 / 10,000
+## 
+## Hit Ratio Table: Extract with `h2o.hit_ratio_table(<model>, <data>)`
+## =======================================================================
+## Top-10 Hit Ratios: 
+##     k hit_ratio
+## 1   1  0.970300
+## 2   2  0.990700
+## 3   3  0.994800
+## 4   4  0.996100
+## 5   5  0.997000
+## 6   6  0.997400
+## 7   7  0.997500
+## 8   8  0.997500
+## 9   9  0.997600
+## 10 10  1.000000
+```
+
+
 
 
 ## Learning More {#rf-learn}
