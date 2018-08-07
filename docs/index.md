@@ -1,6 +1,6 @@
 --- 
 title: "Hands-on Machine Learning with R"
-date: "2018-08-01"
+date: "2018-08-06"
 site: bookdown::bookdown_site
 output: bookdown::gitbook
 documentclass: book
@@ -127,7 +127,7 @@ devtools::session_info(pkgs)
 #>  language (EN)                        
 #>  collate  en_US.UTF-8                 
 #>  tz       America/New_York            
-#>  date     2018-08-01
+#>  date     2018-08-06
 #> Packages -----------------------------------------------------------------
 #>  package      * version    date       source                         
 #>  abind          1.4-5      2016-07-21 CRAN (R 3.5.0)                 

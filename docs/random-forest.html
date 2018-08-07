@@ -24,7 +24,7 @@
 
 
 
-<meta name="date" content="2018-08-01">
+<meta name="date" content="2018-08-06">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -285,7 +285,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="random-forest" class="section level1">
 <h1><span class="header-section-number">Chapter 4</span> Random Forest</h1>
-<p><img src="images/RF_icon.jpg"  style="float:right; margin: 0px 0px 0px 10px; width: 22%; height: 22%;" /> <strong><em>Random forests</em></strong> are a modification of decision trees and bagging that builds a large collection of <em>de-correlated</em> trees to reduce overfitting (aka variance). They have become a very popular “out-of-the-box” learning algorithm that enjoys good predictive performance and easy hyperparameter tuning. Many modern implementations of random forests algorithms exist; however, Leo Breiman’s algorithm<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> has largely become the authoritative procedure. This chapter will cover the fundamentals of random forests.</p>
+<p><img src="images/RF_icon.jpg"  style="float:right; margin: 0px 0px 0px 10px; width: 22%; height: 22%;" /> <strong><em>Random forests</em></strong> are a modification of decision trees and bagging that builds a large collection of <em>de-correlated</em> trees to reduce overfitting (aka variance). They have become a very popular “out-of-the-box” learning algorithm that enjoys good predictive performance and easy hyperparameter tuning. Many modern implementations of random forests algorithms exist; however, Leo Breiman’s algorithm <span class="citation">(Breiman <a href="#ref-breiman2001random">2001</a>)</span> has largely become the authoritative procedure. This chapter will cover the fundamentals of random forests.</p>
 <div id="rf-requirements" class="section level2">
 <h2><span class="header-section-number">4.1</span> Prerequisites</h2>
 <div class="rmdwarning">
@@ -375,7 +375,7 @@ Figure 2.1: Random forest out-of-bag error versus validation error.
 </div>
 <div id="rf-pkgs" class="section level3">
 <h3><span class="header-section-number">4.3.3</span> Package implementation</h3>
-<p>There are over 20 random forest packages in R.<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> The oldest and most well known implementation of the Random Forest algorithm in R is the <code>randomForest</code> package.</p>
+<p>There are over 20 random forest packages in R.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> The oldest and most well known implementation of the Random Forest algorithm in R is the <code>randomForest</code> package.</p>
 <div class="rmdwarning">
 <p>
 <code>randomForest</code> is not a recommended package because as your data sets grow in size <code>randomForest</code> does not scale well (although you can parallelize with <code>foreach</code>). Instead, we recommend you use the <code>ranger</code> and <code>h2o</code> packages.
@@ -383,7 +383,7 @@ Figure 2.1: Random forest out-of-bag error versus validation error.
 </div>
 <p>Since <code>randomForest</code> does not scale well to many of the data set sizes that organizations analyze, we will demonstrate how to implement the random forest algorithm with two fast, efficient, and highly recommended packages:</p>
 <ul>
-<li><a href="https://github.com/imbs-hl/ranger"><code>ranger</code></a>: a C++ implementation of Brieman’s random forest algorithm and particularly well suited for high dimensional data. The original paper describing <code>ranger</code> and providing benchmarking to other packages can be found <a href="http://arxiv.org/pdf/1508.04409v1.pdf">here</a>. Features include<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>:
+<li><a href="https://github.com/imbs-hl/ranger"><code>ranger</code></a>: a C++ implementation of Brieman’s random forest algorithm and particularly well suited for high dimensional data. The original paper describing <code>ranger</code> and providing benchmarking to other packages can be found <a href="http://arxiv.org/pdf/1508.04409v1.pdf">here</a>. Features include<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>:
 <ul>
 <li>Classification, regression, probability estimation and survival forests are supported.</li>
 <li>Multi-threaded capabilities for optimal speed.</li>
@@ -430,7 +430,7 @@ Tree-based algorithms typically perform very well without preprocessing the data
 <li><code>data</code>: training data</li>
 <li><code>num.trees</code>: number of trees in the forest</li>
 <li><code>mtry</code>: randomly selected predictor variables at each split. Default is <span class="math inline">\(\texttt{floor}(\sqrt{\texttt{number of features}})\)</span>; however, for regression problems the preferred <code>mtry</code> to start with is <span class="math inline">\(\texttt{floor}(\frac{\texttt{number of features}}{3}) = \texttt{floor}(\frac{92}{3}) = 30\)</span></li>
-<li><code>respect.unordered.factors</code>: specifies how to treat unordered factor variables. We recommend setting this to “order” for regression. See Hastie et al. (2009), chapter 9.2.4<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> for details.</li>
+<li><code>respect.unordered.factors</code>: specifies how to treat unordered factor variables. We recommend setting this to “order” for regression. See <span class="citation">Friedman, Hastie, and Tibshirani (<a href="#ref-esl">2001</a>)</span>, chapter 9.2.4 for details.</li>
 <li><code>seed</code>: because this is a random algorithm, you will set the seed to get reproducible results</li>
 </ul>
 <div class="rmdnote">
@@ -803,18 +803,18 @@ caret<span class="op">::</span><span class="kw">RMSE</span>(predict_ranger<span 
 ## H2O is not running yet, starting it now...
 ## 
 ## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpMBcJyZ/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpMBcJyZ/h2o_bradboehmke_started_from_r.err
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpF70TJP/h2o_bradboehmke_started_from_r.out
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//RtmpF70TJP/h2o_bradboehmke_started_from_r.err
 ## 
 ## 
 ## Starting H2O JVM and connecting: .. Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 247 milliseconds 
+##     H2O cluster uptime:         2 seconds 255 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 8 days  
+##     H2O cluster version age:    2 months and 13 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_ply740 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   4.44 GB 
@@ -1097,7 +1097,7 @@ best_model &lt;-<span class="st"> </span><span class="kw">h2o.getModel</span>(be
 <h4><span class="header-section-number">4.4.2.3</span> Visualizing results</h4>
 <div id="rf-h2o-regression-vip" class="section level5">
 <h5><span class="header-section-number">4.4.2.3.1</span> Variable importance</h5>
-<p>Once you’ve identified and selected the optimally tuned model, you can visualize variable importance with <code>h2o.varimp_plot</code>. <code>h2o.varimp_plot</code> computes variable importance <strong><em>“by calculating the relative influence of each variable: whether that variable was selected during splitting in the tree building process and how much the squared error (over all trees) improved as a result.”</em></strong><a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a> This is equivalent to the impurity approach used by <code>ranger</code>. The most important variables are relatively similar to those found with the ranger model.</p>
+<p>Once you’ve identified and selected the optimally tuned model, you can visualize variable importance with <code>h2o.varimp_plot</code>. <code>h2o.varimp_plot</code> computes variable importance <strong><em>“by calculating the relative influence of each variable: whether that variable was selected during splitting in the tree building process and how much the squared error (over all trees) improved as a result.”</em></strong><a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> This is equivalent to the impurity approach used by <code>ranger</code>. The most important variables are relatively similar to those found with the ranger model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">h2o.varimp_plot</span>(best_model, <span class="dt">num_of_features =</span> <span class="dv">25</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:h2o-varimp-plot"></span>
 <img src="04-random-forest_files/figure-html/h2o-varimp-plot-1.png" alt="Variable importance plot provided by the __h2o__ package." width="672" />
@@ -1494,7 +1494,7 @@ Figure 4.10: Top 25 most important variables based on impurity (left) and permut
 <p>After the most relevant variables have been identified, the next step is to attempt to understand how the response variable changes based on these variables. This is important considering random forests allow us to pick up non-linear, non-monotonic relationships. For this we can use partial dependence plots (PDPs) and individual conditional expectation (ICE) curves. However, to generate PDPs and ICE curves we need to run a probability model (<code>probability = TRUE</code>) so that we can extract the class probabilities.</p>
 <div class="rmdnote">
 <p>
-To produce a PDP with binary classification problems, we need to create a custom prediction function that will return a vector of the <strong><em>mean predicted probability</em></strong> for the response class of interest (in this example we want the probabilities for <code>Attrition = “Yes”</code>). We supply this custom prediction function
+To produce a PDP with binary classification problems, we need to create a custom prediction function that will return a vector of the <strong><em>mean predicted probability</em></strong> for the response class of interest (in this example we want the probabilities for <code>Attrition = “Yes”</code>). We supply this custom prediction function within the <code>pdp::partial</code> function call.
 </p>
 </div>
 <p>Our PDPs illustrate a strong increase in the probability of attrition for employees that work overtime. Also, note that non-linear relationship between the probability of attrition and monthly income and age. The <code>MonthlyIncome</code> plot shows an increase in probability as monthly income reaches $10,000 but then flatlines until employees make about $20,000 per month. Similiarly with age, as employees get older they tend to become more stable; however, this changes after the age of 45 where an increase of age tends to increase the probablity of attrition (recall in Section <a href="regularized-regression.html#glm-h2o-classification-binary-viz">3.5.2.3</a> that we saw how the regularized models assumed a constantly decreasing relationships between <code>Age</code> and the probability of attrition).</p>
@@ -1664,14 +1664,14 @@ h2o<span class="op">::</span><span class="kw">h2o.no_progress</span>()
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         3 seconds 500 milliseconds 
+##     H2O cluster uptime:         3 seconds 828 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 8 days  
+##     H2O cluster version age:    2 months and 13 days  
 ##     H2O cluster name:           H2O_started_from_R_bradboehmke_ply740 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   4.44 GB 
+##     H2O cluster total memory:   4.39 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -2085,19 +2085,282 @@ Figure 4.15: ROC curve for our <strong>ranger</strong> random forest model based
 </div>
 <div id="rf-multi" class="section level2">
 <h2><span class="header-section-number">4.6</span> Implementation: Multinomial Classification</h2>
+<p>To illustrate various random forest concepts for a multinomial classification problem we will continue with the mnist data, where the goal is to predict handwritten numbers ranging from 0-9.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># import mnist training and testing data</span>
+train &lt;-<span class="st"> </span>data.table<span class="op">::</span><span class="kw">fread</span>(<span class="st">&quot;../data/mnist_train.csv&quot;</span>, <span class="dt">data.table =</span> <span class="ot">FALSE</span>)
+test &lt;-<span class="st"> </span>data.table<span class="op">::</span><span class="kw">fread</span>(<span class="st">&quot;../data/mnist_test.csv&quot;</span>, <span class="dt">data.table =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div id="rf-ranger-multi" class="section level3">
 <h3><span class="header-section-number">4.6.1</span> <code>ranger</code></h3>
+<p>To use <strong>ranger</strong> on a multiclassification problem we need our response variable to be encoded as a character or factor. Since our response variable for the mnist data (<code>V785</code>) contains numeric responses (integers ranging from 0-9), we need to convert these to a factor.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># convert response variable to a factor</span>
+train &lt;-<span class="st"> </span><span class="kw">mutate</span>(train, <span class="dt">V785 =</span> <span class="kw">factor</span>(V785))
+test &lt;-<span class="st"> </span><span class="kw">mutate</span>(test, <span class="dt">V785 =</span> <span class="kw">factor</span>(V785))</code></pre></div>
 <div id="ranger-multi-basic" class="section level4">
 <h4><span class="header-section-number">4.6.1.1</span> Basic implementation</h4>
+<p>Once our response variable is properly encoded as a factor or character, <code>ranger::ranger</code> will automatically apply a random forest model with multinomial terminal nodes without you having to specify. Consequently, the following applies a default random forest model with 500 trees. Since all the predictors in the mnist data set are numeric we do not need to worry about setting the <code>respect.unordered.factors</code> parameter.</p>
+<p>As your data set grows in size, random forests can become slow. Parallel processing can speed up the process and, by default, <strong>ranger</strong> will use the number of CPUs available (you can manually set the number of CPUs to use with <code>num.threads</code>). However, even so, on the mnist data the default <strong>ranger</strong> model takes three minutes to train. The results show an OOB error of 2.98%, which is already more accurate than the tuned regularized regression results (see Section <a href="regularized-regression.html#glm-multinomial-classification">3.6</a>).</p>
+<div class="rmdnote">
+<p>
+This basic default model took a little over 3 minutes to train.
+</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># perform basic random forest model</span>
+m1_ranger &lt;-<span class="st"> </span><span class="kw">ranger</span>(
+  <span class="dt">formula    =</span> V785 <span class="op">~</span><span class="st"> </span>., 
+  <span class="dt">data       =</span> train, 
+  <span class="dt">num.trees  =</span> <span class="dv">500</span>,
+  <span class="dt">verbose    =</span> <span class="ot">FALSE</span>,
+  <span class="dt">seed       =</span> <span class="dv">123</span>
+  )
+
+<span class="co"># look at results</span>
+m1_ranger
+## Ranger result
+## 
+## Call:
+##  ranger(formula = V785 ~ ., data = train, num.trees = 500, seed = 123) 
+## 
+## Type:                             Classification 
+## Number of trees:                  500 
+## Sample size:                      60000 
+## Number of independent variables:  784 
+## Mtry:                             28 
+## Target node size:                 1 
+## Variable importance mode:         none 
+## Splitrule:                        gini 
+## OOB prediction error:             2.98 %
+
+<span class="co"># look at confusion matrix</span>
+m1_ranger<span class="op">$</span>confusion.matrix
+##     predicted
+## true    0    1    2    3    4    5    6    7    8    9
+##    0 5855    1    7    2    3    6   18    0   28    3
+##    1    1 6646   36   11    9    4    5   13    9    8
+##    2   24    9 5787   23   22    2   14   37   36    4
+##    3    9    6   73 5840    1   62    8   44   62   26
+##    4    8   11    9    0 5683    0   23   10   12   86
+##    5   21    5    8   61    9 5223   41    5   27   21
+##    6   20   11    5    1    9   30 5824    0   18    0
+##    7    3   22   55    6   28    0    0 6069   10   72
+##    8    8   27   30   32   20   36   26    4 5610   58
+##    9   21    9   13   65   55   19    4   45   42 5676</code></pre></div>
 </div>
 <div id="ranger-multi-tune" class="section level4">
 <h4><span class="header-section-number">4.6.1.2</span> Tuning</h4>
+<p>As in the binary classification section, we will tune the various hyperparameters of the <code>ranger</code> function. The following creates a hyperparameter grid of 160 model combinations with varying number of trees (<code>num_trees</code>), number of variables to possibly split at (<code>mtry</code>), terminal node size (<code>node_size</code>), sample size (<code>sample_size</code>), and the split rule (<code>splitrule</code>).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hyper_grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(
+  <span class="dt">num_trees   =</span> <span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">500</span>),
+  <span class="dt">mtry        =</span> <span class="kw">seq</span>(<span class="dv">15</span>, <span class="dv">35</span>, <span class="dt">by =</span> <span class="dv">5</span>),
+  <span class="dt">node_size   =</span> <span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="dt">by =</span> <span class="dv">3</span>),
+  <span class="dt">sample_size =</span> <span class="kw">c</span>(.<span class="dv">632</span>, .<span class="dv">80</span>),
+  <span class="dt">splitrule   =</span> <span class="kw">c</span>(<span class="st">&quot;gini&quot;</span>, <span class="st">&quot;extratrees&quot;</span>),
+  <span class="dt">OOB_error   =</span> <span class="dv">0</span>
+)
+
+<span class="kw">nrow</span>(hyper_grid)</code></pre></div>
+<p>Our OOB classification error ranges between 0.0302-0.0383. Our top 10 performing models all have classification error rates in the low 0.03 range. The results show that most of the top 10 models use higher <code>mtry</code> values, smaller <code>min.node.size</code>, and include a stochastic nature with <code>sample.fraction</code> <span class="math inline">\(&gt; 1\)</span>. We also see that the two top models use the <code>extratrees</code> split rule versus the <code>gini</code>; however, the improvement is marginal.</p>
+<div class="rmdtip">
+<p>
+This grid search took 5 hours and 38 minutes!
+</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(hyper_grid)) {
+  
+  <span class="co"># train model</span>
+  model &lt;-<span class="st"> </span><span class="kw">ranger</span>(
+    <span class="dt">formula         =</span> V785 <span class="op">~</span><span class="st"> </span>., 
+    <span class="dt">data            =</span> train,
+    <span class="dt">seed            =</span> <span class="dv">123</span>,
+    <span class="dt">verbose         =</span> <span class="ot">FALSE</span>,
+    <span class="dt">num.trees       =</span> hyper_grid<span class="op">$</span>num_trees[i],
+    <span class="dt">mtry            =</span> hyper_grid<span class="op">$</span>mtry[i],
+    <span class="dt">min.node.size   =</span> hyper_grid<span class="op">$</span>node_size[i],
+    <span class="dt">sample.fraction =</span> hyper_grid<span class="op">$</span>sample_size[i],
+    <span class="dt">splitrule       =</span> hyper_grid<span class="op">$</span>splitrule[i]
+  )
+  
+  <span class="co"># add OOB error to grid</span>
+  hyper_grid<span class="op">$</span>OOB_error[i] &lt;-<span class="st"> </span>model<span class="op">$</span>prediction.error
+}
+
+hyper_grid <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">arrange</span>(OOB_error) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)
+##    num.trees mtry node_size sample_size  splitrule  OOB_error
+## 1        250   35         1         0.8 extratrees 0.03021667
+## 2        500   35         1         0.8 extratrees 0.03021667
+## 3        250   35         1         0.8       gini 0.03046667
+## 4        500   35         1         0.8       gini 0.03046667
+## 5        250   35         4         0.8       gini 0.03061667
+## 6        500   35         4         0.8       gini 0.03061667
+## 7        250   30         1         0.8       gini 0.03065000
+## 8        500   30         1         0.8       gini 0.03065000
+## 9        250   20         1         0.8       gini 0.03078333
+## 10       500   20         1         0.8       gini 0.03078333</code></pre></div>
+<p>The above grid search helps to focus where we can further refine our model tuning. As a next step, we could perform additional grid searches focusing on additional ranges of these parameters. However, for brevity we leave this as an exercise for the reader.</p>
 </div>
 <div id="ranger-multi-viz" class="section level4">
 <h4><span class="header-section-number">4.6.1.3</span> Visual interpretation</h4>
+<div id="variable-importance-ranger-multi-vip" class="section level5">
+<h5><span class="header-section-number">4.6.1.3.1</span> Variable importance {ranger-multi-vip}</h5>
+<p>As in the regression and binary classification setting, once we’ve found our optimal hyperparameter settings we can re-run our model and set the <code>importance</code> argument to “impurity” and/or “permutation”. The following applies both settings so that we can compare and contrast the influential variables each method identifies.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># re-run model with impurity-based variable importance</span>
+m3_ranger_impurity &lt;-<span class="st"> </span><span class="kw">ranger</span>(
+  <span class="dt">formula         =</span> V785 <span class="op">~</span><span class="st"> </span>., 
+  <span class="dt">data            =</span> train, 
+  <span class="dt">num.trees       =</span> <span class="dv">250</span>,
+  <span class="dt">mtry            =</span> <span class="dv">35</span>,
+  <span class="dt">min.node.size   =</span> <span class="dv">1</span>,
+  <span class="dt">sample.fraction =</span> .<span class="dv">80</span>,
+  <span class="dt">splitrule       =</span> <span class="st">&quot;extratrees&quot;</span>,
+  <span class="dt">importance      =</span> <span class="st">&#39;impurity&#39;</span>,
+  <span class="dt">verbose         =</span> <span class="ot">FALSE</span>,
+  <span class="dt">seed            =</span> <span class="dv">123</span>
+  )
+
+<span class="co"># re-run model with permutation-based variable importance</span>
+m3_ranger_permutation &lt;-<span class="st"> </span><span class="kw">ranger</span>(
+  <span class="dt">formula         =</span> V785 <span class="op">~</span><span class="st"> </span>., 
+  <span class="dt">data            =</span> train, 
+  <span class="dt">num.trees       =</span> <span class="dv">250</span>,
+  <span class="dt">mtry            =</span> <span class="dv">35</span>,
+  <span class="dt">min.node.size   =</span> <span class="dv">1</span>,
+  <span class="dt">sample.fraction =</span> .<span class="dv">80</span>,
+  <span class="dt">splitrule       =</span> <span class="st">&quot;extratrees&quot;</span>,
+  <span class="dt">importance      =</span> <span class="st">&#39;permutation&#39;</span>,
+  <span class="dt">verbose         =</span> <span class="ot">FALSE</span>,
+  <span class="dt">seed            =</span> <span class="dv">123</span>
+  )</code></pre></div>
+<p>In the regularized regression chapter, we saw that 67 predictors were not used because they contained zero variance. For random forests, we can assess how many and which variables were not used for any splits within our random forest model to improve impurtiy. This signals those variables that do not provide any increase in the accuracy within each terminal node. For our <code>m3_ranger_impurity</code> model there are 102 variables not used for any splits. We can do the same with the <code>m3_ranger_permutation</code> model; however, variables with zero importance represent those variables that when scrambled, still do not hurt the performance of our model. We see there are 153 variables that have zero importance for the permutation-based approach.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># how many variables not used for a split</span>
+<span class="kw">which</span>(m3_ranger_impurity<span class="op">$</span>variable.importance <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">length</span>()
+## [1] 95
+
+<span class="co"># how many variables where randomizing their values does not hurt performance</span>
+<span class="kw">which</span>(m3_ranger_permutation<span class="op">$</span>variable.importance <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">length</span>()
+## [1] 153</code></pre></div>
+<p>Alternatively, to find important variables we can extract the top 10 influential variables as we did in the regression and binary classification problems. Unlike, in the regularized regression chapter, we cannot extract the most influential variables for each class. This is due to how variable importance is calculated differently between the two. However, shortly we will see how to understand the relationship an influential variable and the different classes of our response variable.</p>
+<p>Figure <a href="random-forest.html#fig:rf-multi-classification-ranger-top10-vip">4.16</a> illustrates the top 25 influential variables in our random forest model. We see many of the same variables towards the top albeit in differing order (i.e. <code>V379</code>, <code>V351</code>, <code>V462</code>, <code>V407</code>) signaling that these variables appear influential regardless of the importance measure used.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1 &lt;-<span class="st"> </span><span class="kw">vip</span>(m3_ranger_impurity, <span class="dt">num_features =</span> <span class="dv">25</span>, <span class="dt">bar =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Impurity-based variable importance&quot;</span>)
+p2 &lt;-<span class="st"> </span><span class="kw">vip</span>(m3_ranger_permutation, <span class="dt">num_features =</span> <span class="dv">25</span>, <span class="dt">bar =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;Permutation-based variable importance&quot;</span>)
+
+gridExtra<span class="op">::</span><span class="kw">grid.arrange</span>(p1, p2, <span class="dt">nrow =</span> <span class="dv">1</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:rf-multi-classification-ranger-top10-vip"></span>
+<img src="04-random-forest_files/figure-html/rf-multi-classification-ranger-top10-vip-1.png" alt="Top 25 most important variables based on impurity (left) and permutation (right)." width="960" />
+<p class="caption">
+Figure 4.16: Top 25 most important variables based on impurity (left) and permutation (right).
+</p>
+</div>
+</div>
+<div id="partial-dependence-plots-ranger-multi-pdp" class="section level5">
+<h5><span class="header-section-number">4.6.1.3.2</span> Partial dependence plots {ranger-multi-pdp}</h5>
+<p>After the most relevant variables have been identified, we can assess the relationship between these influential predictors and the response variable with PDP plots and ICE curves. As with the binary classification model, to generate PDPs and ICE curves we need to use the probability model (<code>probability = TRUE</code>) so that can extract the class probabilities.</p>
+<div class="rmdnote">
+<p>
+To produce a PDP with multi-classification problems, we need to create a custom prediction function that will return a data frame of the <strong><em>mean predicted probability</em></strong> for each response class. We supply this custom prediction function
+</p>
+</div>
+<p>In this example, we assess the PDP of each response category with variable <code>V379</code>, which ranked first as the most influential variable. We can see those response categories where this variable has a large impact (stronger changes in the predicted value <span class="math inline">\(\hat y\)</span> as <code>V379</code> changes) versus those that are less influnced by this predictor (mostly flat-lined plots).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># probability model</span>
+m3_ranger_prob &lt;-<span class="st"> </span><span class="kw">ranger</span>(
+  <span class="dt">formula         =</span> V785 <span class="op">~</span><span class="st"> </span>., 
+  <span class="dt">data            =</span> train, 
+  <span class="dt">num.trees       =</span> <span class="dv">250</span>,
+  <span class="dt">mtry            =</span> <span class="dv">35</span>,
+  <span class="dt">min.node.size   =</span> <span class="dv">1</span>,
+  <span class="dt">sample.fraction =</span> .<span class="dv">80</span>,
+  <span class="dt">importance      =</span> <span class="st">&#39;impurity&#39;</span>,
+  <span class="dt">probability     =</span> <span class="ot">TRUE</span>,
+  <span class="dt">verbose         =</span> <span class="ot">FALSE</span>,
+  <span class="dt">seed            =</span> <span class="dv">123</span>,
+  )
+
+<span class="co"># custom prediction function</span>
+custom_pred &lt;-<span class="st"> </span><span class="cf">function</span>(object, newdata) {
+  pred &lt;-<span class="st"> </span><span class="kw">predict</span>(object, newdata)<span class="op">$</span>predictions
+  avg &lt;-<span class="st"> </span>purrr<span class="op">::</span><span class="kw">map_df</span>(<span class="kw">as.data.frame</span>(pred), mean)
+  <span class="kw">return</span>(avg)
+}
+
+<span class="co"># partial dependence of V379</span>
+pd &lt;-<span class="st"> </span><span class="kw">partial</span>(m3_ranger_prob, <span class="dt">pred.var =</span> <span class="st">&quot;V379&quot;</span>, <span class="dt">pred.fun =</span> custom_pred, <span class="dt">train =</span> train)
+<span class="kw">ggplot</span>(pd, <span class="kw">aes</span>(V379, yhat, <span class="dt">color =</span> <span class="kw">factor</span>(yhat.id))) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">show.legend =</span> <span class="ot">FALSE</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>(<span class="op">~</span><span class="st"> </span>yhat.id, <span class="dt">nrow =</span> <span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">expand_limits</span>(<span class="dt">y =</span> <span class="dv">0</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:rf-ranger-multi-classification-pdp"></span>
+<img src="04-random-forest_files/figure-html/rf-ranger-multi-classification-pdp-1.png" alt="Partial dependence plots of our most influential variable (`V379`) across the 10 response levels. This variable appears to be most influential in predicting the number 0, 1, 3, and 7." width="960" />
+<p class="caption">
+Figure 4.17: Partial dependence plots of our most influential variable (<code>V379</code>) across the 10 response levels. This variable appears to be most influential in predicting the number 0, 1, 3, and 7.
+</p>
+</div>
+</div>
 </div>
 <div id="ranger-multi-predict" class="section level4">
 <h4><span class="header-section-number">4.6.1.4</span> Predicting</h4>
+<p>Finally, if you are satisfied with your final model we can predict values for an unseen data set with <code>predict</code>. If using a non-probability model then your predicted outputs will be a vector containing the predicted class for each observation. If using a probability model then your predicted outputs will be the probability of each class. In both cases, the result of <code>predict</code> is a list with the actual predictions contained in <code>object$predictions</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># predict class as the output</span>
+pred_class &lt;-<span class="st"> </span><span class="kw">predict</span>(m3_ranger_impurity, test)
+<span class="kw">head</span>(pred_class<span class="op">$</span>predictions)
+## [1] 8 3 8 0 1 5
+## Levels: 0 1 2 3 4 5 6 7 8 9
+
+<span class="co"># predict probability as the output</span>
+pred_prob &lt;-<span class="st"> </span><span class="kw">predict</span>(m3_ranger_prob, test)
+pred_prob<span class="op">$</span>predictions[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, ]
+##          0     1     2     3     4     5     6     7     8     9
+## [1,] 0.000 0.000 0.004 0.000 0.004 0.004 0.000 0.000 0.988 0.000
+## [2,] 0.000 0.012 0.000 0.868 0.020 0.024 0.004 0.024 0.008 0.040
+## [3,] 0.140 0.000 0.052 0.120 0.004 0.168 0.088 0.000 0.400 0.028
+## [4,] 0.912 0.004 0.004 0.000 0.000 0.024 0.040 0.000 0.008 0.008
+## [5,] 0.000 1.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000 0.000</code></pre></div>
+<p>Lastly, to assess various performance metrics on our test data we can use <code>caret::confusionMatrix</code>, which provides the majority of the performance measures we are typically concerned with in classification models. We can see that the overall accuracy rate of 0.9702 is significantly higher than our accuracy of <span class="math inline">\(\approx 0.93\)</span> for both regularized regression models. We also see our model is doing a much better job of predicting “2”, “3”, “5”, “8”, and “9” which were all poorly predicted by the regularized regression models.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">caret<span class="op">::</span><span class="kw">confusionMatrix</span>(<span class="kw">factor</span>(pred_class<span class="op">$</span>predictions), <span class="kw">factor</span>(test<span class="op">$</span>V785))
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    0    1    2    3    4    5    6    7    8    9
+##          0  969    0    6    0    1    3    7    1    3    6
+##          1    0 1123    0    0    0    0    3    4    0    5
+##          2    1    2  996    7    2    0    0   20    4    2
+##          3    0    4    8  974    0   10    0    1    9    8
+##          4    0    0    3    0  955    0    2    1    5    8
+##          5    2    1    0   10    0  863    4    0    5    1
+##          6    4    3    3    0    6    6  940    0    1    1
+##          7    1    0   10   10    1    1    0  983    3    6
+##          8    3    1    6    7    2    6    2    2  935    8
+##          9    0    1    0    2   15    3    0   16    9  964
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9702          
+##                  95% CI : (0.9667, 0.9734)
+##     No Information Rate : 0.1135          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.9669          
+##  Mcnemar&#39;s Test P-Value : NA              
+## 
+## Statistics by Class:
+## 
+##                      Class: 0 Class: 1 Class: 2 Class: 3 Class: 4 Class: 5
+## Sensitivity            0.9888   0.9894   0.9651   0.9644   0.9725   0.9675
+## Specificity            0.9970   0.9986   0.9958   0.9956   0.9979   0.9975
+## Pos Pred Value         0.9729   0.9894   0.9632   0.9606   0.9805   0.9740
+## Neg Pred Value         0.9988   0.9986   0.9960   0.9960   0.9970   0.9968
+## Prevalence             0.0980   0.1135   0.1032   0.1010   0.0982   0.0892
+## Detection Rate         0.0969   0.1123   0.0996   0.0974   0.0955   0.0863
+## Detection Prevalence   0.0996   0.1135   0.1034   0.1014   0.0974   0.0886
+## Balanced Accuracy      0.9929   0.9940   0.9804   0.9800   0.9852   0.9825
+##                      Class: 6 Class: 7 Class: 8 Class: 9
+## Sensitivity            0.9812   0.9562   0.9600   0.9554
+## Specificity            0.9973   0.9964   0.9959   0.9949
+## Pos Pred Value         0.9751   0.9685   0.9619   0.9545
+## Neg Pred Value         0.9980   0.9950   0.9957   0.9950
+## Prevalence             0.0958   0.1028   0.0974   0.1009
+## Detection Rate         0.0940   0.0983   0.0935   0.0964
+## Detection Prevalence   0.0964   0.1015   0.0972   0.1010
+## Balanced Accuracy      0.9893   0.9763   0.9779   0.9751</code></pre></div>
 </div>
 </div>
 <div id="rf-h2o-multi" class="section level3">
@@ -2131,11 +2394,17 @@ Figure 4.15: ROC curve for our <strong>ranger</strong> random forest model based
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
+<div id="ref-breiman2001random">
+<p>Breiman, Leo. 2001. “Random Forests.” <em>Machine Learning</em> 45 (1). Springer: 5–32.</p>
+</div>
 <div id="ref-R-ranger">
 <p>Wright, Marvin N., and Andreas Ziegler. 2017. “ranger: A Fast Implementation of Random Forests for High Dimensional Data in C++ and R.” <em>Journal of Statistical Software</em> 77 (1): 1–17. doi:<a href="https://doi.org/10.18637/jss.v077.i01">10.18637/jss.v077.i01</a>.</p>
 </div>
 <div id="ref-harrison1978hedonic">
 <p>Harrison Jr, David, and Daniel L Rubinfeld. 1978. “Hedonic Housing Prices and the Demand for Clean Air.” <em>Journal of Environmental Economics and Management</em> 5 (1). Elsevier: 81–102.</p>
+</div>
+<div id="ref-esl">
+<p>Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2001. <em>The Elements of Statistical Learning</em>. Vol. 1. 10. Springer series in statistics New York, NY, USA:</p>
 </div>
 <div id="ref-goldstein2015peeking">
 <p>Goldstein, Alex, Adam Kapelner, Justin Bleich, and Emil Pitkin. 2015. “Peeking Inside the Black Box: Visualizing Statistical Learning with Plots of Individual Conditional Expectation.” <em>Journal of Computational and Graphical Statistics</em> 24 (1). Taylor &amp; Francis: 44–65.</p>
@@ -2144,11 +2413,9 @@ Figure 4.15: ROC curve for our <strong>ranger</strong> random forest model based
 <div class="footnotes">
 <hr />
 <ol start="3">
-<li id="fn3"><p>Breiman, L. (2001). Random forests. <em>Machine learning, 45</em>(1), 5-32. <a href="https://www.stat.berkeley.edu/~breiman/randomforest2001.pdf">link</a><a href="random-forest.html#fnref3">↩</a></p></li>
-<li id="fn4"><p>See the Random Forest section in the <a href="https://CRAN.R-project.org/view=MachineLearning">Machine Learning Task View</a> on CRAN and Erin LeDell’s <a href="https://koalaverse.github.io/machine-learning-in-R/random-forest.html#random-forest-software-in-r">useR! Machine Learning Tutorial</a> for a non-comprehensive list.<a href="random-forest.html#fnref4">↩</a></p></li>
-<li id="fn5"><p>The features highlighted for each package were originally identified by Erin LeDell in her <a href="https://github.com/ledell/useR-machine-learning-tutorial">useR! 2016 tutorial</a>.<a href="random-forest.html#fnref5">↩</a></p></li>
-<li id="fn6"><p>Friedman, J., Hastie, T., &amp; Tibshirani, R. (2001). <em>The elements of statistical learning</em>. New York: Springer series in statistics. <a href="https://web.stanford.edu/~hastie/ElemStatLearn/">link</a><a href="random-forest.html#fnref6">↩</a></p></li>
-<li id="fn7"><p>H2O documentation <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/drf.html">link</a><a href="random-forest.html#fnref7">↩</a></p></li>
+<li id="fn3"><p>See the Random Forest section in the <a href="https://CRAN.R-project.org/view=MachineLearning">Machine Learning Task View</a> on CRAN and Erin LeDell’s <a href="https://koalaverse.github.io/machine-learning-in-R/random-forest.html#random-forest-software-in-r">useR! Machine Learning Tutorial</a> for a non-comprehensive list.<a href="random-forest.html#fnref3">↩</a></p></li>
+<li id="fn4"><p>The features highlighted for each package were originally identified by Erin LeDell in her <a href="https://github.com/ledell/useR-machine-learning-tutorial">useR! 2016 tutorial</a>.<a href="random-forest.html#fnref4">↩</a></p></li>
+<li id="fn5"><p>H2O documentation <a href="http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/drf.html">link</a><a href="random-forest.html#fnref5">↩</a></p></li>
 </ol>
 </div>
             </section>

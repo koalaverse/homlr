@@ -30,19 +30,19 @@ h2o.init()
 ## H2O is not running yet, starting it now...
 ## 
 ## Note:  In case of errors look at the following log files:
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp0ENAPo/h2o_bradboehmke_started_from_r.out
-##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmp0ENAPo/h2o_bradboehmke_started_from_r.err
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmpys8APG/h2o_bradboehmke_started_from_r.out
+##     /var/folders/ws/qs4y2bnx1xs_4y9t0zbdjsvh0000gn/T//Rtmpys8APG/h2o_bradboehmke_started_from_r.err
 ## 
 ## 
 ## Starting H2O JVM and connecting: .. Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         2 seconds 750 milliseconds 
+##     H2O cluster uptime:         2 seconds 670 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 8 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_cki800 
+##     H2O cluster version age:    2 months and 13 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_zfd324 
 ##     H2O cluster total nodes:    1 
 ##     H2O cluster total memory:   1.78 GB 
 ##     H2O cluster total cores:    4 
