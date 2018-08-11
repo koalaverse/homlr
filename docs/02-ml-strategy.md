@@ -29,14 +29,14 @@ h2o.init()
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         6 minutes 25 seconds 
+##     H2O cluster uptime:         1 minutes 54 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 14 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
+##     H2O cluster version age:    2 months and 18 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_thv371 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.58 GB 
+##     H2O cluster total memory:   4.43 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 

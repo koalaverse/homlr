@@ -1,9 +1,10 @@
 # Gradient Boosting Machines {#gradient-boosting-machines}
 
-```{r setup, include=FALSE}
+```{r setup5, include=FALSE}
+# Set global knitr chunk options
 knitr::opts_chunk$set(
-  echo = TRUE,
   fig.align = "center",
+  fig.height = 4.5,
   error = FALSE,
   message = FALSE, 
   warning = FALSE, 
@@ -14,22 +15,21 @@ knitr::opts_chunk$set(
 
 
 <img src="images/boosted_stumps.gif"  style="float:right; margin: -20px 0px 0px 0px; width: 30%; height: 30%;" />
-Gradient boosted machines (GBMs) are an extremely popular machine learning algorithm that have proven successful across many domains and is one of the leading methods for winning Kaggle competitions.  Whereas [random forests](random_forests) build an ensemble of deep independent trees, GBMs build an ensemble of shallow and weak successive trees with each tree learning and improving on the previous.  When combined, these many weak successive trees produce a powerful "committee" that are often hard to beat with other algorithms.  This tutorial will cover the fundamentals to understanding and implementing GBMs.
+Gradient boosted machines (GBMs) are an extremely popular machine learning algorithm that have proven successful across many domains and is one of the leading methods for winning Kaggle competitions.  Whereas random forests (Chapter \@ref(random_forest)) build an ensemble of deep independent trees, GBMs build an ensemble of shallow and weak successive trees with each tree learning and improving on the previous.  When combined, these many weak successive trees produce a powerful "committee" that are often hard to beat with other algorithms.  This chapter will cover the fundamentals to understanding and implementing GBMs.
 
 
 ## Package Requirements {#gbm-prereq}
 
-This tutorial leverages the following packages. Some of these packages play a supporting role; however, we demonstrate how to implement GBMs with several different packages and discuss the pros and cons to each.
+This chapter leverages the following packages. Some of these packages play a supporting role; however, our focus is on demonstrating how to implement GBMs with the __gbm__ [@R-gbm], __xgboost__ [@R-xgboost], and __h2o__ packages and discuss the pros and cons to each.
 
 ```{r pkg-req, cache=FALSE}
-library(rsample)      # data splitting 
-library(gbm)          # basic implementation
-library(xgboost)      # a faster implementation of gbm
-library(caret)        # an aggregator package for performing many machine learning tasks
-library(h2o)          # a java-based platform
-library(pdp)          # model visualization
-library(ggplot2)      # model visualization
-library(lime)         # model visualization
+library(rsample)  # data splitting 
+library(gbm)      # original implementation of gbm
+library(xgboost)  # a faster implementation of gbm
+library(h2o)      # a java-based platform
+library(vip)      # visualize feature importance 
+library(pdp)      # visualize feature effects
+library(ggplot2)  # model visualization
 ```
 
 
@@ -49,12 +49,12 @@ __Disdvantages:__
 * GBMs will continue improving to minimize all errors.  This can overemphasize outliers and cause overfitting. Must use cross-validation to neutralize.
 * Computationally expensive - GBMs often require many trees (>1000) which can be time and memory exhaustive.
 * The high flexibility results in many parameters that interact and influence heavily the behavior of the approach (number of iterations, tree depth, regularization parameters, etc.). This requires a large grid search during tuning.
-* Less interpretable although this is easily addressed with various tools (variable importance, partial dependence plots, LIME, etc.).
+* Less interpretable although this is easily addressed with various tools (variable importance, partial dependence plots, local variable importance, etc.).
 
 
 ## The Idea {#gbm-idea}
 
-Several supervised machine learning models are founded on a single predictive model (i.e. [linear regression](http://uc-r.github.io/linear_regression), [penalized models](http://uc-r.github.io/regularized_regression), [naive Bayes](http://uc-r.github.io/naive_bayes), [support vector machines](http://uc-r.github.io/svm)). Alternatively, other approaches such as [bagging](http://uc-r.github.io/regression_trees) and [random forests](http://uc-r.github.io/random_forests) are built on the idea of building an ensemble of models where each individual model predicts the outcome and then the ensemble simply averages the predicted values.  The family of boosting methods is based on a different, constructive strategy of ensemble formation. 
+Several supervised machine learning models are founded on a single predictive model such as linear regression, penalized models, naive Bayes, support vector machines. Alternatively, other approaches such as bagging and random forests are built on the idea of building an ensemble of models where each individual model predicts the outcome and then the ensemble simply averages the predicted values.  The family of boosting methods is based on a different, constructive strategy of ensemble formation. 
 
 The main idea of boosting is to add new models to the ensemble ___sequentially___. At each particular iteration, a new weak, base-learner model is trained with respect to the error of the whole ensemble learnt so far.  
 
@@ -66,12 +66,12 @@ knitr::include_graphics("images/boosted-trees-process.png")
 
 Let's discuss each component of the previous sentence in closer detail because they are important.
 
-__Base-learning models__:  Boosting is a framework that iteratively improves _any_ weak learning model.  Many gradient boosting applications allow you to "plug in" various classes of weak learners at your disposal. In practice however, boosted algorithms almost always use decision trees as the base-learner. Consequently, this tutorial will discuss boosting in the context of regression trees.
+__Base-learning models__:  Boosting is a framework that iteratively improves _any_ weak learning model.  Many gradient boosting applications allow you to "plug in" various classes of weak learners at your disposal. In practice however, boosted algorithms almost always use decision trees as the base-learner. Consequently, this chapter will discuss boosting in the context of decision trees.
 
 __Training weak models__: A weak model is one whose error rate is only slightly better than random guessing.  The idea behind boosting is that each sequential model builds a simple weak model to slightly improve the remaining errors.  With regards to decision trees, shallow trees represent a weak learner.  Commonly, trees with only 1-6 splits are used. Combining many weak models (versus strong ones) has a few benefits:
 
 - Speed: Constructing weak models is computationally cheap. 
-- Accuracy improvement: Weak models allow the algorithm to _learn slowly_; making minor adjustments in new areas where it does not perform well. In general,  statistical approaches that learn slowly tend to perform well.
+- Accuracy improvement: Weak models allow the algorithm to _learn slowly_; making minor adjustments in new areas where it does not perform well. In general, statistical approaches that learn slowly tend to perform well.
 - Avoids overfitting: Due to making only small incremental improvements with each model in the ensemble, this allows us to stop the learning process as soon as overfitting has been detected (typically by using cross-validation).
 
 __Sequential training with respect to errors__: Boosted trees are grown sequentially; each tree is grown using information from previously grown trees. The basic algorithm for boosted regression trees can be generalized to the following where _x_ represents our features and _y_ represents our response:
@@ -83,7 +83,7 @@ __Sequential training with respect to errors__: Boosted trees are grown sequenti
 5. Add this new tree to our algorithm: $F_3(x) = F_2(x) + h_1(x)$,
 6. Continue this process until some mechanism (i.e. cross validation) tells us to stop.
 
-The basic algorithm for boosted regression trees can be generalized to the following where the final model is simply a stagewise additive model of *b* individual regression trees:
+The basic algorithm for boosted decision trees can be generalized to the following where the final model is simply a stagewise additive model of *b* individual trees:
 
 $$ f(x) =  \sum^B_{b=1}f^b(x) \tag{1} $$
 
@@ -97,25 +97,25 @@ knitr::include_graphics("images/boosted_stumps.gif")
 
 ### Gradient descent {#gbm-gradient}
 
-Many algorithms, including decision trees, focus on minimizing the residuals and, therefore, emphasize the MSE loss function.  The algorithm discussed in the previous section outlines the approach of sequentially fitting regression trees to minimize the errors.  This specific approach is how gradient boosting minimizes the mean squared error (MSE) loss function.  However, often we wish to focus on other loss functions such as mean absolute error (MAE) or to be able to apply the method to a classification problem with a loss function such as deviance. The name ___gradient___ boosting machines come from the fact that this procedure can be generalized to loss functions other than MSE.
+Many algorithms, including decision trees, focus on minimizing the residuals and, therefore, emphasize the MSE loss function.  The algorithm discussed in the previous section outlines the approach of sequentially fitting regression trees to minimize the errors.  This specific approach is how gradient boosting minimizes the mean squared error (MSE) loss function.  However, often we wish to focus on other loss functions such as mean absolute error (MAE) or to be able to apply the method to a classification problem with a loss function such as deviance. The name ___gradient___ boosting machine comes from the fact that this procedure can be generalized to loss functions other than MSE.
 
 Gradient boosting is considered a ___gradient descent___ algorithm. Gradient descent is a very generic optimization algorithm capable of finding optimal solutions to a wide range of problems. The general idea of gradient descent is to tweak parameters iteratively in order to minimize a cost function. Suppose you are a downhill skier racing your friend.  A good strategy to beat your friend to the bottom is to take the path with the steepest slope. This is exactly what gradient descent does - it measures the local gradient of the loss (cost) function for a given set of parameters ($\Theta$) and takes steps in the direction of the descending gradient. Once the gradient is zero, we have reached the minimum.
 
-```{r gradient-descent-fig, echo=FALSE, fig.align='center', fig.cap="Gradient descent (Geron, 2017).", out.height="50%", out.width="50%"}
+```{r gradient-descent-fig, echo=FALSE, fig.align='center', fig.cap="Gradient descent is the process of gradually decreasing the cost function (i.e. MSE) by tweaking parameters iteratively until you have reached a minimum. Image courtesy of @geron2017hands.", out.height="50%", out.width="50%"}
 
 knitr::include_graphics("images/gradient_descent.png")
 ```
 
-Gradient descent can be performed on any loss function that is differentiable.  Consequently, this allows GBMs to optimize different loss functions as desired (see [ESL, p. 360](http://web.stanford.edu/~hastie/ElemStatLearn/) for common loss functions). An important parameter in gradient descent is the size of the steps which is determined by the _learning rate_. If the learning rate is too small, then the algorithm will take many iterations to find the minimum. On the other hand, if the learning rate is too high, you might jump cross the minimum and end up further away than when you started. 
+Gradient descent can be performed on any loss function that is differentiable.  Consequently, this allows GBMs to optimize different loss functions as desired (see @esl, p. 360 for common loss functions). An important parameter in gradient descent is the size of the steps which is determined by the _learning rate_. If the learning rate is too small, then the algorithm will take many iterations to find the minimum. On the other hand, if the learning rate is too high, you might jump across the minimum and end up further away than when you started. 
 
-```{r learning-rate-fig, echo=FALSE, fig.align='center', fig.cap="Learning rate comparisons (Geron, 2017).", out.height="70%", out.width="70%"}
+```{r learning-rate-fig, echo=FALSE, fig.align='center', fig.cap="A learning rate that is too small will require many iterations to find the minimum. A learning rate too big may jump over the minimum.  Image courtesy of @geron2017hands.", out.height="70%", out.width="70%"}
 
 knitr::include_graphics("images/learning_rate_comparison.png")
 ```
 
-Moreover, not all cost functions are convex (bowl shaped). There may be local minimas, plateaus, and other irregular terrain of the loss function that makes finding the global minimum difficult.  ___Stochastic gradient descent___ can help us address this problem by sampling a fraction of the training observations (typically without replacement) and growing the next tree using that subsample.  This makes the algorithm faster but the stochastic nature of random sampling also adds some random nature in descending the loss function gradient.  Although this randomness does not allow the algorithm to find the absolute global minimum,  it can actually help the algorithm jump out of local minima and off plateaus and get near the global minimum. 
+Moreover, not all cost functions are convex (bowl shaped). There may be local minimas, plateaus, and other irregular terrain of the loss function that makes finding the global minimum difficult.  ___Stochastic gradient descent___ can help us address this problem by sampling a fraction of the training observations (typically without replacement) and growing the next tree using that subsample.  This makes the algorithm faster but the stochastic nature of random sampling also adds some random nature in descending the loss function gradient.  Although this randomness does not allow the algorithm to find the absolute global minimum, it can actually help the algorithm jump out of local minima and off plateaus and get near the global minimum. 
 
-```{r stochastic-gradient-descent-fig, echo=FALSE, fig.align='center', fig.cap="Stochastic gradient descent (Geron, 2017).", out.height="40%", out.width="40%"}
+```{r stochastic-gradient-descent-fig, echo=FALSE, fig.align='center', fig.cap="Stochastic gradient descent will often find a near-optimal solution by jumping out of local minimas and off plateaus. Image courtesy of @geron2017hands.", out.height="40%", out.width="40%"}
 
 knitr::include_graphics("images/stochastic_gradient_descent.png")
 ```
@@ -125,73 +125,96 @@ As we'll see in the next section, there are several hyperparameter tuning option
 
 ### Tuning {#gbm-tuning}
 
-Part of the beauty and challenges of GBM is that they offer several tuning parameters.  The beauty in this is GBMs are highly flexible.  The challenge is that they can be time consuming to tune and find the optimal combination of hyperparamters.  The most common hyperparameters that you will find in most GBM implementations include:
+Part of the beauty and challenges of GBMs is that they offer several tuning parameters.  The beauty in this is GBMs are highly flexible.  The challenge is that they can be time consuming to tune and find the optimal combination of hyperparamters.  The most common hyperparameters that you will find in most GBM implementations include:
 
 * __Number of trees:__ The total number of trees to fit. GBMs often require many trees; however, unlike random forests GBMs can overfit so the goal is to find the optimal number of trees that minimize the loss function of interest with cross validation.
-* __Depth of trees:__ The number *d* of splits in each tree, which controls the complexity of the boosted ensemble. Often $d = 1$ works well, in which case each tree is a _stump_ consisting of a single split. More commonly, d is greater than 1 but it is unlikely $d > 10$ will be required.
+* __Depth of trees:__ The number *d* of splits in each tree, which controls the complexity of the boosted ensemble. Often $d = 1$ works well, in which case each tree is a _stump_ consisting of a single split. More commonly, *d* is greater than 1 but it is unlikely $d > 10$ will be required.
 * __Learning rate:__ Controls how quickly the algorithm proceeds down the gradient descent. Smaller values reduce the chance of overfitting but also increases the time to find the optimal fit. This is also called _shrinkage_.
 * __Subsampling:__ Controls whether or not you use a fraction of the available training observations. Using less than 100% of the training observations means you are implementing stochastic gradient descent.  This can help to minimize overfitting and keep from getting stuck in a local minimum or plateau of the loss function gradient.
 
-Throughout this tutorial you'll be exposed to additional hyperparameters that are specific to certain packages and can improve performance and/or the efficiency of training and tuning models.
+Throughout this chapter you'll be exposed to additional hyperparameters that are specific to certain packages and can improve performance and/or the efficiency of training and tuning models.
 
 ### Package implementation {#gbm-pkg-options}
 
 There are many packages that implement GBMs and GBM variants. You can find a fairly comprehensive list [here](https://koalaverse.github.io/machine-learning-in-R/gradient-boosting-machines.html#gbm-software-in-r) and at the [CRAN Machine Learning Task View](https://cran.r-project.org/web/views/MachineLearning.html). However, the most popular implementations which we will cover in this post include:
 
-- [gbm](https://cran.r-project.org/web/packages/gbm/index.html): The original R implementation of GBMs
-- [xgboost](https://cran.r-project.org/web/packages/xgboost/index.html): A fast and efficient gradient boosting framework (C++ backend).
-- [h2o](https://cran.r-project.org/web/packages/gamboostLSS/index.html): A powerful java-based interface that provides parallel distributed algorithms and efficient productionalization.
+- [gbm](https://cran.r-project.org/web/packages/gbm/index.html): The [gbm](https://github.com/gbm-developers/gbm) R package is an implementation
+of extensions to Freund and Schapire's AdaBoost algorithm and Friedman's gradient boosting machine.  This is the original R implementation of GBM. A presentation is available [here](https://www.slideshare.net/mark_landry/gbm-package-in-r) by Mark Landry.  Features include[^ledell]:
+    - Stochastic GBM.
+    - Supports up to 1024 factor levels.
+    - Supports Classification and regression trees.
+    - Includes methods for:
+        - least squares
+        - absolute loss
+        - t-distribution loss
+        - quantile regression
+        - logistic
+        - multinomial logistic
+        - Poisson
+        - Cox proportional hazards partial likelihood
+        - AdaBoost exponential loss
+        - Huberized hinge loss
+        - Learning to Rank measures ([LambdaMart](https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/tr-2008-109.pdf))
+    - Out-of-bag estimator for the optimal number of iterations is provided.
+    - Easy to overfit since early stopping functionality is not automated in thispackage.
+    - If internal cross-validation is used, this can be parallelized to all cores on the machine.
+    - Currently undergoing a major refactoring & rewrite (and has been for sometime).
+    - GPL-2/3 License.
+- [xgboost](https://cran.r-project.org/web/packages/xgboost/index.html): A fast and efficient gradient boosting framework with a C++ backend). Many resource are available [here](https://github.com/dmlc/xgboost/tree/master/demo).  The xgboost package is quite popular on [Kaggle](http://blog.kaggle.com/tag/xgboost/) for data mining competitions.  Features include:
+    - Stochastic GBM with column and row sampling (per split and per tree) for better generalization.
+    - Includes efficient linear model solver and tree learning algorithms.
+    - Parallel computation on a single machine.
+    - Supports various objective functions, including regression, classification and ranking.
+    - The package is made to be extensible, so that users are also allowed to define their own objectives easily.
+    - Apache 2.0 License.
+- [h2o](https://cran.r-project.org/web/packages/gamboostLSS/index.html): A powerful java-based interface that provides parallel distributed algorithms and efficient productionalization.  Resources regarding __h2o__'s GBM implementation include a Tuning guide by Arno Candel](https://github.com/h2oai/h2o-3/blob/master/h2o-docs/src/product/tutorials/gbm/gbmTuning.Rmd) and a [Vignette](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/booklets/GBMBooklet.pdf). Features include:
+    - Distributed and parallelized computation on either a single node or a multi-node cluster.
+    - Automatic early stopping based on convergence of user-specified metrics to user-specied relative tolerance.
+    - Stochastic GBM with column and  row sampling  (per split and per tree) for better generalization.
+    - Support  for  exponential  families  (Poisson,  Gamma,  Tweedie)  and  loss functions in addition to binomial (Bernoulli), Gaussian and multinomial distributions, such as Quantile regression (including Laplace).
+    - Grid search for hyperparameter optimization and model selection.
+    - Data-distributed, which means the entire dataset does not need to fit into memory on a single node, hence scales to any size training set.
+    - Uses histogram approximations of continuous variables for speedup.
+    - Uses dynamic binning - bin limits are reset at each tree level based on the split bins' min and max values discovered during the last pass.
+    - Uses squared error to determine optimal splits.
+    - Distributed implementation details outlined in a [blog post](http://blog.h2o.ai/2013/10/building-distributed-gbm-h2o/) by Cliff Click.
+    - Unlimited factor levels.
+    - Multiclass trees (one for each class) built in parallel with each other.
+    - Apache 2.0 Licensed.
+    - Model export in plain Java code for deployment in production environments.
 
 
 ## Implementation: Regression {#gbm-regression}
 
-To illustrate the GBM algorithm for a regression problem we will use the following space optimization data, where our intent is to predict `RESPONSE_VAR`.  This data set has over 40,000 observations and 92 features.  You can access this data [here](https://github.8451.com/effoverse/machine-learning-with-R/blob/master/data/space_optimization.csv). 
+To illustrate various GBM concepts for a regression problem we will continue with the Ames, IA housing data, where our intent is to predict `Sale_Price`. 
 
-```{r data-import}
-# import data
-df <- data.table::fread("data/space_optimization.csv", data.table = FALSE, stringsAsFactors = TRUE)
+```{r rf-regression-data-import}
+# Create training (70%) and test (30%) sets for the AmesHousing::make_ames() data.
+# Use set.seed for reproducibility
 
-# check for zero variance variables and remove
-pre <- preProcess(df, method = "zv")
-df <- predict(pre, df)
-
-# Create training (70%) and test (30%) sets.  Use set.seed for reproducibility
 set.seed(123)
-split <- initial_split(df, prop = .7)
-train <- training(split)
-test  <- testing(split)
+ames_split <- initial_split(AmesHousing::make_ames(), prop = .7, strata = "Sale_Price")
+ames_train <- training(ames_split)
+ames_test  <- testing(ames_split)
 ```
 
 
 ```{block, type = "rmdcomment"}
-Tree-based methods tend to perform well on unprocessed data (i.e. without normalizing, centering, scaling features).  In this tutorial I focus on how to implement GBMs with various packages. Although I do not pre-process the data, realize that you ___can___ improve model performance by spending time processing variable attributes.
+Tree-based methods tend to perform well on unprocessed data (i.e. without normalizing, centering, scaling features).  In this chapter I focus on how to implement GBMs with various packages. Although I do not pre-process the data, realize that you ___can___ improve model performance by spending time processing variable attributes.
 ```
 
 ### gbm {#gbm-regression-gbm}
 
-The [`gbm`](https://github.com/gbm-developers/gbm) R package is an implementation of extensions to Freund and Schapire’s [AdaBoost algorithm](http://www.site.uottawa.ca/~stan/csi5387/boost-tut-ppr.pdf) and Friedman’s [gradient boosting machine](https://statweb.stanford.edu/~jhf/ftp/trebst.pdf). This is the original R implementation of GBM. A presentation is available [here](https://www.slideshare.net/mark_landry/gbm-package-in-r) by Mark Landry. 
-
-```{block, type = "rmdwarning"}
-`gbm` is one of the original implementations of GBMs in R.  However, although I demonstrate how to implement it in this tutorial, `xgboost` and `h2o` are the two preferred packages for implementing GBMs for regression at 84.51°.
-```
-
-Features include[^ledell]:
-
-* Stochastic GBM.
-* Supports up to 1024 factor levels.
-* Supports Classification and regression trees.
-* Can incorporate many loss functions.
-* Out-of-bag estimator for the optimal number of iterations is provided.
-* Easy to overfit since early stopping functionality is not automated in this package.
-* If internal cross-validation is used, this can be parallelized to all cores on the machine.
-* Currently undergoing a major refactoring & rewrite (and has been for some time).
-* GPL-2/3 License.
 
 #### Basic implementation {#gbm-regression-gbm-basic}
 
-`gbm` has two primary training functions - `gbm::gbm` and `gbm::gbm.fit`. The primary difference is that `gbm::gbm` uses the formula interface to specify your model whereas `gbm::gbm.fit` requires the separated `x` and `y` matrices.  When working with _many_ variables it is more efficient to use the matrix rather than formula interface.
+__gbm__ has two primary training functions - `gbm::gbm` and `gbm::gbm.fit`. The primary difference is that `gbm::gbm` uses the formula interface to specify your model whereas `gbm::gbm.fit` requires the separated `x` and `y` matrices.  When working with _many_ variables it is more efficient to use the matrix rather than formula interface.
 
-The default settings in `gbm` includes a learning rate (`shrinkage`) of 0.001. This is a very small learning rate and typically requires a large number of trees to find the minimum MSE.  However, `gbm` uses a default number of trees of 100, which is rarely sufficient.  Consequently, I crank it up to 5,000 trees.  The default depth of each tree (`interaction.depth`) is 1, which means we are ensembling a bunch of stumps. Lastly, I also include `cv.folds` to perform a 5 fold cross validation.  The model took about 4 minutes to run and the results show that our MSE loss function is minimized with 5,000 trees.
+The default settings in `gbm` includes a learning rate (`shrinkage`) of 0.001. This is a very small learning rate and typically requires a large number of trees to find the minimum MSE.  However, `gbm` uses a default number of trees of 100, which is rarely sufficient.  Consequently, I crank it up to 5,000 trees.  The default depth of each tree (`interaction.depth`) is 1, which means we are ensembling a bunch of stumps. Lastly, I also include `cv.folds` to perform a 5 fold cross validation.  
+
+```{block, type="rmdnote"}
+The model took 48 seconds to run and the results show that our MSE loss function is minimized with 5,000 trees.
+```
 
 ```{r gbm-pkg-basic, eval=FALSE}
 # for reproducibility
@@ -199,9 +222,9 @@ set.seed(123)
 
 # train GBM model
 gbm.fit <- gbm(
-  formula = RESPONSE_VAR ~ .,
+  formula = Sale_Price ~ .,
   distribution = "gaussian",
-  data = train,
+  data = ames_train,
   n.trees = 5000,
   interaction.depth = 1,
   shrinkage = 0.001,
@@ -212,38 +235,38 @@ gbm.fit <- gbm(
 
 # print results
 print(gbm.fit)
-## gbm(formula = RESPONSE_VAR ~ ., distribution = "gaussian", data = train, 
+## gbm(formula = Sale_Price ~ ., distribution = "gaussian", data = ames_train, 
 ##     n.trees = 5000, interaction.depth = 1, shrinkage = 0.001, 
 ##     cv.folds = 5, verbose = FALSE, n.cores = NULL)
 ## A gradient boosted model with gaussian loss function.
 ## 5000 iterations were performed.
 ## The best cross-validation iteration was 5000.
-## There were 89 predictors of which 11 had non-zero influence.
+## There were 80 predictors of which 27 had non-zero influence.
 ```
 
 
-The output object is a list containing several modelling and results information.  We can access this information with regular indexing; I recommend you take some time to dig around in the object to get comfortable with its components.  Here, we see that the minimum CV RMSE is 0.407 but the plot also illustrates that the CV error is still decreasing at 5,000 trees.  
+The output object is a list containing several modelling and results information.  We can access this information with regular indexing; I recommend you take some time to dig around in the object to get comfortable with its components.  Here, we see that the minimum CV RMSE is \$33,079.61 but the plot also illustrates that the CV error (MSE) is still decreasing at 5,000 trees.  
 
 
 ```{r gbm-basic-results, eval=FALSE}
 # get MSE and compute RMSE
 sqrt(min(gbm.fit$cv.error))
-## [1] 0.407026
+## [1] 33079.61
 
 # plot loss function as a result of n trees added to the ensemble
 gbm.perf(gbm.fit, method = "cv")
 ```
 
-```{r gbm1-gradient-descent, echo=FALSE, out.height="100%", out.width="100%"}
+```{r gbm1-gradient-descent, echo=FALSE, out.height="100%", out.width="100%", fig.cap="Training and cross-validated MSE as *n* trees are added to the GBM algorithm."}
 
 knitr::include_graphics("images/gbm1_gradient_descent.png")
 ```
 
-In this case, the small learning rate is resulting in very small incremental improvements which means ___many___ trees are required.  In fact, with the default learning rate and tree depth settings, the CV error is still reducing after 10,000 trees which takes ~ 20 minutes of run time!
+In this case, the small learning rate is resulting in very small incremental improvements which means ___many___ trees are required.  In fact, with the default learning rate and tree depth settings, the CV error is still reducing after 10,000 trees!
 
 #### Tuning {#gbm-regression-gbm-tune}
 
-However, rarely do the default settings suffice.  We could tune parameters one at a time to see how the results change.  For example, here, I increase the learning rate to take larger steps down the gradient descent, reduce the number of trees (since we are reducing the learning rate), and increase the depth of each tree from using a single split to 3 splits. Our RMSE (0.24) is lower than our initial model and the optimal number of trees required was 4874.
+However, rarely do the default settings suffice.  We could tune parameters one at a time to see how the results change.  For example, here, I increase the learning rate to take larger steps down the gradient descent, reduce the number of trees (since we are reducing the learning rate), and increase the depth of each tree from using a single split to 3 splits. Our RMSE (\$23,813.34) is lower than our initial model and the optimal number of trees required was 964.
 
 ```{r gbm-tune1, eval=FALSE}
 # for reproducibility
@@ -251,9 +274,9 @@ set.seed(123)
 
 # train GBM model
 gbm.fit2 <- gbm(
-  formula = RESPONSE_VAR ~ .,
+  formula = Sale_Price ~ .,
   distribution = "gaussian",
-  data = train,
+  data = ames_train,
   n.trees = 5000,
   interaction.depth = 3,
   shrinkage = 0.1,
@@ -267,13 +290,13 @@ min_MSE <- which.min(gbm.fit2$cv.error)
 
 # get MSE and compute RMSE
 sqrt(gbm.fit2$cv.error[min_MSE])
-## [1] 0.2415405
+## [1] 23813.34
 
 # plot loss function as a result of n trees added to the ensemble
 gbm.perf(gbm.fit2, method = "cv")
 ```
 
-```{r gbm2-gradient-descent, echo=FALSE, out.height="100%", out.width="100%"}
+```{r gbm2-gradient-descent, echo=FALSE, out.height="100%", out.width="100%", fig.cap="Training and cross-validated MSE as *n* trees are added to the GBM algorithm. We can see that are new hyperparameter settings result in a much quicker progression down the gradient descent than our initial model."}
 
 knitr::include_graphics("images/gbm2_gradient_descent.png")
 ```
@@ -298,21 +321,23 @@ nrow(hyper_grid)
 We loop through each hyperparameter combination and apply 5,000 trees.  However, to speed up the tuning process, instead of performing 5-fold CV I train on 75% of the training observations and evaluate performance on the remaining 25%. 
 
 ```{block, type = "rmdwarning"}
-When using `train.fraction` it will take the first XX% of the data so its important to randomize your rows in case their is any logic behind the ordering of the data (i.e. ordered by store, department, product). 
+When using `train.fraction` it will take the first XX% of the data so its important to randomize your rows in case their is any logic behind the ordering of the data (i.e. ordered by neighbhorhood). 
 ```
 
-Our grid search revealed a few important attributes.  First, our top model has better performance than our previously fitted model above, with an RMSE of 0.23. Second, looking at the top 10 models we see that:
+Our grid search revealed a few important attributes.  First, our top model has better performance than our previously fitted model above and any of the other models covered in Chapters \@ref(regularized-regression) and \@ref(random-forest), with an RMSE of \$20,390.55. Second, looking at the top 10 models we see that:
 
-- all of the top models used a learning rate of 0.1; small incremental steps down the gradient descent appears to work best,
-- none of the top models used stumps (`interaction.depth = 1`); there are likely stome important interactions that the deeper trees are able to capture,
-- adding a stochastic component with `bag.fraction` < 1 seems to help; there may be some local minimas in our loss function gradient,
-- only one of the top models used `n.minobsinnode` = 5; smaller nodes allow us to capture pockets of unique feature-response variable instances but it seems we do not need to worry about that,
-- in most instances we appear to use nearly all 5,000 trees. In fact, most of the models with a learning rate of 0.01 used all the trees meaning they may not have had enough trees to converge to their global minimum. Maybe we should increase this parameter in our next search?
+- all the top models used a learning rate of 0.1 or smaller; small incremental steps down the gradient descent appears to work best,
+- all the top models used deeper trees (`interaction.depth = 5`); there are likely stome important interactions that the deeper trees are able to capture,
+- most of the models with a learning rate of 0.01 used nearly all the trees meaning they had just enough trees to converge to their global minimum. 
+
+```{block, type = "rmdtip"}
+Searching this entire grid took 36 minutes.
+```
 
 ```{r gbm-grid-search-1, eval=FALSE}
 # randomize data
-random_index <- sample(1:nrow(train), nrow(train))
-random_train <- train[random_index, ]
+random_index <- sample(1:nrow(ames_train), nrow(ames_train))
+random_train <- ames_train[random_index, ]
 
 # grid search 
 for(i in 1:nrow(hyper_grid)) {
@@ -322,7 +347,7 @@ for(i in 1:nrow(hyper_grid)) {
   
   # train model
   gbm.tune <- gbm(
-    formula = RESPONSE_VAR ~ .,
+    formula = Sale_Price ~ .,
     distribution = "gaussian",
     data = random_train,
     n.trees = 5000,
@@ -343,26 +368,27 @@ for(i in 1:nrow(hyper_grid)) {
 hyper_grid %>% 
   dplyr::arrange(min_RMSE) %>%
   head(10)
-##    shrinkage interaction.depth n.minobsinnode bag.fraction optimal_trees  min_RMSE
-## 1        0.1                 5             15         0.80          4342 0.2346278
-## 2        0.1                 3             15         0.80          4867 0.2362116
-## 3        0.1                 5             15         0.65          2340 0.2362708
-## 4        0.1                 5             15         1.00          3802 0.2376581
-## 5        0.1                 3             15         0.65          3928 0.2395356
-## 6        0.1                 5             10         0.65          4214 0.2401138
-## 7        0.1                 3             15         1.00          4983 0.2402113
-## 8        0.1                 3             10         0.65          4986 0.2405867
-## 9        0.1                 5             10         0.80          4048 0.2420684
-## 10       0.1                 5              5         0.65          2306 0.2426004
+##    shrinkage interaction.depth n.minobsinnode bag.fraction optimal_trees min_RMSE
+## 1       0.01                 5              5         0.80          4911 20390.55
+## 2       0.01                 5              5         0.65          4726 20588.02
+## 3       0.10                 5             10         0.80           500 20758.72
+## 4       0.01                 5             10         0.80          4897 20761.53
+## 5       0.01                 5              5         1.00          5000 20997.68
+## 6       0.10                 5              5         1.00           665 21277.84
+## 7       0.10                 5              5         0.80           514 21277.90
+## 8       0.01                 5             10         0.65          4987 21310.94
+## 9       0.01                 5             15         0.80          4990 21456.17
+## 10      0.01                 5             10         1.00          4960 21481.65
 ```
 
-These results help us to zoom into areas where we can refine our search.  In practice, tuning is an iterative process so you would likely refine this search grid to analyze a search space around the top models.  For example, I would like search the following values in my next grid search:
+These results help us to zoom into areas where we can refine our search.  In practice, tuning is an iterative process so you would likely refine this search grid to analyze a search space around the top models.  For example, I would likely search the following values in my next grid search:
 
-* learning rate: 0.05, 0.1, 0.15
+* learning rate: 0.1, 0.05, 0.01, 0.005
 * interaction depth: 3, 5, 7
-* min obs in a node: 10, 15, 20
 
-Once we have found our top model we train a model with those specific parameters. I'll use the top model in our grid search and since the model converged at 4342 trees I train a model with that many trees.  
+along with the previously assessed values for `n.minobsinnode` and `bag.fraction`.  Also, since we used nearly all 5000 trees when the learning rate was 0.01, I would increase this to ensure there are enough trees for learning rate $=0.005$.
+
+Once we have found our top model we train a model with those specific parameters. I'll use the top model in our grid search and since the model converged at 4911 trees I train a model with that many trees.  
 
 ```{r gbm-final}
 # for reproducibility
@@ -370,13 +396,13 @@ set.seed(123)
 
 # train GBM model
 gbm.fit.final <- gbm(
-  formula = RESPONSE_VAR ~ .,
+  formula = Sale_Price ~ .,
   distribution = "gaussian",
-  data = train,
+  data = ames_train,
   n.trees = 4342,
   interaction.depth = 5,
-  shrinkage = 0.1,
-  n.minobsinnode = 15,
+  shrinkage = 0.01,
+  n.minobsinnode = 5,
   bag.fraction = .80, 
   train.fraction = 1,
   n.cores = NULL, # will use all cores by default
@@ -384,143 +410,92 @@ gbm.fit.final <- gbm(
   )  
 ```
 
-#### Visualizing results {#gbm-regression-gbm-viz}
+#### Feature interpretation {#gbm-regression-gbm-viz}
 
-##### Variable importance {#gbm-regression-gbm-vip}
+Similar to random forests, GBMs make no assumption regarding the linearity and monoticity of the predictor-response relationship.  So as we did in the random forest chapter (Chapter \@ref(random-forest)) we can understand the relationship between the features and the response using variable importance plots and partial dependence plots.
 
-After re-running our final model we likely want to understand the variables that have the largest influence on our response variable.  The `summary` method for `gbm` will output a data frame and a plot that shows the most influential variables.  `cBars` allows you to adjust the number of variables to show (in order of influence). The default method for computing variable importance is with relative influence 
+```{block, type = "rmdtip"}
+Additional model interpretability approaches will be discussed in the ___Model Interpretability___ chapter.
+```
+
+##### Feature importance {#gbm-regression-gbm-vip}
+
+After re-running our final model we likely want to understand the variables that have the largest influence on our response variable.  The `summary` method for __gbm__ will output a data frame and a plot that shows the most influential variables.  `cBars` allows you to adjust the number of variables to show (in order of influence). The default method for computing variable importance is with relative influence but your options include: 
 
 1. `method = relative.influence`: At each split in each tree, `gbm` computes the improvement in the split-criterion (MSE for regression). `gbm` then averages the improvement made by each variable across all the trees that the variable is used. The variables with the largest average decrease in MSE are considered most important.
 2. `method = permutation.test.gbm`: For each tree, the OOB sample is passed down the tree and the prediction accuracy is recorded. Then the values for each variable (one at a time) are randomly permuted and the accuracy is again computed. The decrease in accuracy as a result of this randomly “shaking up” of variable values is averaged over all the trees for each variable. The variables with the largest average decrease in accuracy are considered most important.
 
-```{r vip1}
-par(mar = c(5, 15, 1, 1))
-summary(
-  gbm.fit.final, 
-  cBars = 10,
-  method = relative.influence, # also can use permutation.test.gbm
-  las = 2
-  )
+```{r vip1, eval=FALSE}
+par(mfrow = c(1, 2), mar = c(5, 10, 1, 1))
+
+# relative influence approach
+summary(gbm.fit.final, cBars = 10, method = relative.influence, las = 2)
+
+# permutation approach
+summary(gbm.fit.final, cBars = 10, method = permutation.test.gbm, las = 2)
 ```
 
-An alternative approach is to use the underdevelopment [`vip`](https://github.com/koalaverse/vip) package, which provides `ggplot2` plots.  `vip` also provides an additional measure of variable importance based on partial dependence measures and is a common variable importance plotting framework for many machine learning models.
+```{r gbm-gbm-vip-plot, echo=FALSE, out.height="100%", out.width="100%", fig.cap="Top 10 influential variables using the relative influence (left) and permutation (right) approach. We can see common themes among the top variables although in differing order."}
 
-```{r vip2}
-# install.packages("vip")
-vip::vip(gbm.fit.final)
+knitr::include_graphics("images/gbm-gbm-vip.png")
 ```
 
-##### Partial dependence plots {#gbm-regression-gbm-pdp}
+
+##### Feature effects {#gbm-regression-gbm-pdp}
+
+After the most relevant variables have been identified, we can use partial dependence plots (PDPs) and individual conditional expectation (ICE) curves to better understand the relationship between the predictors and response.  Here we plot two of the most influential variables (`Gr_Liv_Area` and `Overall_Qual`).  We see that both predictor non-linear relationships with the sale price.
+
+```{block, type="rmdtip"}
+As in Chapter \@ref(random-forest), you can produce ICE curves by incorporating `ice = TRUE` and `center = TRUE` (for centered ICE curves).
+```
 
 
-After the most relevant variables have been identified, the next step is to attempt to understand how the response variable changes based on these variables. For this we can use partial dependence plots (PDPs) and individual conditional expectation (ICE) curves.
-
-PDPs plot the change in the average predicted value as specified feature(s) vary over their marginal distribution. For example, consider the `PROD_DIV_PURCHASE_CYCLE` variable. The PDP plot below displays the average change in the predicted response variable (`RESPONSE_VAR`) as we vary `PROD_DIV_PURCHASE_CYCLE` while holding all other variables constant. This is done by holding all variables constant for each observation in our training data set but then apply the unique values of `PROD_DIV_PURCHASE_CYCLE` for each observation. We then average the predicted `RESPONSE_VAR` values across all the observations. This PDP illustrates how the predicted `RESPONSE_VAR` decreases as `PROD_DIV_PURCHASE_CYCLE` increases.
-
-```{r pdp1, fig.height=3.5, fig.width=6}
-gbm.fit.final %>%
+```{r pdp1, fig.height=3.5, fig.width=9, fig.cap="The mean predicted sale price as `Gr_Liv_Area` and `Overall_Qual` change in value."}
+p1 <- gbm.fit.final %>%
   partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE", 
+    pred.var = "Gr_Liv_Area", 
     n.trees = gbm.fit.final$n.trees, 
-    grid.resolution = 100
+    grid.resolution = 50
     ) %>%
-  autoplot(rug = TRUE, train = train) 
-```
+  autoplot(rug = TRUE, train = ames_train) 
 
-ICE curves are an extension of PDP plots but, rather than plot the average marginal effect on the response variable, we plot the change in the predicted response variable for each observation as we vary each predictor variable. Below shows the regular ICE curve plot (left) and the centered ICE curves (right). When the curves have a wide range of intercepts and are consequently “stacked” on each other, heterogeneity in the response variable values due to marginal changes in the predictor variable of interest can be difficult to discern. The centered ICE can help draw these inferences out and can highlight any strong heterogeneity in our results. The resuts show that most observations follow a common trend as `PROD_DIV_PURCHASE_CYCLE` increases; however, there are a few observations that have significantly larger values.
-
-```{r ice-plots, fig.height=3.5, fig.width=9}
-ice1 <- gbm.fit.final %>%
+p2 <- gbm.fit.final %>%
   partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE", 
+    pred.var = "Overall_Qual", 
     n.trees = gbm.fit.final$n.trees, 
-    grid.resolution = 100,
-    ice = TRUE
+    train = data.frame(ames_train)
     ) %>%
-  autoplot(rug = TRUE, train = train, alpha = .1) +
-  ggtitle("Non-centered") 
+  autoplot() 
 
-ice2 <- gbm.fit.final %>%
-  partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE", 
-    n.trees = gbm.fit.final$n.trees, 
-    grid.resolution = 100,
-    ice = TRUE
-    ) %>%
-  autoplot(rug = TRUE, train = train, alpha = .1, center = TRUE) +
-  ggtitle("Centered")
-
-gridExtra::grid.arrange(ice1, ice2, nrow = 1)
-```
-
-##### LIME {#gbm-regression-gbm-lime}
-
-LIME is a newer procedure for understanding why a prediction resulted in a given value for a single observation.  You can read more about LIME [here](https://github.8451.com/pages/effoverse/effoverse.github.io/articles/2018/06/01/lime/). To use the `lime` package on a `gbm` model we need to define model type and prediction methods.
-
-```{r create-lime-methods-gbm}
-model_type.gbm <- function(x, ...) {
-  return("regression")
-}
-
-predict_model.gbm <- function(x, newdata, ...) {
-  pred <- predict(x, newdata, n.trees = x$n.trees)
-  return(as.data.frame(pred))
-}
-```
-
-We can now apply to our two observations.  The results show the predicted value (Case 1: \$118K, Case 2: \$161K), local model fit (both are relatively poor), and the most influential variables driving the predicted value for each observation.
-
-```{r lime-plot-gbm, fig.width=10, fig.height=3.5}
-# get a few observations to perform local interpretation on
-local_obs <- test[1:2, ]
-
-# apply LIME
-explainer <- lime(train, gbm.fit.final)
-explanation <- explain(local_obs, explainer, n_features = 5)
-plot_features(explanation)
+gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
 
 #### Predicting {#gbm-regression-gbm-predict}
 
-Once you have decided on a final model you will likely want to use the model to predict on new observations.  Like most models, we simply use the `predict` function; however, we also need to supply the number of trees to use (see `?predict.gbm` for details).  We see that our RMSE for our test set is actually slightly lower than the RMSE we obtained on our best `gbm` model.
+Once you've found your optimal model, predicting new observations with the __gbm__ model follows the same procedure as most R models.  We simply use the `predict` function; however, we also need to supply the number of trees to use (see `?predict.gbm` for details).  We see that our RMSE for our test set is right in line with the optimal RMSE obtained during our grid search and far better than any model to-date.
 
 ```{r gbm-predict}
 # predict values for test data
-pred <- predict(gbm.fit.final, n.trees = gbm.fit.final$n.trees, test)
+pred <- predict(gbm.fit.final, n.trees = gbm.fit.final$n.trees, ames_test)
 
 # results
-caret::RMSE(pred, test$RESPONSE_VAR)
+caret::RMSE(pred, ames_test$Sale_Price)
 ```
 
 
 ### xgboost {#regression-xgboost}
 
-The [`xgboost`](https://cran.r-project.org/web/packages/xgboost/index.html) R package provides an R API to “Extreme Gradient Boosting”, which is an efficient implementation of gradient boosting framework (apprx 10x faster than `gbm`). The [xgboost/demo](https://github.com/dmlc/xgboost/tree/master/demo) repository provides a wealth of information. You can also find a fairly comprehensive parameter tuning guide [here](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/). The `xgboost` package has been quite popular and successful on [Kaggle](http://blog.kaggle.com/tag/xgboost/) for data mining competitions.
+The __xgboost__ package only works with matrices that contain all numeric variables; consequently, we need to one hot encode our data.  Throughout this book we've illustrated different ways to do this in R (i.e. `Matrix::sparse.model.matrix`, `caret::dummyVars`) but here we will use the __vtreat__ package.  __vtreat__ is a robust package for data prep and helps to eliminate problems caused by missing values, novel categorical levels that appear in future data sets that were not in the training data, etc.  However, __vtreat__ is not very intuitive.  I will not explain the functionalities but you can find more information [here](https://arxiv.org/abs/1611.09477), [here](https://www.r-bloggers.com/a-demonstration-of-vtreat-data-preparation/), and [here](https://github.com/WinVector/vtreat).  
 
-Features include:
-
-* Provides built-in k-fold cross-validation
-* Stochastic GBM with column and row sampling (per split and per tree) for better generalization.
-* Includes efficient linear model solver and tree learning algorithms.
-* Parallel computation on a single machine.
-* Supports various objective functions, including regression, classification and ranking.
-* The package is made to be extensible, so that users are also allowed to define their own objectives easily.
-* Apache 2.0 License.
-
-
-#### Basic implementation {#gbm-regression-xgb-basic}
-
-XGBoost only works with matrices that contain all numeric variables; consequently, we need to one hot encode our data.  There are different ways to do this in R (i.e. `Matrix::sparse.model.matrix`, `caret::dummyVars`) but here we will use the `vtreat` package.  `vtreat` is a robust package for data prep and helps to eliminate problems caused by missing values, novel categorical levels that appear in future data sets that were not in the training data, etc.  However, `vtreat` is not very intuitive.  I will not explain the functionalities but you can find more information [here](https://arxiv.org/abs/1611.09477), [here](https://www.r-bloggers.com/a-demonstration-of-vtreat-data-preparation/), and [here](https://github.com/WinVector/vtreat).  
-
-The following applies `vtreat` to one-hot encode the training and testing data sets.
+The following applies __vtreat__ to one-hot encode the training and testing data sets.
 
 ```{r xgboost-create-matrices}
 # variable names
-features <- setdiff(names(train), "RESPONSE_VAR")
+features <- setdiff(names(ames_train), "Sale_Price")
 
 # Create the treatment plan from the training data
-treatplan <- vtreat::designTreatmentsZ(train, features, verbose = FALSE)
+treatplan <- vtreat::designTreatmentsZ(ames_train, features, verbose = FALSE)
 
 # Get the "clean" variable names from the scoreFrame
 new_vars <- treatplan %>%
@@ -529,24 +504,32 @@ new_vars <- treatplan %>%
   magrittr::use_series(varName)     
 
 # Prepare the training data
-features_train <- vtreat::prepare(treatplan, train, varRestriction = new_vars) %>% as.matrix()
-response_train <- train$RESPONSE_VAR
+features_train <- vtreat::prepare(treatplan, ames_train, varRestriction = new_vars) %>% as.matrix()
+response_train <- ames_train$Sale_Price
 
 # Prepare the test data
-features_test <- vtreat::prepare(treatplan, test, varRestriction = new_vars) %>% as.matrix()
-response_test <- test$RESPONSE_VAR
+features_test <- vtreat::prepare(treatplan, ames_test, varRestriction = new_vars) %>% as.matrix()
+response_test <- ames_test$Sale_Price
 
 # dimensions of one-hot encoded data
 dim(features_train)
 dim(features_test)
 ```
 
-`xgboost` provides different training functions (i.e. `xgb.train` which is just a wrapper for `xgboost`). However, to train an XGBoost we typically want to use `xgb.cv`, which incorporates cross-validation.  The following trains a basic 5-fold cross validated XGBoost model with 1,000 trees.  There are many parameters available in `xgb.cv` but the ones you have become more familiar with in this tutorial include the following default values:
+
+#### Basic implementation {#gbm-regression-xgb-basic}
+
+__xgboost__ provides different training functions (i.e. `xgb.train` which is just a wrapper for `xgboost`). However, to train an __xgboost__ model we typically want to use `xgb.cv`, which incorporates cross-validation.  The following trains a basic 5-fold cross validated XGBoost model with 1,000 trees.  There are many parameters available in `xgb.cv` but the ones you have become more familiar with in this chapter include the following default values:
 
 * learning rate (`eta`): 0.3
 * tree depth (`max_depth`): 6
 * minimum node size (`min_child_weight`): 1
 * percent of training data to sample for each tree (`subsample` --> equivalent to `gbm`'s `bag.fraction`): 100%
+
+```{block, type="rmdnote"}
+This model took nearly 2 minutes to run.  The reason __xgboost__ seems slower than __gbm__ is since we one-hot encoded our data, __xgboost__ is searching across 211 features where __gbm__ uses non-one-hot encoded which means it was only searching across 80 features.
+```
+
 
 ```{r xgb-basic-implementation, eval=FALSE}
 # reproducibility
@@ -558,36 +541,41 @@ xgb.fit1 <- xgb.cv(
   nrounds = 1000,
   nfold = 5,
   objective = "reg:linear",  # for regression models
-  verbose = 0               # silent,
+  verbose = 0                # silent,
 )
 ```
 
-The `xgb.fit1` object contains lots of good information. In particular we can assess the `xgb.fit1$evaluation_log` to identify the minimum RMSE and the optimal number of trees for both the training data and the cross-validated error. We can see that the training error continues to decreasing through all 1000 trees where the RMSE nearly reaches 0.0198; however, the cross validated error reaches a minimum RMSE of 0.257 with only 183 trees. 
+The `xgb.fit1` object contains lots of good information. In particular we can assess the `xgb.fit1$evaluation_log` to identify the minimum RMSE and the optimal number of trees for both the training data and the cross-validated error. We can see that the training error continues to decreasing through 980 trees where the RMSE nearly reaches 0; however, the cross validated error reaches a minimum RMSE of \$26,758.30 with only 98 trees. 
 
-```{r xgb-find-min-error, fig.width=6, fig.height=3.5, eval=FALSE}
+```{r xgb-find-min-error, eval=FALSE}
 # get number of trees that minimize error
 xgb.fit1$evaluation_log %>%
   dplyr::summarise(
-    ntrees.train = which(train_rmse_mean == min(train_rmse_mean))[1],
-    rmse.train   = min(train_rmse_mean),
-    ntrees.test  = which(test_rmse_mean == min(test_rmse_mean))[1],
-    rmse.test   = min(test_rmse_mean),
+    ntrees.train = which.min(train_rmse_mean),
+    rmse.train = min(train_rmse_mean),
+    ntrees.test = which.min(test_rmse_mean),
+    rmse.test = min(test_rmse_mean),
   )
 ##   ntrees.train rmse.train ntrees.test rmse.test
-## 1         1000  0.0197884         183 0.2569686
+## 1          980    0.05009          98   26758.3
 
 # plot error vs number trees
-ggplot(xgb.fit1$evaluation_log) +
-  geom_line(aes(iter, train_rmse_mean), color = "red") +
-  geom_line(aes(iter, test_rmse_mean), color = "blue")
+xgb.fit1$evaluation_log %>% 
+  tidyr::gather(error, RMSE, train_rmse_mean, test_rmse_mean) %>%
+  ggplot(aes(iter, RMSE, color = error)) +
+  geom_line()
 ```
 
-```{r xgb-gradient-descent-plot, echo=FALSE, out.height="70%", out.width="70%"}
+```{r xgb-gradient-descent-plot, echo=FALSE, out.height="85%", out.width="85%", fig.cap="Training (blue) and cross-validation (red) error for each additional tree added to the GBM algorithm. The CV error is quickly minimized with 98 trees while the training error reduces to near zero over 980 trees."}
 
 knitr::include_graphics("images/xgb1_gradient_descent.png")
 ```
 
 A nice feature provided by `xgb.cv` is early stopping.  This allows us to tell the function to stop running if the cross validated error does not improve for *n* continuous trees.  For example, the above model could be re-run with the following where we tell it stop if we see no improvement for 10 consecutive trees.  This feature will help us speed up the tuning process in the next section.
+
+```{block, type="rmdtip"}
+This reduced our training time from 2 minutes to 8 seconds!
+```
 
 ```{r fig.width=6, fig.height=3.5, eval=FALSE}
 # reproducibility
@@ -604,12 +592,13 @@ xgb.fit2 <- xgb.cv(
 )
 
 # plot error vs number trees
-ggplot(xgb.fit2$evaluation_log) +
-  geom_line(aes(iter, train_rmse_mean), color = "red") +
-  geom_line(aes(iter, test_rmse_mean), color = "blue")
+xgb.fit2$evaluation_log %>% 
+  tidyr::gather(error, RMSE, train_rmse_mean, test_rmse_mean) %>%
+  ggplot(aes(iter, RMSE, color = error)) +
+  geom_line()
 ```
 
-```{r xgb2-gradient-descent2-plot, echo=FALSE, out.height="70%", out.width="70%"}
+```{r xgb2-gradient-descent2-plot, echo=FALSE, out.height="80%", out.width="80%", fig.cap="Early stopping allows us to stop training once we experience no additional improvement on our cross-validated error."}
 
 knitr::include_graphics("images/xgb2_gradient_descent.png")
 ```
@@ -655,16 +644,16 @@ xgb.fit3 <- xgb.cv(
 # assess results
 xgb.fit3$evaluation_log %>%
   dplyr::summarise(
-    ntrees.train = which(train_rmse_mean == min(train_rmse_mean))[1],
-    rmse.train   = min(train_rmse_mean),
-    ntrees.test  = which(test_rmse_mean == min(test_rmse_mean))[1],
-    rmse.test   = min(test_rmse_mean),
+    ntrees.train = which.min(train_rmse_mean),
+    rmse.train = min(train_rmse_mean),
+    ntrees.test = which.min(test_rmse_mean),
+    rmse.test = min(test_rmse_mean),
   )
 ##   ntrees.train rmse.train ntrees.test rmse.test
-## 1          735   0.121736         725  0.241092
+## 1          122   7954.668         112  24547.28
 ```
 
-To perform a large search grid, we can follow the same procedure we did with `gbm`.  We create our hyperparameter search grid along with columns to dump our results in.  Here, I create a pretty large search grid consisting of 108 different hyperparameter combinations to model.
+To perform a large search grid, we can follow the same procedure we did with __gbm__.  We create our hyperparameter search grid along with columns to dump our results in.  Here, I create a pretty large search grid consisting of 108 different hyperparameter combinations to model.
 
 ```{r xgb-grid}
 # create hyperparameter grid
@@ -681,10 +670,10 @@ hyper_grid <- expand.grid(
 nrow(hyper_grid)
 ```
 
-Now I apply the same for loop procedure to loop through and apply a XGBoost model for each hyperparameter combination and dump the results in the `hyper_grid` data frame.  
+Now I apply the same `for` loop procedure to loop through and apply an __xgboost__ model for each hyperparameter combination and dump the results in the `hyper_grid` data frame.  Our minimum RMSE (\$23,316.40) is a little higher than the __gbm__ model, likely a result of one-hot encoding our data and how the models treat these dummy coded variables differently.
 
 ```{block, type = "rmdwarning"}
-If you plan to run this code be prepared to run it before going out to eat or going to bed as it the full search grid took 6 hours to run!
+This full search grid took __34 minutes__ to run!
 ```
 
 ```{r xgb-grid-search, eval=FALSE}
@@ -723,29 +712,29 @@ for(i in 1:nrow(hyper_grid)) {
 hyper_grid %>%
   dplyr::arrange(min_RMSE) %>%
   head(10)
-##     eta max_depth min_child_weight subsample colsample_bytree optimal_trees  min_RMSE
-## 1  0.05         5               15      0.80              0.9          1892 0.2383528
-## 2  0.05         5               10      0.80              1.0          1361 0.2394012
-## 3  0.05         5               15      0.80              1.0          1270 0.2394488
-## 4  0.05         7               10      0.80              1.0           770 0.2395246
-## 5  0.05         5                5      0.80              0.9          1291 0.2396664
-## 6  0.05         5                5      0.65              0.9          1200 0.2397968
-## 7  0.05         5               15      0.65              1.0          1396 0.2398580
-## 8  0.05         7               15      0.80              1.0           948 0.2399040
-## 9  0.05         5                5      0.80              1.0          1224 0.2399266
-## 10 0.05         5               15      0.65              0.9          1362 0.2401734
+##     eta max_depth min_child_weight subsample colsample_bytree optimal_trees min_RMSE
+## 1  0.05         7                5      0.65              1.0           481 23316.40
+## 2  0.05         5                5      0.65              1.0           355 23515.42
+## 3  0.05         5                5      0.80              1.0           469 23856.31
+## 4  0.05         5                5      0.65              0.9           312 23888.34
+## 5  0.05         7                5      0.80              1.0           660 23904.30
+## 6  0.15         3                5      0.65              1.0           227 23909.78
+## 7  0.05         3                5      0.80              1.0           567 23967.56
+## 8  0.05         3               10      0.80              1.0           665 23998.05
+## 9  0.15         3                5      0.65              0.9           230 24001.86
+## 10 0.05         5               10      0.80              1.0           624 24033.78
 ```
 
-After assessing the results you would likely perform a few more grid searches to hone in on the parameters that appear to influence the model the most.  In fact, [here is a link](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/) to a great blog post that discusses a strategic approach to tuning with `xgboost`. However, for brevity, we'll just assume the top model in the above search is the globally optimal model.  Once you've found the optimal model, we can fit our final model with `xgb.train`.
+After assessing the results you would likely perform a few more grid searches to hone in on the parameters that appear to influence the model the most.  In fact, [here is a link](https://www.analyticsvidhya.com/blog/2016/03/complete-guide-parameter-tuning-xgboost-with-codes-python/) to a great blog post that discusses a strategic approach to tuning with __xgboost__. However, for brevity, we'll just assume the top model in the above search is the globally optimal model.  Once you've found the optimal model, we can fit our final model with `xgb.train` or `xgboost`.
 
 ```{r xgb-best}
 # parameter list
 params <- list(
   eta = 0.05,
-  max_depth = 5,
-  min_child_weight = 15,
-  subsample = 0.80,
-  colsample_bytree = 0.9
+  max_depth = 7,
+  min_child_weight = 5,
+  subsample = 0.65,
+  colsample_bytree = 1
 )
 
 # train final model
@@ -753,7 +742,7 @@ xgb.fit.final <- xgboost(
   params = params,
   data = features_train,
   label = response_train,
-  nrounds = 1892,
+  nrounds = 481,
   objective = "reg:linear",
   verbose = 0
 )
@@ -761,40 +750,49 @@ xgb.fit.final <- xgboost(
 
 
 
-#### Visualizing {#gbm-regression-xgb-viz}
+#### Feature interpretation {#gbm-regression-xgb-viz}
 
-##### Variable importance {#gbm-regression-xgb-vip}
+##### Feature importance {#gbm-regression-xgb-vip}
 
-`xgboost` provides built-in variable importance plotting.  First, you need to create the importance matrix with `xgb.importance` and then feed this matrix into `xgb.plot.importance`.  There are 3 variable importance measure:
+__xgboost__ provides built-in variable importance plotting.  First, you need to create the importance matrix with `xgb.importance` and then feed this matrix into `xgb.plot.importance` (or `xgb.ggplot.importance` for a ggplot output).  __xgboost__ provides 3 variable importance measures:
 
-* Gain: the relative contribution of the corresponding feature to the model calculated by taking each feature's contribution for each tree in the model. This is synonymous with `gbm`'s `relative.influence`.
-* Cover: the relative number of observations related to this feature. For example, if you have 100 observations, 4 features and 3 trees, and suppose feature1 is used to decide the leaf node for 10, 5, and 2 observations in tree1, tree2 and tree3 respectively; then the metric will count cover for this feature as 10+5+2 = 17 observations. This will be calculated for all the 4 features and the cover will be 17 expressed as a percentage for all features' cover metrics.
-* Frequency: the percentage representing the relative number of times a particular feature occurs in the trees of the model. In the above example, if feature1 occurred in 2 splits, 1 split and 3 splits in each of tree1, tree2 and tree3; then the weightage for feature1 will be 2+1+3 = 6. The frequency for feature1 is calculated as its percentage weight over weights of all features.
+* Gain: the relative contribution of the corresponding feature to the model calculated by taking each feature's contribution for each tree in the model. This is synonymous with __gbm__'s `relative.influence`.
+* Cover: the relative number of observations related to this feature. For example, if you have 100 observations, 4 features and 3 trees, and suppose $feature_1$ is used to decide the leaf node for 10, 5, and 2 observations in $tree_1$, $tree_2$ and $tree_3$ respectively; then the metric will count cover for this feature as $10+5+2 = 17$ observations. This will be calculated for all the 4 features and the cover will be 17 expressed as a percentage for all features' cover metrics.
+* Frequency: the percentage representing the relative number of times a particular feature occurs in the trees of the model. In the above example, if $feature_1$ occurred in 2 splits, 1 split and 3 splits in each of $tree_1$, $tree_2$ and $tree_3$; then the weightage for $feature_1$ will be $2+1+3 = 6$. The frequency for $feature_1$ is calculated as its percentage weight over weights of all features.
 
-```{r xgb-vip}
+```{block, type="rmdnote"}
+The `xgb.ggplot.importance` plotting mechanism will also perform a cluster analysis on the features based on their importance scores.  This becomes more useful when visualizing many features (i.e. 50) and you want to categorize them based on their importance.
+```
+
+
+```{r xgb-vip, fig.width=25, fig.cap="Top 25 influential variables for our final __xgboost__ model based on the three different variable importance metrics."}
 # create importance matrix
 importance_matrix <- xgb.importance(model = xgb.fit.final)
 
 # variable importance plot
-xgb.plot.importance(importance_matrix, top_n = 10, measure = "Gain")
+p1 <- xgb.ggplot.importance(importance_matrix, top_n = 10, measure = "Gain") + ggtitle("Gain") + theme(legend.position="bottom")
+p2 <- xgb.ggplot.importance(importance_matrix, top_n = 10, measure = "Cover") + ggtitle("Cover") + theme(legend.position="bottom")
+p3 <- xgb.ggplot.importance(importance_matrix, top_n = 10, measure = "Frequency") + ggtitle("Frequency") + theme(legend.position="bottom")
+
+gridExtra::grid.arrange(p1, p2, p3, ncol = 1)
 ```
 
-As with `gbm`, an alternate simplified approach is to use the underdevelopment [`vip`](https://github.com/koalaverse/vip) package, which provides `ggplot2` plots.  `vip` also provides an additional measure of variable importance based on partial dependence measures and is a common variable importance plotting framework for many machine learning models.
+##### Feature effects {#gbm-regression-xgb-pdp}
 
-```{r xgb-vip2}
-vip::vip(xgb.fit.final)
+PDP and ICE plots work similarly to how we implemented them with __gbm__. The only difference is you need to incorporate the training data within the `partial` function since these data cannot be extracted directly from the model object.  We see a similar non-linear relationship between `Gr_Liv_Area` and predicted sale price as we did with __gbm__ and in the random forest models; however, note the unique dip right after `Gr_liv_Area` reaches 3,000 square feet. We saw this dip in the __gbm__ model; however, it is a pattern that was not picked up on by the random forests models.
+
+
+```{block, type="rmdtip"}
+You do not need to supply the number of trees with `n.trees = xgb.fit.final$niter`; however, when supplying a cross-validated model where the optimal number of trees may be less than the total number of trees ran, then you will want to supply the optimal number of trees to the `n.trees` paramater.
 ```
 
-##### Partial dependence plots {#gbm-regression-xgb-pdp}
 
-PDP and ICE plots work similarly to how we implemented them with `gbm`. The only difference is you need to incorporate the training data within the `partial` function.
-
-```{r xgb-pdp-ice, fig.height=3.5, fig.width=9}
+```{r xgb-pdp-ice, fig.height=3.5, fig.width=9, fig.cap="The mean predicted sale price as the above ground living area increases."}
 pdp <- xgb.fit.final %>%
   partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE_clean", 
-    n.trees = 1892, 
-    grid.resolution = 100, 
+    pred.var = "Gr_Liv_Area_clean", 
+    n.trees = xgb.fit.final$niter, 
+    grid.resolution = 50, 
     train = features_train
     ) %>%
   autoplot(rug = TRUE, train = features_train) +
@@ -802,68 +800,33 @@ pdp <- xgb.fit.final %>%
 
 ice <- xgb.fit.final %>%
   partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE_clean", 
-    n.trees = 1892, 
+    pred.var = "Gr_Liv_Area_clean", 
+    n.trees = xgb.fit.final$niter, 
     grid.resolution = 100, 
     train = features_train, 
     ice = TRUE
     ) %>%
-  autoplot(rug = TRUE, train = features_train, alpha = .1, center = TRUE) +
+  autoplot(rug = TRUE, train = features_train, alpha = .05, center = TRUE) +
   ggtitle("ICE")
 
 gridExtra::grid.arrange(pdp, ice, nrow = 1)
 ```
 
 
-##### LIME {#gbm-regression-xgb-lime}
+#### Predicting {#gbm-regression-gbm-predict}
 
-LIME provides built-in functionality for `xgboost` objects (see `?model_type`).  However, just keep in mind that the local observations being analyzed need to be one-hot encoded in the same manner as we prepared the training and test data.  Also, when you feed the training data into the `lime::lime` function be sure that you coerce it from a matrix to a data frame.
+Lastly, we use `predict` to predict on new observations; however, unlike __gbm__ we do not need to provide the number of trees. 
 
-```{r xgb-lime, fig.width=11}
-# one-hot encode the local observations to be assessed.
-local_obs_onehot <- vtreat::prepare(treatplan, local_obs, varRestriction = new_vars)
-
-# apply LIME
-explainer <- lime(data.frame(features_train), xgb.fit.final)
-explanation <- explain(local_obs_onehot, explainer, n_features = 5)
-plot_features(explanation)
-```
-
-
-#### Predicting {#gbm-regression-xgb-predict}
-
-Lastly, we use `predict` to predict on new observations; however, unlike `gbm` we do not need to provide the number of trees. Our test set RMSE is only about 0.001 different than that produced by our `gbm` model.  
-
-```{r xgb-predict}
+```{r gbm-xgboost-regression-predict}
 # predict values for test data
 pred <- predict(xgb.fit.final, features_test)
 
-# results
+# test set results
 caret::RMSE(pred, response_test)
 ```
 
+
 ### h2o {#gbm-regression-h2o}
-
-The [`h2o`](https://cran.r-project.org/web/packages/h2o/index.html) R package is a powerful and efficient java-based interface that allows for local and cluster-based deployment. It comes with a fairly comprehensive [online resource](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html) that includes methodology and code documentation along with tutorials.
-
-Features include:
-
-* Distributed and parallelized computation on either a single node or a multi-node cluster.
-* Automatic early stopping based on convergence of user-specified metrics to user-specified relative tolerance.
-* Stochastic GBM with column and row sampling (per split and per tree) for better generalization.
-* Support for exponential families (Poisson, Gamma, Tweedie) and loss functions in addition to binomial (Bernoulli), Gaussian and multinomial distributions, such as Quantile regression (including Laplace).
-* Grid search for hyperparameter optimization and model selection.
-* Data-distributed, which means the entire dataset does not need to fit into memory on a single node, hence scales to any size training set.
-* Uses histogram approximations of continuous variables for speedup.
-* Uses dynamic binning - bin limits are reset at each tree level based on the split bins’ min and max values discovered during the last pass.
-* Uses squared error to determine optimal splits.
-* Distributed implementation details outlined in a [blog post](http://blog.h2o.ai/2013/10/building-distributed-gbm-h2o/) by Cliff Click.
-* Unlimited factor levels.
-* Multiclass trees (one for each class) built in parallel with each other.
-* Apache 2.0 Licensed.
-* Model export in plain Java code for deployment in production environments.
-
-#### Basic implementation {#gbm-regression-h2o-basic}
 
 Lets go ahead and start up h2o:
 
@@ -871,6 +834,8 @@ Lets go ahead and start up h2o:
 h2o.no_progress()
 h2o.init(max_mem_size = "5g")
 ```
+
+#### Basic implementation {#gbm-regression-h2o-basic}
 
 `h2o.gbm` allows us to perform a GBM with H2O. However, prior to running our initial model we need to convert our training data to an h2o object. By default, `h2o.gbm` applies a GBM model with the following parameters:
 
@@ -880,15 +845,25 @@ h2o.init(max_mem_size = "5g")
 * minimum observations in a terminal node (`min_rows`): 10
 * no sampling of observations or columns
 
-Since we are performing a 5-fold cross-validation, the output reports results for both our training set ($RMSE = 0.235$) and validation set ($RMSE = 0.273$).
+Since we are performing a 5-fold cross-validation, the output reports results for both our training set ($RMSE = 12539.86$) and validation set ($RMSE = 24654.047$).
+
+```{r hide-h2o-data-conversion, echo=FALSE}
+# create feature names
+y <- "Sale_Price"
+x <- setdiff(names(ames_train), y)
+
+# turn training set into h2o object
+train.h2o <- as.h2o(ames_train)
+```
+
 
 ```{r h2o-fit1, eval=FALSE}
 # create feature names
-y <- "RESPONSE_VAR"
-x <- setdiff(names(train), y)
+y <- "Sale_Price"
+x <- setdiff(names(ames_train), y)
 
 # turn training set into h2o object
-train.h2o <- as.h2o(train)
+train.h2o <- as.h2o(ames_train)
 
 # training basic GBM model with defaults
 h2o.fit1 <- h2o.gbm(
@@ -904,20 +879,20 @@ h2o.fit1
 ## ==============
 ## 
 ## H2ORegressionModel: gbm
-## Model ID:  GBM_model_R_1529500732603_1 
+## Model ID:  GBM_model_R_1533927247702_1 
 ## Model Summary: 
 ##   number_of_trees number_of_internal_trees model_size_in_bytes min_depth max_depth mean_depth min_leaves max_leaves mean_leaves
-## 1              50                       50               21192         5         5    5.00000         20         32    28.70000
+## 1              50                       50               17591         5         5    5.00000          9         31    22.96000
 ## 
 ## 
 ## H2ORegressionMetrics: gbm
 ## ** Reported on training data. **
 ## 
-## MSE:  0.05514764
-## RMSE:  0.2348353
-## MAE:  0.1590732
-## RMSLE:  0.151168
-## Mean Residual Deviance :  0.05514764
+## MSE:  157248046
+## RMSE:  12539.86
+## MAE:  8988.278
+## RMSLE:  0.08190755
+## Mean Residual Deviance :  157248046
 ## 
 ## 
 ## 
@@ -925,25 +900,25 @@ h2o.fit1
 ## ** Reported on cross-validation data. **
 ## ** 5-fold cross-validation on training data (Metrics computed for combined holdout predictions) **
 ## 
-## MSE:  0.0744412
-## RMSE:  0.2728391
-## MAE:  0.1695441
-## RMSLE:  0.1576812
-## Mean Residual Deviance :  0.0744412
+## MSE:  612660925
+## RMSE:  24751.99
+## MAE:  15485.9
+## RMSLE:  0.1369165
+## Mean Residual Deviance :  612660925
 ## 
 ## 
 ## Cross-Validation Metrics Summary: 
-##                               mean           sd  cv_1_valid cv_2_valid cv_3_valid cv_4_valid  cv_5_valid
-## mae                      0.1695384 0.0016719307   0.1705474 0.17250285  0.1691635 0.17014036  0.16533786
-## mean_residual_deviance 0.074436866  0.008977603 0.075791925 0.09748287 0.06861903 0.07091171 0.059378795
-## mse                    0.074436866  0.008977603 0.075791925 0.09748287 0.06861903 0.07091171 0.059378795
-## r2                       0.8468726  0.010645257   0.8520754  0.8198849 0.85473984  0.8433657   0.8642973
-## residual_deviance      0.074436866  0.008977603 0.075791925 0.09748287 0.06861903 0.07091171 0.059378795
-## rmse                    0.27188966  0.016013693  0.27530333 0.31222245 0.26195234 0.26629254  0.24367765
-## rmsle                   0.15766184 0.0012269478  0.16038696  0.1579677 0.15727077 0.15773772  0.15494606
+##                               mean          sd cv_1_valid  cv_2_valid  cv_3_valid  cv_4_valid  cv_5_valid
+## mae                     15465.6455    403.8833  15899.954   14460.245  16051.8125    15667.94   15248.277
+## mean_residual_deviance 6.1167661E8 6.4985276E7 6.851456E8 4.3496512E8 6.0995507E8 6.7103411E8 6.5728301E8
+## mse                    6.1167661E8 6.4985276E7 6.851456E8 4.3496512E8 6.0995507E8 6.7103411E8 6.5728301E8
+## r2                       0.9020621 0.008838167  0.8946199   0.9245291  0.89047533   0.8939862  0.90669996
+## residual_deviance      6.1167661E8 6.4985276E7 6.851456E8 4.3496512E8 6.0995507E8 6.7103411E8 6.5728301E8
+## rmse                     24654.047   1388.2732  26175.287   20855.818    24697.27   25904.326   25637.531
+## rmsle                   0.13682812 0.009084022 0.15625001  0.12442712  0.12835869  0.12703055  0.14807428
 ```
 
-Similar to XGBoost, we can incorporate automated stopping so that we can crank up the number of trees but terminate training once model improvement decreases or stops.  There is also an option to terminate training after so much time has passed (see `max_runtime_secs`). In this example, I train a default model with 5,000 trees but stop training after 10 consecutive trees have no improvement on the cross-validated error. In this case, training stops after 2594 trees and has a cross-validated RMSE of 0.235.
+Similar to __xgboost__, we can incorporate automated stopping so that we can crank up the number of trees but terminate training once model improvement decreases or stops.  There is also an option to terminate training after so much time has passed (see `max_runtime_secs`). In this example, I train a default model with 5,000 trees but stop training after 10 consecutive trees have no improvement on the cross-validated error. In this case, training stops after 2623 trees and has a cross-validated RMSE of \$23,441.46.
 
 ```{r h2o-fit2, eval=FALSE}
 # training basic GBM model with defaults
@@ -960,17 +935,17 @@ h2o.fit2 <- h2o.gbm(
 
 # model stopped after xx trees
 h2o.fit2@parameters$ntrees
-## [1] 2594
+## [1] 2623
 
 # cross validated RMSE
 h2o.rmse(h2o.fit2, xval = TRUE)
-## [1] 0.2352998
+## [1] 23441.46
 ```
 
 
 #### Tuning {#gbm-regression-h2o-tune}
 
-H2O provides ___many___ parameters that can be adjusted.  It is well worth your time to check out the available documentation at [H2O.ai](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/gbm.html#gbm-tuning-guide).  For this tutorial, we'll focus on the more common hyperparameters that are adjusted.  This includes:
+H2O provides ___many___ parameters that can be adjusted.  It is well worth your time to check out the available documentation at [H2O.ai](http://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/gbm.html#gbm-tuning-guide).  For this chapter, we'll focus on the more common hyperparameters that are adjusted.  This includes:
 
 * Tree complexity:
     * `ntrees`: number of trees to train
@@ -985,13 +960,18 @@ H2O provides ___many___ parameters that can be adjusted.  It is well worth your 
     
 Note that there are parameters that control how categorical and continuous variables are encoded, binned, and split.  The defaults tend to perform quite well but we have been able to gain small improvements in certain circumstances by adjusting these.  We will not cover them but they are worth reviewing. 
 
-To perform grid search tuning with H2O we have two options: perform a full or random discrete grid search.
+To perform grid search tuning with H2O we can perform either a full or random discrete grid search as discussed in Section \@ref(rf-h2o-regression-tune).
 
 ##### Full grid search {#gbm-regression-h2o-tune-full}
 
-A ___full cartesian grid search___ examines every combination of hyperparameter settings that we specify in a tuning grid.  This has been the type of tuning we have been performing with our manual `for` loops with `gbm` and `xgboost`.  However, to speed up training with H2O I'll use a validation set rather than perform k-fold cross validation.  The following creates a hyperparameter grid consisting of 216 hyperparameter combinations. We apply `h2o.grid` to perform a grid search while also incorporating stopping parameters to reduce training time. 
+We'll start with a full grid search. However, to speed up training with __h2o__ I'll use a validation set rather than perform k-fold cross validation.  The following creates a hyperparameter grid consisting of 216 hyperparameter combinations. We apply `h2o.grid` to perform a grid search while also incorporating stopping parameters to reduce training time. 
 
-We see that the worst model had an RMSE of 0.37 ($\sqrt{0.14}$) and the best had an RMSE of 0.22 ($\sqrt{0.0486}$). A few characteristics pop out when we assess the results - models with deeper trees, no annealing, and stochastic observation sampling tend to perform best. 
+We see that the worst model had an RMSE of \$34,142.31 ($\sqrt{476228672}$) and the best had an RMSE of \$21,822.66 ($\sqrt{1165697554}$). A few characteristics pop out when we assess the results - models that search across a sample of columns, include more interactions via deeper trees, and allow nodes with single observations tend to perform best. 
+
+```{block, type="rmdtip"}
+This full grid search took __18 minutes__.
+```
+
 
 ```{r h2o-full-grid, eval=FALSE}
 # create training & validation sets
@@ -1047,56 +1027,74 @@ grid_perf
 ## 
 ## Hyper-Parameter Search Summary: ordered by increasing mse
 ##   col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate           model_ids                  mse
-## 1             0.9       0.05                  1.0         5     10.0        0.75 gbm_grid1_model_102 0.048607431355423336
-## 2             1.0       0.05                  1.0         5      5.0         1.0 gbm_grid1_model_175  0.04864224220391745
-## 3             1.0       0.05                  1.0         5      5.0        0.75  gbm_grid1_model_67 0.048698672210600556
-## 4             0.9       0.05                  1.0         5      5.0        0.75  gbm_grid1_model_66  0.04883724086664055
-## 5             0.9       0.05                  1.0         5      1.0        0.75  gbm_grid1_model_30  0.04886859434835919
+## 1             0.9       0.05                  1.0         5      1.0         1.0 gbm_grid1_model_138  4.762286724006572E8
+## 2             0.9       0.05                  1.0         5      1.0        0.75  gbm_grid1_model_30 4.9950455156501746E8
+## 3             0.9        0.1                 0.99         5      1.0         1.0 gbm_grid1_model_134   5.04407597702603E8
+## 4             0.9       0.15                  1.0         5      1.0         1.0 gbm_grid1_model_142 5.1283047945094573E8
+## 5             0.9       0.05                 0.99         5      1.0         1.0 gbm_grid1_model_132 5.1307290689450026E8
 ## 
 ## ---
-##     col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate           model_ids                 mse
-## 211             0.9       0.05                 0.99         1     10.0         1.0 gbm_grid1_model_180 0.14026319166371584
-## 212             0.9       0.05                 0.99         1      1.0         1.0 gbm_grid1_model_108 0.14026319166371584
-## 213             0.9       0.05                 0.99         1      5.0         1.0 gbm_grid1_model_144 0.14026319166371584
-## 214             1.0       0.05                 0.99         1     10.0         1.0 gbm_grid1_model_181 0.14032816819309543
-## 215             1.0       0.05                 0.99         1      1.0         1.0 gbm_grid1_model_109 0.14032816819309543
-## 216             1.0       0.05                 0.99         1      5.0         1.0 gbm_grid1_model_145 0.14032816819309543
+##     col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate           model_ids                  mse
+## 211             1.0       0.05                 0.99         1      5.0        0.75  gbm_grid1_model_37 1.1602102219725711E9
+## 212             1.0       0.05                 0.99         1     10.0        0.75  gbm_grid1_model_73 1.1620871092432442E9
+## 213             0.9       0.05                 0.99         1      5.0         1.0 gbm_grid1_model_144 1.1631655136872623E9
+## 214             1.0       0.05                 0.99         1      5.0         1.0 gbm_grid1_model_145  1.164083893251335E9
+## 215             0.9       0.05                 0.99         1     10.0         1.0 gbm_grid1_model_180 1.1653298042199028E9
+## 216             1.0       0.05                 0.99         1     10.0         1.0 gbm_grid1_model_181 1.1656975535614166E9
 ```
 
 
-We can check out more details of the best performing model. 
+We can check out more details of the best performing model. We can see that our best model used all 5000 trees, thus a future grid search may want to increase the number of trees.
 
 ```{r h2o-full-grid2, eval=FALSE}
 # Grab the model_id for the top model, chosen by validation error
 best_model_id <- grid_perf@model_ids[[1]]
 best_model <- h2o.getModel(best_model_id)
 
+best_model@parameters$ntrees
+## [1] 5000
+
 # Now let’s get performance metrics on the best model
 h2o.performance(model = best_model, valid = TRUE)
 ## H2ORegressionMetrics: gbm
 ## ** Reported on validation data. **
 ## 
-## MSE:  0.04860743
-## RMSE:  0.2204709
-## MAE:  0.1511828
-## RMSLE:  0.1510375
-## Mean Residual Deviance :  0.04860743
+## MSE:  476228672
+## RMSE:  21822.66
+## MAE:  13972.88
+## RMSLE:  0.1341252
+## Mean Residual Deviance :  476228672
 ```
 
 ##### Random discrete grid search {#gbm-regression-h2o-tune-random}
 
-Because of the combinatorial explosion, each additional hyperparameter that gets added to our grid search has a huge effect on the time to complete. Consequently, `h2o` provides an additional grid search path called ___"RandomDiscrete"___, which will jump from one random combination to another and stop once a certain level of improvement has been made, certain amount of time has been exceeded, or a certain amount of models have been ran (or a combination of these have been met). Although using a random discrete search path will likely not find the optimal model, it typically does a good job of finding a very good model.
+As discussed in Section \@ref(rf-h2o-regression-tune-random), __h2o__ also allows us to perform a random grid search that allows early stopping.  We can build onto the previous results and perform a random discrete grid.  This time I increase the `max_depth`, refine the `min_rows`, and allow for 80% `col_sample_rate`.  I keep all hyperparameter search criteria the same. I also add a search criteria that stops the grid search if none of the last 10 models have managed to have a 0.5% improvement in MSE compared to the best model before that. If we continue to find improvements then I cut the grid search off after 1800 seconds (30 minutes). In this example, our search went for the entire 90 minutes and evaluated 57 of the 216 potential models.
 
-The following performs a random discrete grid search using the same hyperparameter grid we used above.  However, in this example we add a search criteria (which is preferred when using a random search) that stops the grid search if none of the last 10 models have managed to have a 0.5% improvement in MSE compared to the best model before that. If we continue to find improvements then I cut the grid search off after 5400 seconds (90 minutes). In this example, our search went for the entire 90 minutes and evaluated 57 of the 216 potential models.
+In the body of the grid search, notice that I increased the trees to 10,000 since our best model used all 5,000 but I also include a stopping mechanism so that the model quits adding trees once no improvement is made in the validation RMSE.
+
+```{block, type="rmdtip"}
+This random grid search took __30 minutes__.  It only assessed a third of the number of models the full grid search did but keep in mind that this grid search was assessing models with very low learning rates, which can take a long time. 
+```
+
 
 ```{r h2o-random-grid-search, eval=FALSE}
+# refined hyperparameter grid
+hyper_grid <- list(
+  max_depth = c(5, 7, 9),
+  min_rows = c(1, 3, 5),
+  learn_rate = c(0.05, 0.1, 0.15),
+  learn_rate_annealing = c(.99, 1),
+  sample_rate = c(.75, 1),
+  col_sample_rate = c(.8, .9)
+)
+
 # random grid search criteria
 search_criteria <- list(
   strategy = "RandomDiscrete",
   stopping_metric = "mse",
   stopping_tolerance = 0.005,
   stopping_rounds = 10,
-  max_runtime_secs = 90*60
+  max_runtime_secs = 60*30
   )
 
 # perform grid search 
@@ -1109,7 +1107,7 @@ grid <- h2o.grid(
   validation_frame = valid,
   hyper_params = hyper_grid,
   search_criteria = search_criteria, # add search criteria
-  ntrees = 5000,
+  ntrees = 10000,
   stopping_rounds = 10,
   stopping_tolerance = 0,
   seed = 123
@@ -1133,28 +1131,28 @@ grid_perf
 ##   -  max_depth 
 ##   -  min_rows 
 ##   -  sample_rate 
-## Number of models: 57 
+## Number of models: 68 
 ## Number of failed models: 0 
 ## 
 ## Hyper-Parameter Search Summary: ordered by increasing mse
-##   col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate          model_ids                 mse
-## 1             0.9       0.05                  1.0         5      5.0         1.0 gbm_grid2_model_55 0.04741440049518694
-## 2             0.9       0.05                  1.0         3      5.0        0.75 gbm_grid2_model_24 0.04754228441210801
-## 3             1.0       0.05                  1.0         5     10.0        0.75  gbm_grid2_model_9 0.04764814562415094
-## 4             0.9        0.1                  1.0         5      5.0         1.0 gbm_grid2_model_35 0.04774319395514676
-## 5             0.9       0.05                  1.0         5      1.0         1.0 gbm_grid2_model_49 0.04843219263329381
+##   col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate          model_ids                  mse
+## 1             0.9       0.05                  1.0         5      1.0         1.0 gbm_grid2_model_50 4.7624213765845805E8
+## 2             0.8        0.1                 0.99         5      5.0        0.75 gbm_grid2_model_40 4.9473498408073145E8
+## 3             0.8        0.1                 0.99         5      1.0        0.75 gbm_grid2_model_34  4.989151160193848E8
+## 4             0.9       0.05                  1.0         5      1.0        0.75  gbm_grid2_model_2   4.99534198008744E8
+## 5             0.9        0.1                 0.99         7      1.0         1.0 gbm_grid2_model_46 5.1068183500740755E8
 ## 
 ## ---
 ##    col_sample_rate learn_rate learn_rate_annealing max_depth min_rows sample_rate          model_ids                 mse
-## 52             0.9       0.15                 0.99         1      1.0        0.75 gbm_grid2_model_41 0.11016680160774638
-## 53             0.9        0.1                 0.99         1      1.0        0.75 gbm_grid2_model_22  0.1165029567676438
-## 54             1.0        0.1                 0.99         1      1.0        0.75  gbm_grid2_model_1 0.11651835551464795
-## 55             0.9       0.05                 0.99         1      5.0        0.75 gbm_grid2_model_44  0.1346984954915405
-## 56             1.0       0.05                 0.99         1      1.0         1.0 gbm_grid2_model_25 0.13477967328304552
-## 57             1.0       0.05                  1.0         3      5.0        0.75 gbm_grid2_model_56 0.21234342479564433
+## 63             0.9        0.1                 0.99         9      1.0         1.0 gbm_grid2_model_19 6.888828473137908E8
+## 64             0.9       0.05                  1.0         9      5.0         1.0 gbm_grid2_model_66 6.978688028588266E8
+## 65             0.9       0.05                 0.99         9      3.0         1.0 gbm_grid2_model_53 7.120703549234108E8
+## 66             0.8       0.15                  1.0         9      1.0        0.75 gbm_grid2_model_64 7.175292869435712E8
+## 67             0.9        0.1                 0.99         9      3.0         1.0  gbm_grid2_model_3 7.793274661905156E8
+## 68             0.8       0.15                  1.0         7      5.0        0.75 gbm_grid2_model_67 8.279874389570463E8
 ```
 
-In this example, the best model obtained a cross-validated RMSE of 0.218.  So although we assessed only a 26% of the total models we were able to find a model approximately just as good as the full grid search.[^diff]
+In this example, the best model obtained a cross-validated RMSE of \$21,822.97.  So although we assessed only 31% of the total models we were able to find a model that was better than our initial full grid search.
 
 ```{r h2o-random-grid-perf, eval=FALSE}
 # Grab the model_id for the top model, chosen by validation error
@@ -1166,26 +1164,17 @@ h2o.performance(model = best_model, valid = TRUE)
 ## H2ORegressionMetrics: gbm
 ## ** Reported on validation data. **
 ## 
-## MSE:  0.0474144
-## RMSE:  0.2177485
-## MAE:  0.1492446
-## RMSLE:  0.1484267
-## Mean Residual Deviance :  0.0474144
+## MSE:  476242138
+## RMSE:  21822.97
+## MAE:  13972.9
+## RMSLE:  0.1341249
+## Mean Residual Deviance :  476242138
 ```
 
 Once we've found our preferred model, we'll go ahead and retrain a new model with the full training data.  I'll use the best model from the full grid search and perform a 5-fold CV to get a robust estimate of the expected error.  I crank up the number of trees just to make sure we find a global minimum.
 
-```{r re-create-h2o-objects, echo=FALSE}
-# create feature names
-y <- "RESPONSE_VAR"
-x <- setdiff(names(train), y)
 
-# turn training set into h2o object
-train.h2o <- as.h2o(train)
-```
-
-
-```{r h2o-final-fit}
+```{r h2o-final-fit, eval=FALSE}
 # train final model
 h2o.final <- h2o.gbm(
   x = x,
@@ -1206,87 +1195,61 @@ h2o.final <- h2o.gbm(
 
 # model stopped after xx trees
 h2o.final@parameters$ntrees
+## [1] 5526
 
 # cross validated RMSE
 h2o.rmse(h2o.final, xval = TRUE)
+## [1] 23553.76
 ```
 
+```{r gbm-h2o-regression-best-model-import, echo=FALSE, cache=FALSE}
+# save the model
+# h2o.saveModel(object = h2o.final, path = "outputs/h2o_best_gbm_model", force = TRUE)
 
-#### Visualizing {#gbm-regression-h2o-viz}
-
-##### Variable importance {#gbm-regression-h2o-vip}
-
-`h2o` provides a built function that plots variable importance.  It only has one measure of variable importance, relative importance, which measures the average impact each variable has across all the trees on the loss function. The variable with the largest is most importance and the impact of all other variables are provided relative to the most important variable.  
-
-```{r h2o-vip}
-h2o.varimp_plot(h2o.final, num_of_features = 10)
+# import model
+h2o.final <- h2o.loadModel(path = "outputs/h2o_best_gbm_model/GBM_model_R_1534000844639_2")
 ```
 
-The `vip` package also works with `h2o` objects to plot variable importance but provides nicer `ggplot` outputs and has other nice features worth checking out (see the model interpretation chapter).
+#### Feature interpretation {#gbm-regression-h2o-viz}
 
-```{r h2o-vip2}
-vip::vip(h2o.final)
+##### Feature importance {#gbm-regression-h2o-vip}
+
+Looking at the top 25 most important features, we see many of the same predictors as we have with the other GBM implementations and also with the random forest approaches.
+
+```{r h2o-vip2, fig.cap="Top 25 most influential predictors based on impurity."}
+vip::vip(h2o.final, num_features = 25, bar = FALSE)
 ```
 
-##### Partial dependence plots {#gbm-regression-h2o-pdp}
+##### Feature effects {#gbm-regression-h2o-pdp}
 
-We can also create similar PDP and ICE plots as before.  We only need to incorporate a specialty function that converts the supplied data to an `h2o` object and then formats the predicted output as a data frame.  We feed this into the `partial` function and the rest is standard.
+PDP and ICE plots work similarly to how we implemented them with the __h2o__ approaches for random forests. Figure \@ref(fig:gbm-regression-h2o-pdp-ice) illustrates the same non-linear relationship between `Gr_Liv_Area` and predicted sale price that we have been seeing with other GBM and random forest implementations. 
 
-
-```{r h2o-pdp-ice, fig.height=3.5, fig.width=9}
+```{r gbm-regression-h2o-pdp-ice, fig.height=3.5, fig.width=5, fig.cap="ICE curves illustrating the non-linear relationship between above ground square footage (`Gr_Liv_Area`) and predicted sale price."}
+# build custom prediction function
 pfun <- function(object, newdata) {
   as.data.frame(predict(object, newdata = as.h2o(newdata)))[[1L]]
 }
 
-pdp <- h2o.final %>%
-  partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE", 
-    pred.fun = pfun,
-    grid.resolution = 50, 
-    train = train
-    ) %>%
-  autoplot(rug = TRUE, train = train, alpha = .1) +
-  ggtitle("PDP")
-
-ice <- h2o.final %>%
-  partial(
-    pred.var = "PROD_DIV_PURCHASE_CYCLE", 
-    pred.fun = pfun,
-    grid.resolution = 50, 
-    train = train,
-    ice = TRUE
-    ) %>%
-  autoplot(rug = TRUE, train = train, alpha = .1, center = TRUE) +
-  ggtitle("ICE")
-
-gridExtra::grid.arrange(pdp, ice, nrow = 1)
+# compute ICE curves 
+partial(
+  h2o.final, 
+  pred.var = "Gr_Liv_Area", 
+  train = ames_train,
+  pred.fun = pfun,
+  grid.resolution = 20
+) %>%
+  autoplot(rug = TRUE, train = ames_train, alpha = 0.05, center = TRUE) + 
+  ggtitle("Centered ICE curves")
 ```
 
-`h2o` does not provide built-in ICE plots but it does provide a PDP plot that plots not only the mean marginal impact (as in a normal PDP) but also one standard error to show the variability.  
-
-```{r h2o-built-in-partial, fig.height=4, fig.width=7}
-h2o.partialPlot(h2o.final, data = train.h2o, cols = "PROD_DIV_PURCHASE_CYCLE")
-```
-
-
-##### LIME {#gbm-regression-h2o-lime}
-
-LIME also provides built-in functionality for `h2o` objects (see `?model_type`). 
-
-```{r h2o-lime, fig.width=11}
-# apply LIME
-explainer <- lime(train, h2o.final)
-explanation <- explain(local_obs, explainer, n_features = 5)
-plot_features(explanation)
-```
 
 #### Predicting {#gbm-regression-h2o-predict}
 
-Lastly, we use `h2o.predict` or `predict` to predict on new observations and we can also evaluate the performance of our model on our test set easily with `h2o.performance`.  Results are quite similar to both `gmb` and `xgboost`.
+Lastly, we use `h2o.predict` or `predict` to predict on new observations and we can also evaluate the performance of our model on our test set easily with `h2o.performance`.  Results are quite similar to both __gmb__ and __xgboost__.
 
-```{r h2o-predict}
+```{r gbm-regression-h2o-predict}
 # convert test set to h2o object
-test.h2o <- as.h2o(test)
+test.h2o <- as.h2o(ames_test)
 
 # evaluate performance on new data
 h2o.performance(model = h2o.final, newdata = test.h2o)
@@ -1304,7 +1267,24 @@ h2o.shutdown(prompt = FALSE)
 ```
 
 
-## Implementation: Classification {#gbm-classification}
+## Implementation: Binary Classification {#gbm-binary-classification}
+
+
+### gbm
+
+Coming soon!
+
+
+### xgboost
+
+Coming soon!
+
+
+### h2o
+
+Coming soon!
+
+## Implementation: Multinomial Classification {#gbm-multi-classification}
 
 
 ### gbm
@@ -1342,4 +1322,4 @@ __Alternative online resources:__
 * [Alexey Natekin1 and Alois Knoll - Gradient boosting machines, a tutorial](http://journal.frontiersin.org/article/10.3389/fnbot.2013.00021/full) (blog post)
 
 [^ledell]: The features highlighted for each package were originally identified by Erin LeDell in her [useR! 2016 tutorial](https://github.com/ledell/useR-machine-learning-tutorial).
-[^diff]: Part of the reason we found a model in the random search that was better than all the full grid search models is because I ran the models on separate days and the validation set I used for the two grid searches contained different observations.
+

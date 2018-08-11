@@ -177,7 +177,7 @@ Since `randomForest` does not scale well to many of the data set sizes that orga
 
 ## Implementation: Regression {#rf-regression}
 
-To illustrate various regularization concepts for a regression problem we will use the Ames, IA housing data, where our intent is to predict `Sale_Price`. 
+To illustrate various random forest concepts for a regression problem we will use the Ames, IA housing data, where our intent is to predict `Sale_Price`. 
 
 ```{r rf-regression-data-import}
 # Create training (70%) and test (30%) sets for the AmesHousing::make_ames() data.
@@ -395,7 +395,7 @@ hyper_grid %>%
 
 The above grid search helps to focus where we can further refine our model tuning.  As a next step, we would perform additional grid searches that focus in on a refined grid space for sample size and also try a few additional settings of `mtry` and `min.node.size` to rule out their effects on performance.  However, for brevity we will leave this as an exercise for the reader.
 
-#### Visual interpretation {#ranger-regression-viz}
+#### Feature interpretation {#ranger-regression-viz}
 
 Whereas regularized regression assumes a monotonic linear relationship between features and the response, random forests make no such assumption.  Moreover, random forests do not have coefficients to base these relationships on.  Consequently, with random forests we can understand the relationship between the features and the response using variable importance plots and partial dependence plots.
 
@@ -403,7 +403,7 @@ Whereas regularized regression assumes a monotonic linear relationship between f
 Additional model interpretability approaches will be discussed in the ___Model Interpretability___ chapter.
 ```
 
-##### Variable importance {#ranger-rf-regression-vip}
+##### Feature importance {#ranger-rf-regression-vip}
 
 Whereas regularized models used the standardized coefficients to signal importance, random forests have, historically, applied two different approaches to measure variable importance.   
 
@@ -463,7 +463,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
 
-##### Partial dependence plots {#ranger-rf-regression-pdp}
+##### Feature effects {#ranger-rf-regression-pdp}
 
 After the most relevant variables have been identified, the next step is to attempt to understand how the response variable changes based on these variables. Unlike linear approaches, random forests do not assume a linear relationship.  Consequently, we can use partial dependence plots (PDPs) and individual conditional expectation (ICE) curves.
 
@@ -845,9 +845,9 @@ best_model <- h2o.loadModel(path = "outputs/h2o_best_rf_model/rf_random_grid_mod
 
 
 
-#### Visualizing results {#rf-h2o-regression-viz}
+#### Feature interpretation {#rf-h2o-regression-viz}
 
-##### Variable importance {#rf-h2o-regression-vip}
+##### Feature importance {#rf-h2o-regression-vip}
 
 Once you’ve identified and selected the optimally tuned model, you can visualize variable importance with `h2o.varimp_plot`.  `h2o.varimp_plot` computes variable importance ___"by calculating the relative influence of each variable: whether that variable was selected during splitting in the tree building process and how much the squared error (over all trees) improved as a result."___ [^var]  This is equivalent to the impurity approach used by `ranger`.  The most important variables are relatively similar to those found with the ranger model.
 
@@ -863,7 +863,7 @@ vip(best_model, num_features = 25, bar = FALSE)
 ```
 
 
-##### Partial dependence plots {#rh-h2o-regression-pdp}
+##### Feature effects {#rh-h2o-regression-pdp}
 
 As with __ranger__, we can also assess PDP plots. `h2o` provides the `h2o.partialPlot` function to plot PDPs.  Although it does not allow you to plot individual ICE curves, it does plot the standard error of the mean response across all observations along with automatically showing you the values of the predictor variable (by default it selects 20 values but can be adjusted with `nbins`), mean response, and standard error of the response. The partial dependence plot for `Gr_Liv_Area` follows a similar non-linear trend as we saw with the __ranger__ model.
 
@@ -1148,9 +1148,9 @@ hyper_grid %>%
 The above grid search helps to focus where we can further refine our model tuning.  As a next step, we would perform additional grid searches; however, for brevity we will leave this as an exercise for the reader.
 
 
-#### Visualizing results {#ranger-rf-binary-classification-viz}
+#### Feature interpretation {#ranger-rf-binary-classification-viz}
 
-##### Variable importance {#ranger-rf-binary-classification-vip}
+##### Feature importance {#ranger-rf-binary-classification-vip}
 
 As in the regression setting, once we've found our optimal hyperparameter settings we can re-run our model and set the `importance` argument to "impurity" and/or "permutation".  The following applies both settings so that we can compare and contrast the influential variables each method identifies.
 
@@ -1192,7 +1192,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
 
-##### Partial dependence plots {#ranger-rf-binary-classification-pdp}
+##### Feature effects {#ranger-rf-binary-classification-pdp}
 
 After the most relevant variables have been identified, the next step is to attempt to understand how the response variable changes based on these variables.  This is important considering random forests allow us to pick up non-linear, non-monotonic relationships. For this we can use partial dependence plots (PDPs) and individual conditional expectation (ICE) curves.  However, to generate PDPs and ICE curves we need to run a probability model (`probability = TRUE`) so that we can extract the class probabilities.  
 
@@ -1575,9 +1575,9 @@ best_model <- h2o.getModel(best_model_id)
 best_model <- h2o.loadModel(path = "outputs/h2o_best_rf_model/rf_random_grid_model_39")
 ```
 
-#### Visualizing results {#h2o-rf-binary-classification-viz}
+#### Feature interpretation {#h2o-rf-binary-classification-viz}
 
-##### Variable importance {#h2o-rf-binary-classification-vip}
+##### Feature importance {#h2o-rf-binary-classification-vip}
 
 Assessing the variable importance, we see similar results as with the __ranger__ model with the most influential variables including `OverTime`, `MonthlyIncome`, `Age`, and `JobRole`.
 
@@ -1588,7 +1588,7 @@ vip(best_model, num_features = 25, bar = FALSE)
 ```
 
 
-##### Partial dependence plots {#h2o-rf-multi-classification-pdp}
+##### Feature effects {#h2o-rf-multi-classification-pdp}
 
 As with `ranger`, we can also assess PDPs and ICE curves. The following looks at three of the most influential variables in our model (`OverTime`, `MonthlyIncome` and `Age`).  Our centered ICE curves help to illustrate the marginal increasing or decreasing effect on the predicted probability of attrition.  In all three plots we see groups of observations going in opposite directions (i.e. at age 35 many employees experience an increase in the probability of attrition while many others a decrease).  This indicates interaction effects with other features, which we will explore more in the ___Model Interpretability___ chapter.
 
@@ -1803,9 +1803,9 @@ hyper_grid %>%
 
 The above grid search helps to focus where we can further refine our model tuning.  As a next step, we could perform additional grid searches focusing on additional ranges of these parameters.  However, for brevity we leave this as an exercise for the reader.
 
-#### Visual interpretation {#ranger-multi-viz}
+#### Feature interpretation {#ranger-multi-viz}
 
-##### Variable importance {ranger-multi-vip}
+##### Feature importance {#ranger-multi-vip}
 
 As in the regression and binary classification setting, once we've found our optimal hyperparameter settings we can re-run our model and set the `importance` argument to "impurity" and/or "permutation". The following applies both settings so that we can compare and contrast the influential variables each method identifies.
 
@@ -1863,7 +1863,7 @@ p2 <- vip(m3_ranger_permutation, num_features = 25, bar = FALSE) + ggtitle("Perm
 gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
-##### Partial dependence plots {#ranger-multi-pdp}
+##### Feature effects {#ranger-multi-pdp}
 
 After the most relevant variables have been identified, we can assess the relationship between these influential predictors and the response variable with PDP plots and ICE curves. As with the binary classification model, to generate PDPs and ICE curves we need to use the probability model (`probability = TRUE`) so that can extract the class probabilities.
 
@@ -2246,7 +2246,7 @@ h2o_final <- h2o.loadModel(path = "outputs/h2o_best_rf_model/DRF_model_R_1533647
 ```
 
 
-#### Visual interpretation {#rf-h2o-multi-viz}
+#### Feature interpretation {#rf-h2o-multi-viz}
 
 In the regularized regression chapter, we saw that 67 predictors were not used because they contained zero variance and in our __ranger__ model there were 102 variables not used for any splits.  Similarly, for our __h2o__ model we can assess how many variables have zero importance.  Since __h2o__ uses the impurity method for variable importance, this implies that these variables were not used for any splits.  We see there are 23 variables that have zero importance.  
 
@@ -2263,7 +2263,7 @@ Alternatively, to find important variables we can extract the top 25 influential
 vip(h2o_final, num_features = 25, bar = FALSE)
 ```
 
-##### Partial dependence plots {#rf-h20-multi-pdp}
+##### Feature effects {#rf-h20-multi-pdp}
 
 Similar to the __ranger__ section, next we assess the relationship between these influential predictors and the response variable with PDP plots. In this example, we assess the PDP of each response category with variable `V407`, which ranked first as the most influential variable.  We can see those response categories where this variable has a large impact (stronger changes in the predicted value $\hat y$ as `V407` changes) versus those that are less influnced by this predictor (mostly flat-lined plots).
 

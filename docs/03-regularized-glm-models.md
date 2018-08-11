@@ -238,10 +238,10 @@ ames_test  <- testing(ames_split)
 
 ### `glmnet` {#regression-glm-glmnet}
 
-The glmnet package is a fast implementation, but it requires some extra processing up-front to your data if it’s not already represented as a numeric matrix.  __glmnet__ does not use the formula method (`y ~ x`) so prior to modeling we need to create our feature and target set.  Furthermore, we use the `model.matrix` function on our feature set (see `Matrix::sparse.model.matrix` for increased efficiency on large dimension data).  We also Box Cox transform our response variable due to its skeweness.
+The glmnet package is a fast implementation, but it requires some extra processing up-front to your data if it’s not already represented as a numeric matrix.  __glmnet__ does not use the formula method (`y ~ x`) so prior to modeling we need to create our feature and target set.  Furthermore, we use the `model.matrix` function on our feature set (see `Matrix::sparse.model.matrix` for increased efficiency on large dimension data).  We also log transform our response variable due to its skeweness.
 
 <div class="rmdtip">
-<p>The Box Cox transformation of the response variable is not required; however, parametric models such as regularized regression are sensitive to skewed values so it is always recommended to normalize your response variable.</p>
+<p>The log transformation of the response variable is not required; however, parametric models such as regularized regression are sensitive to skewed values so it is always recommended to normalize your response variable.</p>
 </div>
 
 
@@ -252,7 +252,7 @@ train_x <- model.matrix(Sale_Price ~ ., ames_train)[, -1]
 test_x  <- model.matrix(Sale_Price ~ ., ames_test)[, -1]
 
 # Create training and testing response vectors
-# transform y based on skewness of training data
+# transform y with log transformation
 train_y <- log(ames_train$Sale_Price)
 test_y  <- log(ames_test$Sale_Price)
 ```
@@ -320,14 +320,14 @@ Recall that $\lambda$ is a tuning parameter that helps to control our model from
 
 
 ```r
-# Apply CV Ridge regression to attrition data
+# Apply CV Ridge regression to Ames data
 ridge <- cv.glmnet(
   x = train_x,
   y = train_y,
   alpha = 0
 )
 
-# Apply CV Ridge regression to attrition data
+# Apply CV Lasso regression to Ames data
 lasso <- cv.glmnet(
   x = train_x,
   y = train_y,
@@ -513,7 +513,7 @@ tuning_grid %>%
 </div>
 
 
-#### Visual interpretation {#regression-glmnet-visualizing}
+#### Feature interpretation {#regression-glmnet-visualizing}
 
 Regularized regression ___assumes a monotonic linear relationship___ between the predictor variables and the response.  The _linear_ relationship part of that statement just means, for a given predictor variable, it assumes for every one unit change in a given predictor variable there is a constant change in the response.  This constant change is given by the given coefficient for a predictor.  The _monotonic_ relationship means that a given predictor variable will always have a positive or negative relationship.
 
@@ -585,6 +585,11 @@ coef(lasso, s = "lambda.min") %>%
 
 Once you have identified your preferred model, you can simply use `predict` to predict the same model on a new data set.  The only caveat is you need to supply `predict` an `s` parameter with the preferred models $\lambda$ value.  For example, here we create a lasso model, which provides me a minimum MSE of 0.02398 (RMSE = 0.123). However, our response variable is log transformed so we must re-transform it to get an interpretable RMSE (our average generalized error is \$25,156.77).
 
+<div class="rmdwarning">
+<p>During a normal modeling process, you would not assess the results on your test set until you've assessed all potential models with the training data and decided upon a final model. Then, and only then, should you make predictions on the test set and assess the final generalizable error. However, for educational purposes I will show you how to do this for each model covered in this book as there are some model and package specific differences in the predicting process.</p>
+</div>
+
+
 
 ```r
 # optimal model
@@ -612,14 +617,14 @@ To perform regularized regression with __h2o__, we first need to initiate our __
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         6 minutes 32 seconds 
+##     H2O cluster uptime:         1 minutes 59 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 14 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
+##     H2O cluster version age:    2 months and 18 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_thv371 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.58 GB 
+##     H2O cluster total memory:   4.43 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -816,7 +821,7 @@ best_model@parameters$alpha
 ```
 
 
-#### Visual interpretation {#regression-h2o-viz}
+#### Feature interpretation {#regression-h2o-viz}
 
 __h2o__ provides a built-in function that plots variable importance. To compute variable importance for regularized models, __h2o__ uses the standardized coefficient values (which is the same that we plotted in the __glmnet__ example). You will notice that the the largest influential variables produced by this H2O model differ from the glmnet model.  This is because we are assessing the ridge model here, where in the glmnet interpretation section we assessed the lasso and H2O and glmnet use differing approaches to generate the $\lambda$ search path. However, you will notice that both `Overall_Qual.Excellent` and `Overall_Cond.Fair` were also top influencers in the glmnet model suggesting they may have a strong signal regardless of the regularization penalty we use.
 
@@ -1298,7 +1303,7 @@ tuning_grid %>%
 </div>
 
 
-#### Visual interpretation {#classification-binary-glmnet-visualizing}
+#### Feature interpretation {#classification-binary-glmnet-visualizing}
 
 ##### Variable importance
 
@@ -1493,14 +1498,14 @@ h2o.init(max_mem_size = "5g")
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         6 minutes 32 seconds 
+##     H2O cluster uptime:         1 minutes 59 seconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 14 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
+##     H2O cluster version age:    2 months and 18 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_thv371 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.58 GB 
+##     H2O cluster total memory:   4.43 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -1682,9 +1687,9 @@ best_model@parameters$alpha
 ```
 
 
-#### Visual Interpretation {#glm-h2o-classification-binary-viz}
+#### Feature interpretation {#glm-h2o-classification-binary-viz}
 
-##### Variable importance
+##### Feature importance
 
 To identify the most influential variables we can use __h2o__'s variable importance plot.  Recall that for a GLM model, variable importance is simply represented by the standardized coefficients.  We see that `JobInvolvement.Low` and `JobRole.Sales_Representative` have the largest influence in increasing the probability of attrition whereas `JobRole.Research_Director` and `OverTime.No` have the largest influence in decreasing the probability of attrition.
 
@@ -2049,7 +2054,7 @@ caret::confusionMatrix(factor(pred_class), factor(test_y))
 ```
 
 
-#### Visual interpretation {#classification-multi-glmnet-visualizing}
+#### Feature interpretation {#classification-multi-glmnet-visualizing}
 
 Interpreting the underlying predictor mechanisms with a multinomial problem is much like the regression and binary classification problems but with a few extra nuances.  The first thing to remember is that although we started with 784 predictors, our full ridge model only used 717 because 67 predictors had zero variance.  This is not unique to multinomial problems but its important to understand which variables these are because, in an organizational situation, we can assess whether or not we should continue collecting this information.  In this example, they primarily represent pixels along the very edge of the images.
 
@@ -2309,14 +2314,14 @@ h2o.init(max_mem_size = "5g")
 ##  Connection successful!
 ## 
 ## R is connected to the H2O cluster: 
-##     H2O cluster uptime:         6 minutes 33 seconds 
+##     H2O cluster uptime:         2 minutes 366 milliseconds 
 ##     H2O cluster timezone:       America/New_York 
 ##     H2O data parsing timezone:  UTC 
 ##     H2O cluster version:        3.18.0.11 
-##     H2O cluster version age:    2 months and 14 days  
-##     H2O cluster name:           H2O_started_from_R_bradboehmke_qnx795 
+##     H2O cluster version age:    2 months and 18 days  
+##     H2O cluster name:           H2O_started_from_R_bradboehmke_thv371 
 ##     H2O cluster total nodes:    1 
-##     H2O cluster total memory:   1.58 GB 
+##     H2O cluster total memory:   4.43 GB 
 ##     H2O cluster total cores:    4 
 ##     H2O cluster allowed cores:  4 
 ##     H2O cluster healthy:        TRUE 
@@ -2511,7 +2516,7 @@ h2o.confusionMatrix(best_model)
 
 
 
-#### Visual Interpretation {#glm-h2o-classification-multinomial-viz}
+#### Feature interpretation {#glm-h2o-classification-multinomial-viz}
 
 Similar to __glmnet__, we can extract useful information from our coefficients to interpret influential variables in our predictors.  First, we need to do a little clean up of our coefficient table.
 
@@ -2657,7 +2662,6 @@ h2o.performance(best_model, newdata = test_h2o)
 ```r
 # shutdown h2o
 h2o.removeAll()
-## [1] 0
 h2o.shutdown(prompt = FALSE)
 ```
 

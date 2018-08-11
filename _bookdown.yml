@@ -11,6 +11,7 @@ rmd_files: [
   "02-ml-strategy.rmd",
   "03-regularized-glm-models.rmd",
   "04-random-forest.rmd",
+  "05-gradient-boosting-machines.rmd",
   "10-references.rmd"
 
 ]

@@ -106,12 +106,17 @@ pkgs <- c(
   "data.table",
   "dplyr",
   "ggplot2",
+  "gbm",
   "glmnet",
   "h2o",
+  "pdp",
   "pROC",
   "purrr",
+  "ranger",
   "ROCR",
-  "rsample"
+  "rsample",
+  "vip",
+  "xgboost"
 )
 
 # package & session info
