@@ -1,0 +1,17 @@
+book_filename: "hands-on-machine-learning-with-R"
+chapter_name: "Chapter "
+repo: https://github.com/bradleyboehmke/hands-on-machine-learning-with-r
+output_dir: docs
+clean: [packages.bib, bookdown.bbl]
+new_session: yes
+
+rmd_files: [
+  "index.rmd",
+  "01-introduction.rmd",
+  "02-ml-strategy.rmd",
+  #"03-regularized-glm-models.rmd",
+  #"04-random-forest.rmd",
+  #"05-gradient-boosting-machines.rmd",
+  "10-references.rmd"
+
+]
