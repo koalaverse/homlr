@@ -3,7 +3,7 @@
 
 This repository is the future home of the [Hands-on Machine Learning with R](http://bit.ly/HOML_with_R) book by [Brad Boehmke](https://github.com/bradleyboehmke/) and [Brandon Greenwell](https://github.com/bgreenwell).  The book is under development and will eventually be published by Chapman & Hall/CRC; however, it has not undergone the formal review process. 
 
-Currently, this repo provides a place to ask questions or make comments about the beta version of the book. Any feedback would be greatly appreciated and will help us make it better!
+Currently, this repo provides a place to [ask questions or make comments](https://github.com/koalaverse/hands-on-machine-learning-with-r/issues) about the beta version of the book. Any feedback would be greatly appreciated and will help us make it better!
 
 Eventually, this repo will contain additional content to include but not limited to:
 
