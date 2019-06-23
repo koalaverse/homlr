@@ -59,8 +59,9 @@ navbar:
     - text: Data sets
       menu:
       - text: Ames housing
-      - href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/ames.csv
+        href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/ames.csv
       - text: Job attrition
+        href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/attrition.csv
       - text: MNIST
       - text: My basket
 output:
