@@ -1,0 +1,46 @@
+name: "homl"
+output_dir: "docs"
+exclude: [""]
+navbar:
+  title: "HOML"
+  left:
+    - icon: fa-home fa-lg
+      href: index.html
+    - text: Supplementary material
+      menu:
+      - text: "Fundamentals:"
+      - text: Introduction to Machine Learning
+      - text: --------
+      - text: "Supervised learning:"
+      - text: Linear regression
+      - text: --------
+      - text: "Dimension reduction:"
+      - text: Princicpal component analysis
+      - text: --------
+      - text: "Clustering:"
+      - text: K-means clustering
+    - text: Exercises
+      menu:
+      - text: "Fundamentals:"
+      - text: Introduction to Machine Learning
+      - text: --------
+      - text: "Supervised learning:"
+      - text: Linear regression
+      - text: --------
+      - text: "Dimension reduction:"
+      - text: Princicpal component analysis
+      - text: --------
+      - text: "Clustering:"
+      - text: K-means clustering
+    - text: Data sets
+      menu:
+      - text: Ames housing
+      - text: Job attrition
+      - text: MNIST
+      - text: My basket
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
+    include:
+    css: custom.css

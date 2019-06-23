@@ -1,0 +1,445 @@
+.note, .tip, .warning, .question, .exercise {
+  padding: 1em 1em 1em 4em;
+  margin-bottom: 10px;
+  background: #FEF9E7 5px center/3em no-repeat;
+}
+
+.yourturn {
+  padding: 5em 5em 1em 11em;
+  margin-bottom: 10px;
+  background: #FEF9E7 5px center/10em no-repeat;
+}
+
+.note {
+  background-image: url("icons/note.png");
+}
+
+.tip {
+  background-image: url("icons/tip.png");
+}
+
+.warning {
+  background-image: url("icons/warning.png");
+}
+
+.question {
+  background-image: url("icons/question.png");
+}
+
+.exercise {
+  background-image: url("icons/exercise.png");
+}
+
+.yourturn {
+  background-image: url("icons/your-turn.jpg");
+}
+
+
+/*******************************************************************************
+Font size
+*******************************************************************************/
+
+.code05 .remark-code {
+  font-size: 5%;
+}
+
+.code10 .remark-code {
+  font-size: 10%;
+}
+
+.code15 .remark-code {
+  font-size: 15%;
+}
+
+.code20 .remark-code {
+  font-size: 20%;
+}
+
+.code25 .remark-code {
+  font-size: 25%;
+}
+
+.code30 .remark-code {
+  font-size: 30%;
+}
+
+.code35 .remark-code {
+  font-size: 35%;
+}
+
+.code40 .remark-code {
+  font-size: 40%;
+}
+
+.code45 .remark-code {
+  font-size: 45%;
+}
+
+.code50 .remark-code {
+  font-size: 50%;
+}
+
+.code55 .remark-code {
+  font-size: 55%;
+}
+
+.code60 .remark-code {
+  font-size: 60%;
+}
+
+.code65 .remark-code {
+  font-size: 65%;
+}
+
+.code70 .remark-code {
+  font-size: 70%;
+}
+
+.code75 .remark-code {
+  font-size: 75%;
+}
+
+.code80 .remark-code {
+  font-size: 80%;
+}
+
+.code85 .remark-code {
+  font-size: 85%;
+}
+
+.code90 .remark-code {
+  font-size: 90%;
+}
+
+.code95 .remark-code {
+  font-size: 95%;
+}
+
+.code100 .remark-code {
+  font-size: 100%;
+}
+
+.code105 .remark-code {
+  font-size: 105%;
+}
+
+.code110 .remark-code {
+  font-size: 110%;
+}
+
+.code115 .remark-code {
+  font-size: 115%;
+}
+
+.code120 .remark-code {
+  font-size: 120%;
+}
+
+.code125 .remark-code {
+  font-size: 125%;
+}
+
+.code130 .remark-code {
+  font-size: 130%;
+}
+
+.code135 .remark-code {
+  font-size: 135%;
+}
+
+.code140 .remark-code {
+  font-size: 140%;
+}
+
+.code145 .remark-code {
+  font-size: 145%;
+}
+
+.code150 .remark-code {
+  font-size: 150%;
+}
+
+.font10 {
+  font-size: 10%;
+}
+
+.font15 {
+  font-size: 15%;
+}
+
+.font20 {
+  font-size: 20%;
+}
+
+.font25 {
+  font-size: 25%;
+}
+
+.font30 {
+  font-size: 30%;
+}
+
+.font35 {
+  font-size: 35%;
+}
+
+.font40 {
+  font-size: 40%;
+}
+
+.font45 {
+  font-size: 45%;
+}
+
+.font50 {
+  font-size: 50%;
+}
+
+.font55 {
+  font-size: 55%;
+}
+
+.font60 {
+  font-size: 60%;
+}
+
+.font65 {
+  font-size: 65%;
+}
+
+.font70 {
+  font-size: 70%;
+}
+
+.font75 {
+  font-size: 75%;
+}
+
+.font80 {
+  font-size: 80%;
+}
+
+.font85 {
+  font-size: 85%;
+}
+
+.font90 {
+  font-size: 90%;
+}
+
+.font95 {
+  font-size: 95%;
+}
+
+.font100 {
+  font-size: 100%;
+}
+
+.font105 {
+  font-size: 105%;
+}
+
+.font110 {
+  font-size: 110%;
+}
+
+.font115 {
+  font-size: 115%;
+}
+
+.font120 {
+  font-size: 120%;
+}
+
+.font125 {
+  font-size: 125%;
+}
+
+.font130 {
+  font-size: 130%;
+}
+
+.font135 {
+  font-size: 135%;
+}
+
+.font140 {
+  font-size: 140%;
+}
+
+.font145 {
+  font-size: 145%;
+}
+
+.font150 {
+  font-size: 150%;
+}
+
+.font155 {
+  font-size: 155%;
+}
+
+.font160 {
+  font-size: 160%;
+}
+
+.font165 {
+  font-size: 165%;
+}
+
+.font170 {
+  font-size: 170%;
+}
+
+.font175 {
+  font-size: 175%;
+}
+
+.font180 {
+  font-size: 180%;
+}
+
+.font185 {
+  font-size: 185%;
+}
+
+.font190 {
+  font-size: 190%;
+}
+
+.font195 {
+  font-size: 195%;
+}
+
+.font200 {
+  font-size: 200%;
+}
+
+.font205 {
+  font-size: 205%;
+}
+
+.font210 {
+  font-size: 210%;
+}
+
+.font215 {
+  font-size: 215%;
+}
+
+.font220 {
+  font-size: 220%;
+}
+
+.font225 {
+  font-size: 225%;
+}
+
+.font230 {
+  font-size: 230%;
+}
+
+.font235 {
+  font-size: 235%;
+}
+
+.font240 {
+  font-size: 240%;
+}
+
+.font245 {
+  font-size: 245%;
+}
+
+.font250 {
+  font-size: 250%;
+}
+
+.font255 {
+  font-size: 255%;
+}
+
+.font260 {
+  font-size: 260%;
+}
+
+.font265 {
+  font-size: 265%;
+}
+
+.font270 {
+  font-size: 270%;
+}
+
+.font275 {
+  font-size: 275%;
+}
+
+.font280 {
+  font-size: 280%;
+}
+
+.font285 {
+  font-size: 285%;
+}
+
+.font290 {
+  font-size: 290%;
+}
+
+.font295 {
+  font-size: 295%;
+}
+
+.font300 {
+  font-size: 300%;
+}
+
+
+/* For backwards compatibility */
+.smaller { font-size: 25% }
+.small { font-size: 75% }
+.medium { font-size: 125% }
+.large { font-size: 150% }
+.larger { font-size: 200% }
+.huge { font-size: 250% }
+.huger { font-size: 300% }
+
+
+/*******************************************************************************
+Colors
+*******************************************************************************/
+
+.blue { 
+  color: blue; 
+}
+.darkblue { 
+  color: darkblue; 
+}
+.darkorange { 
+  color: darkorange; 
+}
+.dodgerblue { 
+  color: dodgerblue; 
+}
+.forestgreen { 
+  color: forestgreen; 
+}
+.green { 
+  color: green; 
+}
+.magenta { 
+  color: magenta; 
+}
+.MediumSeaGreen {
+  color: MediumSeaGreen;
+}
+.purple { 
+  color: purple; 
+}
+.red { 
+  color: red; 
+}
+.tomato {
+  color: tomato;
+}
