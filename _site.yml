@@ -68,6 +68,14 @@ navbar:
       menu:
       - text: Errata
         href: errata.html
+    - text: Additional resources
+      menu:
+      - text: Analytics summit '19
+        href: https://github.com/koalaverse/AnalyticsSummit19
+      - text: Machine Learning Day '18
+        href: https://github.com/bgreenwell/MLDay18
+      - text: Introduction to Machine Learning in R
+        href: https://github.com/bgreenwell/intro-ml-r
 output:
   html_document:
     theme: cosmo
