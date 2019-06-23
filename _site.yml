@@ -64,6 +64,10 @@ navbar:
         href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/attrition.csv
       - text: MNIST
       - text: My basket
+    - text: Miscellaneous
+      menu:
+      - text: Errata
+        href: errata.html
 output:
   html_document:
     theme: cosmo
