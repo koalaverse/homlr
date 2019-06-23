@@ -13,6 +13,18 @@ navbar:
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression
+      - text: Logistic regression
+      - text: Regularized regression
+      - text: Multivariate adaptive regression splines (MARS)
+      - text: K-nearest neighbors
+      - text: Decision trees
+      - text: Bagging
+      - text: Random forests
+      - text: Gradient boosting
+      - text: Deep learning
+      - text: Support vector machines
+      - text: Stacked models
+      - text: Interpretable machine learning
       - text: --------
       - text: "Dimension reduction:"
       - text: Princicpal component analysis
@@ -26,6 +38,18 @@ navbar:
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression
+      - text: Logistic regression
+      - text: Regularized regression
+      - text: Multivariate adaptive regression splines (MARS)
+      - text: K-nearest neighbors
+      - text: Decision trees
+      - text: Bagging
+      - text: Random forests
+      - text: Gradient boosting
+      - text: Deep learning
+      - text: Support vector machines
+      - text: Stacked models
+      - text: Interpretable machine learning
       - text: --------
       - text: "Dimension reduction:"
       - text: Princicpal component analysis
