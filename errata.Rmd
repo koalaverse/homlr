@@ -1,0 +1,6 @@
+---
+title: "Errata"
+output: github_document
+---
+
+Errors discovered after printing will be documented here, along with their contributor.
