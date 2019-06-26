@@ -64,6 +64,7 @@ navbar:
         href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/attrition.csv
       - text: MNIST
       - text: My basket
+        href: https://koalaverse.github.io/hands-on-machine-learning-with-r/data/my_basket.csv
     - text: Miscellaneous
       menu:
       - text: Errata
