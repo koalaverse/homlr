@@ -12,3 +12,4 @@ Eventually, this repo will contain additional content to include but not limited
 - Chapter exercises
 - Data sets used that are not available via an R package
 
+Companion website (under heavy construction): https://koalaverse.github.io/hands-on-machine-learning-with-r/
