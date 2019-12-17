@@ -1,5 +1,38 @@
+<br>
+<br>
+
+
+## Hands-On Machine Learning with R &nbsp;&nbsp; <a href="https://www.amazon.com/Hands-Machine-Learning-Chapman-Hall/dp/1138495689/ref=sr_1_3?keywords=hands+on+machine+learning+with+r&qid=1573598828&sr=8-3" style="color:black;"><i class="fa fa-amazon" style="font-size:.7em"></i></a>
+
+<a href="https://www.crcpress.com/Hands-On-Machine-Learning-with-R/Boehmke-Greenwell/p/book/9781138495685"><img src="https://raw.githubusercontent.com/bradleyboehmke/HOML/master/images/homl-cover.jpg?token=ABTQ2PQSGDIJZ4FB2H27UQC6AFOQI"  style="float:right; margin: 0px 0px 0px 10px; width: 40%; height: 40%;" /></a>
+
+#### By Brad Boehmke & Brandon Greenwell
 
 <br>
 
-# `r emo::ji("warning")` This site is currently under construction `r emo::ji("construction")`
+Welcome to the supplementary website for [*Hands-On Machine Learning with R*](http://bit.ly/HOML_with_R). This project aims to teach you the fundamentals
+of Machine Learning with the R machine learning tech stack and this website is
+designed to provide you with additional content and resources that we could not
+include in the hard copy book such as:
 
+* An environment to run code from the book
+* Chapter exercises
+* Direct access to the data sets
+* Slides from relevant workshops
+* Errata
+
+With the exception of the book, all this content is [CC BY 4.0 licensed](LICENSE.md).
+
+## Quick Start
+
+Want to reproduce the code in the book without having to install anything? Go to
+our [RStudio Cloud project](https://rstudio.cloud/project/801185) and you will
+find R notebooks containing the code for each chapter's code chunks, figures,
+and tables. Learn more about RStudio Cloud [here](https://rstudio.cloud/learn/guide).
+
+## Contributors
+
+We would like to thank everyone who contributed to this project, either by
+providing useful feedback, filing issues or submitting Pull Requests. If you
+identify any areas for improvement, whether in the book or with these resources,
+please don't hesitate to file an [issue](https://github.com/koalaverse/homlr/issues).

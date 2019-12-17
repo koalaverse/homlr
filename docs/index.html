@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -86,7 +87,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -246,18 +246,6 @@ $(document).ready(function () {
   display: none;
 }
 </style>
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
 
 <!-- code folding -->
 
@@ -421,9 +409,31 @@ $(document).ready(function () {
 </div>
 
 
+<p><br> <br></p>
+<div id="hands-on-machine-learning-with-r" class="section level2">
+<h2>Hands-On Machine Learning with R    <a href="https://www.amazon.com/Hands-Machine-Learning-Chapman-Hall/dp/1138495689/ref=sr_1_3?keywords=hands+on+machine+learning+with+r&qid=1573598828&sr=8-3" style="color:black;"><i class="fa fa-amazon" style="font-size:.7em"></i></a></h2>
+<p><a href="https://www.crcpress.com/Hands-On-Machine-Learning-with-R/Boehmke-Greenwell/p/book/9781138495685"><img src="https://raw.githubusercontent.com/bradleyboehmke/HOML/master/images/homl-cover.jpg?token=ABTQ2PQSGDIJZ4FB2H27UQC6AFOQI"  style="float:right; margin: 0px 0px 0px 10px; width: 40%; height: 40%;" /></a></p>
+<div id="by-brad-boehmke-brandon-greenwell" class="section level4">
+<h4>By Brad Boehmke &amp; Brandon Greenwell</h4>
 <p><br></p>
-<div id="this-site-is-currently-under-construction" class="section level1">
-<h1>⚠️ This site is currently under construction 🚧</h1>
+<p>Welcome to the supplementary website for <a href="http://bit.ly/HOML_with_R"><em>Hands-On Machine Learning with R</em></a>. This project aims to teach you the fundamentals of Machine Learning with the R machine learning tech stack and this website is designed to provide you with additional content and resources that we could not include in the hard copy book such as:</p>
+<ul>
+<li>An environment to run code from the book</li>
+<li>Chapter exercises</li>
+<li>Direct access to the data sets</li>
+<li>Slides from relevant workshops</li>
+<li>Errata</li>
+</ul>
+<p>With the exception of the book, all this content is <a href="LICENSE.md">CC BY 4.0 licensed</a>.</p>
+</div>
+</div>
+<div id="quick-start" class="section level2">
+<h2>Quick Start</h2>
+<p>Want to reproduce the code in the book without having to install anything? Go to our <a href="https://rstudio.cloud/project/801185">RStudio Cloud project</a> and you will find R notebooks containing the code for each chapter’s code chunks, figures, and tables. Learn more about RStudio Cloud <a href="https://rstudio.cloud/learn/guide">here</a>.</p>
+</div>
+<div id="contributors" class="section level2">
+<h2>Contributors</h2>
+<p>We would like to thank everyone who contributed to this project, either by providing useful feedback, filing issues or submitting Pull Requests. If you identify any areas for improvement, whether in the book or with these resources, please don’t hesitate to file an <a href="https://github.com/koalaverse/homlr/issues">issue</a>.</p>
 </div>
 
 
@@ -443,6 +453,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
