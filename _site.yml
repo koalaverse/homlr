@@ -9,7 +9,12 @@ navbar:
     - text: Supplementary material
       menu:
       - text: "Fundamentals:"
-      - text: Introduction to Machine Learning
+      - text: Introduction to machine learning
+        href: https://koalaverse.github.io/homlr/notebooks/01-introduction.nb.html
+      - text: Modeling process
+        href: https://koalaverse.github.io/homlr/notebooks/02-modeling-process.nb.html
+      - text: Feature & target engineering
+        href: https://koalaverse.github.io/homlr/notebooks/03-feature-engineering.nb.html
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression
@@ -28,9 +33,13 @@ navbar:
       - text: --------
       - text: "Dimension reduction:"
       - text: Princicpal component analysis
+      - text: Generalized low rank models
+      - text: Autoencoders
       - text: --------
       - text: "Clustering:"
       - text: K-means clustering
+      - text: Hierarchical clustering
+      - text: Model-based clustering
     - text: Exercises
       menu:
       - text: "Fundamentals:"
@@ -75,8 +84,15 @@ navbar:
         href: https://github.com/koalaverse/AnalyticsSummit19
       - text: Machine Learning Day '18
         href: https://github.com/bgreenwell/MLDay18
-      - text: Introduction to Machine Learning in R
+      - text: Introduction to Machine Learning in R '18
         href: https://github.com/bgreenwell/intro-ml-r
+      - text: Advanced Analytics with R '18
+        href: https://github.com/uc-r/Advanced-R
+      - text: Random Forests with R '18
+        href: https://github.com/bradleyboehmke/random-forest-training
+      - text: Interpretable Machine Learning '18
+        href: https://github.com/bradleyboehmke/CinDay-RUG-IML-2018
+        
 output:
   html_document:
     theme: cosmo
