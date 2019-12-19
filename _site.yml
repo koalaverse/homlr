@@ -20,6 +20,7 @@ navbar:
       - text: Linear regression
         href: https://koalaverse.github.io/homlr/notebooks/04-linear-regression.nb.html
       - text: Logistic regression
+        href: https://koalaverse.github.io/homlr/notebooks/05-logistic-regression.nb.html
       - text: Regularized regression
       - text: Multivariate adaptive regression splines (MARS)
       - text: K-nearest neighbors
