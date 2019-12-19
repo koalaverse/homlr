@@ -18,6 +18,7 @@ navbar:
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression
+        href: https://koalaverse.github.io/homlr/notebooks/04-linear-regression.nb.html
       - text: Logistic regression
       - text: Regularized regression
       - text: Multivariate adaptive regression splines (MARS)
