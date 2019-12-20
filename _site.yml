@@ -22,9 +22,13 @@ navbar:
       - text: Logistic regression
         href: https://koalaverse.github.io/homlr/notebooks/05-logistic-regression.nb.html
       - text: Regularized regression
+        href: https://koalaverse.github.io/homlr/notebooks/06-regularized-regression.nb.html
       - text: Multivariate adaptive regression splines (MARS)
+        href: https://koalaverse.github.io/homlr/notebooks/07-mars.nb.html
       - text: K-nearest neighbors
+        href: https://koalaverse.github.io/homlr/notebooks/08-knn.nb.html
       - text: Decision trees
+        href: https://koalaverse.github.io/homlr/notebooks/09-decision-trees.nb.html
       - text: Bagging
       - text: Random forests
       - text: Gradient boosting
