@@ -2,7 +2,7 @@
 <br>
 
 
-## Hands-On Machine Learning with R &nbsp;&nbsp; <a href="https://www.amazon.com/Hands-Machine-Learning-Chapman-Hall/dp/1138495689/ref=sr_1_3?keywords=hands+on+machine+learning+with+r&qid=1573598828&sr=8-3" style="color:black;"><i class="fa fa-amazon" style="font-size:.7em"></i></a>
+## Hands-On Machine Learning with R
 
 <a href="https://www.crcpress.com/Hands-On-Machine-Learning-with-R/Boehmke-Greenwell/p/book/9781138495685"><img src="https://raw.githubusercontent.com/bradleyboehmke/HOML/master/images/homl-cover.jpg?token=ABTQ2PQSGDIJZ4FB2H27UQC6AFOQI"  style="float:right; margin: 0px 0px 0px 10px; width: 40%; height: 40%;" /></a>
 

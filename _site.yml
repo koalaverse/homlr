@@ -98,6 +98,12 @@ navbar:
         href: https://github.com/bradleyboehmke/random-forest-training
       - text: Interpretable Machine Learning '18
         href: https://github.com/bradleyboehmke/CinDay-RUG-IML-2018
+    - icon: fa-book fa-lg
+      href: http://bit.ly/HOML_with_R
+    - icon: fa-amazon fa-lg
+      href: https://www.amazon.com/Hands-Machine-Learning-Chapman-Hall/dp/1138495689/ref=sr_1_3?keywords=hands+on+machine+learning+with+r&qid=1573598828&sr=8-3
+    - icon: fa-github fa-lg
+      href: https://github.com/koalaverse/homlr
         
 output:
   html_document:
