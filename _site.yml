@@ -30,6 +30,7 @@ navbar:
       - text: Decision trees
         href: https://koalaverse.github.io/homlr/notebooks/09-decision-trees.nb.html
       - text: Bagging
+        href: https://koalaverse.github.io/homlr/notebooks/10-bagging.nb.html
       - text: Random forests
       - text: Gradient boosting
       - text: Deep learning
