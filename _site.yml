@@ -32,6 +32,7 @@ navbar:
       - text: Bagging
         href: https://koalaverse.github.io/homlr/notebooks/10-bagging.nb.html
       - text: Random forests
+        href: https://koalaverse.github.io/homlr/notebooks/11-random-forests.nb.html
       - text: Gradient boosting
       - text: Deep learning
       - text: Support vector machines
