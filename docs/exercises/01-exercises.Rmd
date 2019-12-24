@@ -1,0 +1,31 @@
+---
+title: "Chapter 1 Exercises"
+output: html_notebook
+---
+
+1. Identify four real-life applications of supervised and unsupervised problems.
+   - Explain what makes these problems supervised versus unsupervised.
+   - For each problem identify the target variable (if applicable) and potential
+     features.
+
+2. Identify and contrast a regression problem with a classification problem.
+   - What is the target variable in each problem and why would being able to
+     accurately predict this target be beneficial to society?
+   - What are potential features and where could you collect this information?
+   - What is determining if the problem is a regression or a classification
+     problem?
+
+3. Identify three open source datasets suitable for machine learning (e.g.,
+   https://bit.ly/35wKu5c).
+   - Explain the type of machine learning models that could be constructed from
+     the data (e.g., supervised versus unsupervised and regression versus
+     classification).
+   - What are the dimensions of the data?
+   - Is there a code book that explains who collected the data, why it was
+     originally collected, and what each variable represents?
+   - If the dataset is suitable for supervised learning, which variable(s) could
+     be considered as a useful target? Which variable(s) could be considered as
+     features?
+
+4. Identify examples of misuse of machine learning in society. What was the
+   ethical concern?

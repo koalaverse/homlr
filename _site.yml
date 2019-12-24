@@ -52,6 +52,7 @@ navbar:
       menu:
       - text: "Fundamentals:"
       - text: Introduction to Machine Learning
+        href: https://koalaverse.github.io/homlr/exercises/01-exercises.nb.html
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression

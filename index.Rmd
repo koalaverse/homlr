@@ -4,7 +4,7 @@
 
 ## Hands-On Machine Learning with R
 
-<a href="https://www.crcpress.com/Hands-On-Machine-Learning-with-R/Boehmke-Greenwell/p/book/9781138495685"><img src="https://raw.githubusercontent.com/bradleyboehmke/HOML/master/images/homl-cover.jpg?token=ABTQ2PQSGDIJZ4FB2H27UQC6AFOQI"  style="float:right; margin: 0px 0px 0px 10px; width: 40%; height: 40%;" /></a>
+<a href="https://www.crcpress.com/Hands-On-Machine-Learning-with-R/Boehmke-Greenwell/p/book/9781138495685"><img src="images/homl-cover.jpg"  style="float:right; margin: 0px 0px 0px 10px; width: 40%; height: 40%;" /></a>
 
 #### By Brad Boehmke & Brandon Greenwell
 
