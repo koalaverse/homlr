@@ -1,0 +1,36 @@
+---
+title: "Chapter 2 Exercises"
+output: html_notebook
+---
+
+1. Load the Boston housing data set from the [pdp package](https://cran.r-project.org/package=pdp). These data come from a [classic paper](https://www.sciencedirect.com/science/article/abs/pii/0095069678900062) that analyzed the relationship between several characteristics (e.g., crime rate, average rooms per dwelling, property tax value) and the median value of homes within a census tract (`cmedv`). See `?pdp::boston` for details and further references.
+
+   - What are the dimensions of this data set?
+   - Perform some exploratory data analysis on this data set (be sure to assess the distribution of the target variable `cmedv`).
+
+2. Split the Boston housing data into a training set and test set using a 70-30% split.
+
+   - How many observations are in the training set and test set?
+   - Compare the distribution of `cmedv` between the training set and test set.
+
+3. Load the spam data set from the [kernlab package](https://cran.r-project.org/package=kernlab).
+
+   - What is the distribution of the target variable (`type`) across the entire data set?
+   - Create a 70/30 training/test split stratified by the target variable.
+   - Compare the distribution of the target variable between the training set and test set.
+
+4. Using the Boston housing training data created in 2), fit a linear regression model that use all available features to predict `cmedv`. 
+
+   - Create a model with `lm()`, `glm()`, and `caret::train()`.
+   - How do the coefficients compare across these models?
+   - How does the MSE/RMSE compare across these models?
+   - Which method is `caret::train()` using to fit a linear regression model?
+
+5. Using the Boston housing training data created in exercise 2), perform a 10-fold cross-validated linear regression model, repeated 5 times, that uses all available features to predict `cmedv`. 
+
+   - What is the average RMSE across all 50 model iterations?
+   - Plot the distribution of the RMSE across all 50 model iterations.
+   - Describe the results.
+   - Repeat this exercise for the spam data from exercise 3); since the target (`type`) is binary, be sure to use a more appropriate metric (e.g., AUC or misclassification error).
+
+6. Repeat exercise 5) on the Boston housing data; however, instead of a linear regression model, use a _k_-nearest neighbor model that executes a hyperparameter grid search where _k_ ranges from 2--20. How does this model's results compare to the linear regression results?

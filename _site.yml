@@ -53,6 +53,9 @@ navbar:
       - text: "Fundamentals:"
       - text: Introduction to Machine Learning
         href: https://koalaverse.github.io/homlr/exercises/01-exercises.nb.html
+      - text: Modeling process
+        href: https://koalaverse.github.io/homlr/exercises/02-exercises.nb.html
+      - text: Feature & target engineering
       - text: --------
       - text: "Supervised learning:"
       - text: Linear regression
