@@ -34,6 +34,7 @@ navbar:
       - text: Random forests
         href: https://koalaverse.github.io/homlr/notebooks/11-random-forests.nb.html
       - text: Gradient boosting
+        href: https://koalaverse.github.io/homlr/notebooks/12-gbm.nb.html
       - text: Deep learning
       - text: Support vector machines
       - text: Stacked models
