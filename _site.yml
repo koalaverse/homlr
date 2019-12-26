@@ -36,6 +36,7 @@ navbar:
       - text: Gradient boosting
         href: https://koalaverse.github.io/homlr/notebooks/12-gbm.nb.html
       - text: Deep learning
+        href: https://koalaverse.github.io/homlr/notebooks/13-deep-learning.nb.html
       - text: Support vector machines
       - text: Stacked models
       - text: Interpretable machine learning
