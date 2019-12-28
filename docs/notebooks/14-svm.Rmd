@@ -1,0 +1,768 @@
+---
+title: "Chapter 14: Support Vector Machines"
+output: html_notebook
+---
+
+__Note__: Some results may differ from the hard copy book due to the changing of sampling procedures introduced in R 3.6.0. See http://bit.ly/35D1SW7 for more details. Access and run the source code for this notebook [here](https://rstudio.cloud/project/801185). 
+
+Hidden chapter requirements used in the book to set the plotting theme and load packages used in hidden code chunks:
+
+```{r setup}
+# Set global knitr chunk options
+knitr::opts_chunk$set(
+  cache = FALSE,
+  collapse = TRUE, 
+  fig.align = "center",
+  fig.height = 3.5,
+  message = FALSE, 
+  warning = FALSE
+)
+
+# Set the graphical theme
+ggplot2::theme_set(ggplot2::theme_light())
+
+# Increase output width
+options(width = 120)
+
+# Load required packages
+library(ggplot2)
+library(kernlab)
+library(svmpath)
+
+# Colors
+dark2 <- RColorBrewer::brewer.pal(8, "Dark2")
+set1 <- RColorBrewer::brewer.pal(9, "Set1")
+
+# Plotting function; modified from svmpath::svmpath()
+plot_svmpath <- function(x, step = max(x$Step), main = "") {
+  
+  # Extract model info
+  object <- x
+  f <- predict(object, lambda = object$lambda[step], type = "function")
+  x <- object$x
+  y <- object$y
+  Elbow <- object$Elbow[[step]]
+  alpha <- object$alpha[, step]
+  alpha0 <- object$alpha0[step]
+  lambda <- object$lambda[step]
+  df <- as.data.frame(x[, 1L:2L])
+  names(df) <- c("x1", "x2")
+  df$y <- norm2d$y
+  beta <- (alpha * y) %*% x
+
+  # Construct plot
+  ggplot(df, aes(x = x1, y = x2)) +
+    geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+    xlab("Income (standardized)") +
+    ylab("Lot size (standardized)") +
+    xlim(-6, 6) +
+    ylim(-6, 6) +
+    coord_fixed() +
+    theme(legend.position = "none") +
+    theme_bw() +
+    scale_shape_discrete(
+      name = "Owns a riding\nmower?",
+      breaks = c(1, 2),
+      labels = c("Yes", "No")
+    ) +
+    scale_color_brewer(
+      name = "Owns a riding\nmower?",
+      palette = "Dark2",
+      breaks = c(1, 2),
+      labels = c("Yes", "No")
+    ) +
+    geom_abline(intercept = -alpha0/beta[2], slope = -beta[1]/beta[2], 
+                color = "black") +
+    geom_abline(intercept = lambda/beta[2] - alpha0/beta[2], 
+                slope = -beta[1]/beta[2], 
+                color = "black", linetype = 2) +
+    geom_abline(intercept = -lambda/beta[2] - alpha0/beta[2], 
+                slope = -beta[1]/beta[2], 
+                color = "black", linetype = 2) +
+    geom_point(data = df[Elbow, ], size = 3) +
+    ggtitle(main)
+    
+}
+```
+
+## Prerequisites
+
+```{r svm-pkgs}
+# Helper packages
+library(dplyr)    # for data wrangling
+library(ggplot2)  # for awesome graphics
+library(rsample)  # for data splitting
+
+# Modeling packages
+library(caret)    # for classification and regression training
+library(kernlab)  # for fitting SVMs
+
+# Model interpretability packages
+library(pdp)      # for partial dependence plots, etc.
+library(vip)      # for variable importance plots
+```
+
+```{r 05-data-import}
+# Load attrition data
+df <- attrition %>% 
+  mutate_if(is.ordered, factor, ordered = FALSE)
+
+# Create training (70%) and test (30%) sets
+set.seed(123)  # for reproducibility
+churn_split <- initial_split(df, prop = 0.7, strata = "Attrition")
+churn_train <- training(churn_split)
+churn_test  <- testing(churn_split)
+```
+
+
+## Optimal separating hyperplanes {#hyperplanes}
+
+Figure 14.1:
+
+```{r hyperplanes, echo=TRUE, fig.width=10, fig.height=5, out.width="100%", fig.cap="Examples of hyperplanes in 2-D and 3-D feature space."}
+# Construct data for plotting
+x1 <- x2 <- seq(from = 0, to = 1, length = 100)
+xgrid <- expand.grid(x1 = x1, x2 = x2)
+y1 <- 1 + 2 * x1
+y2 <- 1 + 2 * xgrid$x1 + 3 * xgrid$x2
+
+# Hyperplane: p = 2
+p1 <- lattice::xyplot(
+  x = y1 ~ x1, 
+  type = "l", 
+  col = "black", 
+  xlab = expression(X[1]), 
+  ylab = expression(X[2]),
+  main = expression({f(X)==1+2*X[1]-X[2]}==0),
+  scales = list(tck = c(1, 0))
+)
+
+# Hyperplane: p = 3
+p2 <- lattice::wireframe(
+  x = y2 ~ xgrid$x1 * xgrid$x2, 
+  xlab = expression(X[1]), 
+  ylab = expression(X[2]),
+  zlab = expression(X[3]),
+  main = expression({f(X)==1+2*X[1]+3*X[2]-X[3]}==0),
+  drape = TRUE,
+  colorkey = FALSE,
+  col = dark2[1],
+  scales = list(arrows = FALSE)
+  # par.settings = list(axis.line = list(col = "transparent"))
+)
+
+# Display plots side by side
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+### The hard margin classifier
+
+Figure 14.2:
+
+```{r svm-separating-hyperplanes, echo=TRUE, fig.width=8, fig.asp=0.5, out.width="100%", fig.cap="Simulated binary classification data with two separable classes. _Left:_ Raw data. _Right:_ Raw data with example decision boundaries (in this case, separating hyperplanes) from various machine learning algorithms."}
+# Simulate data
+set.seed(805)
+norm2d <- as.data.frame(mlbench::mlbench.2dnormals(
+  n = 100,
+  cl = 2,
+  r = 4,
+  sd = 1
+))
+names(norm2d) <- c("x1", "x2", "y")  # rename columns
+
+# Scatterplot
+p1 <- ggplot(norm2d, aes(x = x1, y = x2)) +
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  coord_fixed() +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  )
+
+# Fit a Logistic regression, linear discriminant analysis (LDA), and optimal
+# separating hyperplane (OSH). Note: we sometimes refer to the OSH as the hard 
+# margin classifier
+fit_glm <- glm(as.factor(y) ~ ., data = norm2d, family = binomial)
+fit_lda <- MASS::lda(as.factor(y) ~ ., data = norm2d)
+invisible(capture.output(fit_hmc <- ksvm(  # use ksvm() to find the OSH
+  x = data.matrix(norm2d[c("x1", "x2")]),
+  y = as.factor(norm2d$y), 
+  kernel = "vanilladot",  # no fancy kernel, just ordinary dot product
+  C = Inf,                # to approximate hard margin classifier
+  prob.model = TRUE       # needed to obtain predicted probabilities
+)))
+
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -6, 6, length = npts),
+  x2 = seq(from = -6, 6, length = npts)
+)
+
+# Predicted probabilities (as a two-column matrix)
+prob_glm <- predict(fit_glm, newdata = xgrid, type = "response")
+prob_glm <- cbind("1" = 1 - prob_glm, "2" = prob_glm)
+prob_lda <- predict(fit_lda, newdata = xgrid)$posterior
+prob_hmc <- predict(fit_hmc, newdata = xgrid, type = "probabilities")
+
+# Add predicted class probabilities
+xgrid2 <- xgrid %>%
+  cbind("GLM" = prob_glm[, 1L], 
+        "LDA" = prob_lda[, 1L], 
+        "HMC" = prob_hmc[, 1L]) %>%
+  tidyr::gather(Model, Prob, -x1, -x2)
+
+# Scatterplot with decision boundaries
+p2 <- p1 + 
+  stat_contour(data = xgrid2, aes(x = x1, y = x2, z = Prob, linetype = Model), 
+               breaks = 0.5, color = "black")
+
+# Display plots side by side
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+Figure 14.3:
+
+```{r svm-hmc, echo=TRUE, fig.width=7, fig.asp=0.618, fig.cap="HMC for the simulated riding mower data. The solid black line forms the decision boundary (in this case, a separating hyperplane), while the dashed lines form the boundaries of the margins (shaded regions) on each side of the hyperplane. The shortest distance between the two classes (i.e., the dotted line connecting the two convex hulls) has length $2M$. Two of the training observations (solid red points) fall on the margin boundaries; in the context of SVMs (which we discuss later), these two points form the _support vectors_."}
+# Compute convex hull for each class
+hpts1 <- chull(norm2d[norm2d$y == 1, c("x1", "x2")])
+hpts1 <- c(hpts1, hpts1[1L])
+hpts2 <- chull(norm2d[norm2d$y == 2, c("x1", "x2")])
+hpts2 <- c(hpts2, hpts2[1L])
+
+# Support vectors
+sv <- norm2d[fit_hmc@alphaindex[[1L]], c("x1", "x2")]  # 16-th and 97-th observations
+
+# Compute the perpendicular bisector of the line segment joining the two support 
+# vectors
+slope <- -1 / ((sv[2L, 2L] - sv[1L, 2L]) / (sv[2L, 1L] - sv[1L, 1L]))
+midpoint <- apply(sv, 2, mean)
+
+# Scatterplot with convex hulls, etc.
+ggplot(norm2d, aes(x = x1, y = x2)) +
+  
+  # Convex hulls
+  geom_polygon(
+    data = norm2d[norm2d$y == 1, c("x1", "x2")][hpts1, c("x1", "x2")],
+    color = "black",
+    fill = "transparent"
+  ) +
+  geom_polygon(
+    data = norm2d[norm2d$y == 2, c("x1", "x2")][hpts2, c("x1", "x2")],
+    color = "black",
+    fill = "transparent"
+  ) +
+  
+  # Scatterplot
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-10, 10) +
+  ylim(-10, 10) +
+  # coord_fixed() +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  
+  # Decision boundary
+  geom_abline(
+    intercept = -slope * midpoint[1L] + midpoint[2L], 
+    slope = slope
+  ) +
+  
+  # Margin boundaries (shaded in)
+  geom_abline(
+    intercept = -slope * sv[1L, 1L] + sv[1L, 2L], 
+    slope = slope,
+    linetype = 2
+  ) +
+  geom_abline(
+    intercept = -slope * sv[2L, 1L] + sv[2L, 2L], 
+    slope = slope,
+    linetype = 2
+  ) +
+  annotate(
+    geom = "polygon", 
+    x = c(-7, -7, 7, 7), 
+    y = c(-slope * sv[1L, 1L] + sv[1L, 2L] - 7 * slope, 
+          -slope * midpoint[1L] + midpoint[2L] - 7 * slope, 
+          -slope * midpoint[1L] + midpoint[2L] + 7 * slope,
+          -slope * sv[1L, 1L] + sv[1L, 2L] + 7 * slope),
+    alpha = 0.1, 
+    color = "transparent",
+    fill = dark2[2]
+  ) +
+  annotate(
+    geom = "polygon", 
+    x = c(-7, -7, 7, 7), 
+    y = c(-slope * sv[2L, 1L] + sv[2L, 2L] - 7 * slope,
+          -slope * midpoint[1L] + midpoint[2L] - 7 * slope,
+          -slope * midpoint[1L] + midpoint[2L] + 7 * slope,
+          -slope * sv[2L, 1L] + sv[2L, 2L] + 7 * slope), 
+    alpha = 0.1, 
+    color = "transparent",
+    fill = dark2[2]
+  ) +
+  
+  # Arrows, labels, etc.
+  annotate("segment",
+    x = sv[1L, 1L], y = sv[1L, 2L], xend = sv[2L, 1L], yend = sv[2L, 2L], 
+    # alpha = 0.5,
+    linetype = 3
+    # arrow = arrow(length = unit(0.03, units = "npc"), ends = "both")
+  ) +
+  geom_curve(x = -3, y = 4.5, xend = 0, yend = 5, 
+             arrow = arrow(length = unit(0.03, units = "npc"))) +
+  annotate("text", label = "Width = M", x = 0.45, y = 5.45, size = 5) +
+  geom_curve(x = 2, y = -3, xend = 0, yend = -5, 
+             arrow = arrow(length = unit(0.03, units = "npc"))) +
+  annotate("text", label = "Width = M", x = 0, y = -5.35, size = 5) +
+  
+  # Support vectors
+  annotate("point", x = sv$x1[1], y = sv$x2[1], shape = 17, color = "red", 
+           size = 3) +
+  annotate("point", x = sv$x1[2], y = sv$x2[2], shape = 16, color = "red", 
+           size = 3) +
+  # geom_point(data = cbind(sv, y = c("2", "1")), aes(shape = y),
+  #            size = 4, color = "red") +
+  
+  # Zoom in
+  coord_fixed(xlim = c(-6, 6), ylim = c(-6, 6))
+```
+
+### The soft margin classifier
+
+Figure 14.4:
+
+```{r svm-noisy, echo=TRUE, fig.width=7, fig.asp=0.618, fig.cap="Simulated binary classification data with an outlier at the point $\\left(0.5, 1\\right)$."}
+# Add an outlier
+norm2d <- rbind(norm2d, data.frame("x1" = 0.5, "x2" = 1, "y" = 2))
+
+# Fit a Logistic regression, linear discriminant analysis (LDA), and optimal
+# separating hyperplane (OSH)
+#
+# Note: we sometimes refer to the OSH as the hard margin classifier
+fit_glm <- glm(as.factor(y) ~ ., data = norm2d, family = binomial)
+fit_lda <- MASS::lda(as.factor(y) ~ ., data = norm2d)
+invisible(capture.output(fit_hmc <- ksvm(  # use ksvm() to find the OSH
+  x = data.matrix(norm2d[c("x1", "x2")]),
+  y = as.factor(norm2d$y), 
+  kernel = "vanilladot",  # no fancy kernel, just ordinary dot product
+  C = Inf,                # to approximate maximal margin classifier
+  prob.model = TRUE       # needed to obtain predicted probabilities
+)))
+
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -6, 6, length = npts),
+  x2 = seq(from = -6, 6, length = npts)
+)
+
+# Predicted probabilities (as a two-column matrix)
+prob_glm <- predict(fit_glm, newdata = xgrid, type = "response")
+prob_glm <- cbind("1" = 1 - prob_glm, "2" = prob_glm)
+prob_lda <- predict(fit_lda, newdata = xgrid)$posterior
+prob_hmc <- predict(fit_hmc, newdata = xgrid, type = "probabilities")
+
+# Add predicted class probabilities
+xgrid2 <- xgrid %>%
+  cbind("GLM" = prob_glm[, 1L], 
+        "LDA" = prob_lda[, 1L], 
+        "HMC" = prob_hmc[, 1L]) %>%
+  tidyr::gather(Model, Prob, -x1, -x2)
+
+# Scatterplot
+ggplot(norm2d, aes(x = x1, y = x2)) +
+  
+  # Label outlier
+  geom_curve(x = tail(norm2d, n = 1)$x1 - 0.2, y = tail(norm2d, n = 1)$x2 - 0.2, 
+             xend = -4, yend = 3, curvature = -0.5, angle = 90,
+             arrow = arrow(length = unit(0.03, units = "npc"))) +
+  annotate("text", label = "Outlier?", x = -4, y = 3.5, size = 5) +
+
+  # Scatterplot, etc.
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  coord_fixed() +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  stat_contour(data = xgrid2, aes(x = x1, y = x2, z = Prob, linetype = Model), 
+               breaks = 0.5, color = "black")
+```
+
+Figure 14.5:
+
+```{r smc, echo=TRUE, fig.width=8, fig.asp=0.5, out.width="100%", fig.cap="Soft margin classifier. Left: Zero budget for overlap (i.e., the HMC). Right: Maximumn allowable overlap. The solid black points represent the support vectors that define the margin boundaries."}
+# Fit the entire regularization path
+fit_smc <- svmpath(
+  x = data.matrix(norm2d[c("x1", "x2")]), 
+  y = ifelse(norm2d$y == 1, 1, -1)
+)
+# Plot both extremes
+p1 <- plot_svmpath(fit_smc, step = max(fit_smc$Step), main = expression(C == 0))
+p2 <- plot_svmpath(fit_smc, step = min(fit_smc$Step), main = expression(C == infinity))
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+## The support vector machine
+
+Figure 14.6:
+
+```{r svm-circle, echo=TRUE, fig.width=12, fig.asp=1/3, out.width="100%", fig.cap="Simulated nested circle data. _Left:_ The two classes in the original (2-D) feature space. _Middle:_ The two classes in the enlarged (3-D) feature space. _Right:_ The decision boundary from the HMC in the enlarged feature space projected back into the original feature space."}
+# Load required packages
+library(grid)
+library(lattice)
+
+# Simulate data
+set.seed(1432)
+circle <- as.data.frame(mlbench::mlbench.circle(
+  n = 200,
+  d = 2
+))
+names(circle) <- c("x1", "x2", "y")  # rename columns
+
+# Fit a support vector machine (SVM)
+fit_svm_poly <- ksvm( 
+  x = data.matrix(circle[c("x1", "x2")]),
+  y = as.factor(circle$y), 
+  kernel = "polydot",       # polynomial kernel
+  kpar = list(degree = 2),  # kernel parameters
+  C = Inf,                  # to approximate maximal margin classifier
+  prob.model = TRUE         # needed to obtain predicted probabilities
+)
+
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -1.25, 1.25, length = npts),
+  x2 = seq(from = -1.25, 1.25, length = npts)
+)
+
+# Predicted probabilities (as a two-column matrix)
+prob_svm_poly <- predict(fit_svm_poly, newdata = xgrid, type = "probabilities")
+
+# Scatterplot
+p1 <- contourplot(
+  x = prob_svm_poly[, 1] ~ x1 * x2, 
+  data = xgrid, 
+  at = 0, 
+  labels = FALSE,
+  scales = list(tck = c(1, 0)),
+  xlab = "x1",
+  ylab = "x2",
+  main = "Original feature space",
+  panel = function(x, y, z, ...) {
+    panel.contourplot(x, y, z, ...)
+    panel.xyplot(
+      x = circle$x1, 
+      y = circle$x2, 
+      groups = circle$y, 
+      pch = 19, 
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5),
+      ...
+    )
+  }
+)
+
+# Enlarge feature space
+circle_3d <- circle
+circle_3d$x3 <- circle_3d$x1^2 + circle_3d$x2^2
+
+# 3-D scatterplot
+p2 <- cloud(
+  x = x3 ~ x1 * x2, 
+  data = circle_3d, 
+  groups = y,
+  main = "Enlarged feature space",
+  par.settings = list(
+    superpose.symbol = list(
+      pch = 19,
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5)
+    )
+  )
+) 
+
+# Scatterplot with decision boundary
+p3 <- contourplot(
+  x = prob_svm_poly[, 1] ~ x1 * x2, 
+  data = xgrid, 
+  at = 0.5, 
+  labels = FALSE,
+  scales = list(tck = c(1, 0)),
+  xlab = "x1",
+  ylab = "x2",
+  main = "Non-linear decision boundary",
+  panel = function(x, y, z, ...) {
+    panel.contourplot(x, y, z, ...)
+    panel.xyplot(
+      x = circle$x1, 
+      y = circle$x2, 
+      groups = circle$y, 
+      pch = 19, 
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5),
+      ...
+    )
+  }
+) 
+
+# Combine plots
+gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
+```
+
+```{r svm-getModelInfo}
+# Linear (i.e., soft margin classifier)
+caret::getModelInfo("svmLinear")$svmLinear$parameters
+
+# Polynomial kernel
+caret::getModelInfo("svmPoly")$svmPoly$parameters
+
+# Radial basis kernel
+caret::getModelInfo("svmRadial")$svmRadial$parameters
+```
+
+Figure 14.7:
+
+```{r two-spirals, echo=TRUE, fig.width=8, fig.asp=0.5, out.width="100%", fig.cap="Two spirals benchmark problem. _Left:_ Decision boundary from a random forest. _Right:_ Decision boundary from an SVM with radial basis kernel."}
+# Load required packages
+library(kernlab)  # for fitting SVMs
+library(mlbench)  # for ML benchmark data sets
+
+# Simulate train and test sets
+set.seed(0841)
+spirals <- as.data.frame(
+  mlbench.spirals(300, cycles = 2, sd = 0.09)
+)
+names(spirals) <- c("x1", "x2", "classes")
+
+# Fit an RF
+set.seed(7256)
+spirals_rfo <- ranger::ranger(classes ~ ., data = spirals, probability = TRUE)
+
+# Fit an SVM using a radial basis function kernel
+spirals_svm <- ksvm(classes ~ x1 + x2, data = spirals, kernel = "rbfdot",
+                    C = 500, prob.model = TRUE)
+
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -2, 2, length = npts),
+  x2 = seq(from = -2, 2, length = npts)
+)
+
+# Predicted probabilities (as a two-column matrix)
+prob_rfo <- predict(spirals_rfo, data = xgrid)$predictions
+prob_svm <- predict(spirals_svm, newdata = xgrid, type = "probabilities")
+
+# Add predicted class probabilities
+xgrid2 <- xgrid %>%
+  cbind("RF" = prob_rfo[, 1L], 
+        "SVM" = prob_svm[, 1L]) %>%
+  tidyr::gather(Model, Prob, -x1, -x2)
+
+# Scatterplots with decision boundaries
+ggplot(spirals, aes(x = x1, y = x2)) +
+  geom_point(aes(shape = classes, color = classes), size = 3, alpha = 0.75) +
+  xlab(expression(X[1])) +
+  ylab(expression(X[2])) +
+  xlim(-2, 2) +
+  ylim(-2, 2) +
+  coord_fixed() +
+  theme(legend.position = "none") +
+  theme_bw() +
+  stat_contour(data = xgrid2, aes(x = x1, y = x2, z = Prob), 
+               breaks = 0.5, color = "black") +
+  facet_wrap( ~ Model)
+```
+
+
+### Support vector regression
+
+Figure 14.8:
+
+```{r eps-band, echo=TRUE, fig.width=6, fig.asp=0.618, fig.cap="$\\epsilon$-insensitive regression band. The solid black line represents the estimated regression curve $f\\left(x\\right)$."}
+ggplot() +
+  geom_abline(intercept = 4, slope = 1, linetype = 2, color = dark2[1L]) +
+  geom_abline(intercept = 3, slope = 1) +
+  geom_abline(intercept = 2, slope = 1, linetype = 2, color = dark2[1L]) +
+  xlim(0, 5) +
+  ylim(1, 10) +
+  xlab(expression(x)) +
+  ylab(expression(f(x))) +
+  theme_bw() +
+  annotate("text", label = "f(x) + epsilon", parse = TRUE, x = 2, y = 6.75, 
+           size = 6, color = dark2[1L]) +
+  annotate("text", label = "f(x) - epsilon", parse = TRUE, x = 2, y = 3.15, 
+           size = 6, color = dark2[1L])
+```
+
+Figure 14.9:
+
+```{r sinc, echo=TRUE, fig.width=6, fig.asp=0.618, fig.cap="Simulated data from a sinc function with added noise."}
+# Simulate data
+set.seed(1218)
+x <- seq(from = -20, to = 20, by = 0.1)
+y <- sin(x) / x + rnorm(length(x), sd = 0.03)
+df <- na.omit(data.frame(x = x, y = y))
+
+# Plot results
+ggplot(df, aes(x = x, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_line(aes(x = x, y = sin(x) / x), size = 1, color = "darkorange") +
+  theme_bw() +
+  theme(legend.position = "none") 
+```
+
+Figure 14.10:
+
+```{r sinc-predictions, echo=TRUE, fig.width=12, fig.height=4, out.width="100%", fig.cap="Simulated sine"}
+# SVR model
+set.seed(101)
+svr <- kernlab::ksvm(y ~ x, data = df, kernel = "rbfdot", kpar = "automatic",
+                     type = "eps-svr", epsilon = 0.1)
+
+# MARS model
+mars <- earth::earth(y ~ x, data = df)
+
+# Random forest
+set.seed(102)
+rfo <- ranger::ranger(y ~ x, data = df)
+
+# Gather predictions
+df$SVR <- predict(svr, newdata = df)
+df$MARS <- predict(mars, newdata = df)[, 1L, drop = TRUE]
+df$RF <- predict(rfo, data = df)$predictions
+df <- df %>% tidyr::gather(Model, Prediction, -x, -y)
+
+# Plot results
+ggplot(df, aes(x = x, y = y)) +
+  geom_point(alpha = 0.5) +
+  geom_line(aes(x = x, y = Prediction, color = Model), size = 1) +
+  facet_wrap( ~ Model) +
+  theme_bw() +
+  theme(legend.position = "none") 
+```
+
+## Job attrition example
+
+```{r svm-attrition-train}
+# Tune an SVM with radial basis kernel
+set.seed(1854)  # for reproducibility
+churn_svm <- train(
+  Attrition ~ ., 
+  data = churn_train,
+  method = "svmRadial",               
+  preProcess = c("center", "scale"),  
+  trControl = trainControl(method = "cv", number = 10),
+  tuneLength = 10
+)
+```
+
+
+```{r 08-attrition-03, fig.width=5, fig.height=3, out.width = "80%"}
+# Plot results
+ggplot(churn_svm) + theme_light()
+
+# Print results
+churn_svm$results
+```
+
+### Class probabilities
+
+```{r auc}
+# Control params for SVM
+ctrl <- trainControl(
+  method = "cv", 
+  number = 10, 
+  classProbs = TRUE,                 
+  summaryFunction = twoClassSummary  # also needed for AUC/ROC
+)
+
+# Tune an SVM
+set.seed(5628)  # for reproducibility
+churn_svm_auc <- train(
+  Attrition ~ ., 
+  data = churn_train,
+  method = "svmRadial",               
+  preProcess = c("center", "scale"),  
+  metric = "ROC",  # area under ROC curve (AUC)       
+  trControl = ctrl,
+  tuneLength = 10
+)
+
+# Print results
+churn_svm_auc$results
+```
+
+
+```{r confusion-matrix-svm}
+confusionMatrix(churn_svm_auc)
+```
+
+
+## Feature interpretation
+
+```{r svm-attrition-vip-prediction-function}
+prob_yes <- function(object, newdata) {
+  predict(object, newdata = newdata, type = "prob")[, "Yes"]
+}
+```
+
+```{r svm-attrition-vip-permutation, fig.width=6, fig.asp=0.618, warnings=FALSE}
+# Variable importance plot
+set.seed(2827)  # for reproducibility
+vip(churn_svm_auc, method = "permute", nsim = 5, train = churn_train, 
+    target = "Attrition", metric = "auc", reference_class = "Yes", 
+    pred_wrapper = prob_yes)
+```
+
+```{r svm-attrition-pdps, fig.width=6, fig.asp=0.618, out.width="100%", warnings=FALSE}
+features <- c("OverTime", "WorkLifeBalance", 
+              "JobSatisfaction", "JobRole")
+pdps <- lapply(features, function(x) {
+  partial(churn_svm_auc, pred.var = x, which.class = 2,  
+          prob = TRUE, plot = TRUE, plot.engine = "ggplot2") +
+    coord_flip()
+})
+grid.arrange(grobs = pdps,  ncol = 2)
+```

@@ -38,6 +38,7 @@ navbar:
       - text: Deep learning
         href: https://koalaverse.github.io/homlr/notebooks/13-deep-learning.nb.html
       - text: Support vector machines
+        href: https://koalaverse.github.io/homlr/notebooks/14-svm.nb.html
       - text: Stacked models
       - text: Interpretable machine learning
       - text: --------
