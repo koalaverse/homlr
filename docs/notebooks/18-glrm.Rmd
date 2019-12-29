@@ -1,0 +1,255 @@
+---
+title: "Chapter 18: Generalized Low Rank Models"
+output: html_notebook
+---
+
+__Note__: Some results may differ from the hard copy book due to the changing of
+sampling procedures introduced in R 3.6.0. See http://bit.ly/35D1SW7 for more
+details. Access and run the source code for this notebook [here](https://rstudio.cloud/project/801185).
+
+Hidden chapter requirements used in the book to set the plotting theme and load
+packages used in hidden code chunks:
+
+```{r setup}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  cache = FALSE
+)
+
+# Set the graphical theme
+ggplot2::theme_set(ggplot2::theme_light())
+```
+
+## Prerequisites
+
+This chapter leverages the following packages:
+
+```{r glrm-pkg-req}
+# Helper packages
+library(dplyr)    # for data manipulation
+library(ggplot2)  # for data visualization
+library(tidyr)    # for data reshaping
+
+# Modeling packages
+library(h2o)  # for fitting GLRMs
+```
+
+To illustrate GLRM concepts, we'll continue using the `my_basket` data set created in the previous chapter:
+
+```{r glrm-data-req}
+url <- "https://koalaverse.github.io/homlr/data/my_basket.csv"
+my_basket <- readr::read_csv(url)
+```
+
+
+## The idea
+
+```{r mtcars-table}
+head(mtcars)
+```
+
+Figure 18.1:
+
+```{r glrm-example, fig.cap="Example GLRM where we reduce the mtcars data set down to a rank of 3.", out.height="100%", out.width="100%"}
+knitr::include_graphics("images/glrm-example.png")
+```
+
+## Finding the lower ranks
+
+### Loss functions
+
+Figure 18.2:
+
+```{r quadratic-vs-huber, fig.cap="Huber loss (green) compared to quadratic loss (blue).  The $x$-axis represents a particular value at $A_{i,j}$ and the $y$-axis represents the predicted value produced by $X_iY_j$. Note how the Huber loss produces a linear loss while the quadratic loss produces much larger loss values as the residual value increases."}
+knitr::include_graphics("images/quadratic-huber-loss.png")
+```
+
+## Fitting GLRMs in R
+
+```{r glrm-h2o-init}
+h2o.no_progress()  # turn off progress bars
+h2o.init(max_mem_size = "5g")  # connect to H2O instance
+```
+
+### Basic GLRM model
+
+```{r glrm-model-1}
+# convert data to h2o object
+my_basket.h2o <- as.h2o(my_basket)
+
+# run basic GLRM
+basic_glrm <- h2o.glrm(
+  training_frame = my_basket.h2o,
+  k = 20, 
+  loss = "Quadratic",
+  regularization_x = "None", 
+  regularization_y = "None", 
+  transform = "STANDARDIZE", 
+  max_iterations = 2000,
+  seed = 123
+)
+```
+
+```{r glrm-mod1-results}
+# get top level summary information on our model
+summary(basic_glrm)
+
+plot(basic_glrm)
+```
+
+```{r archetype-variance-explained}
+# amount of variance explained by each archetype (aka "pc")
+basic_glrm@model$importance
+```
+
+```{r glrm-mod1-plot-variance-explained, fig.height=5, fig.width=9, fig.cap="Variance explained by the first 20 archetypes in our GLRM model."}
+data.frame(
+    PC  = basic_glrm@model$importance %>% seq_along(),
+    PVE = basic_glrm@model$importance %>% .[2,] %>% unlist(),
+    CVE = basic_glrm@model$importance %>% .[3,] %>% unlist()
+) %>%
+    gather(metric, variance_explained, -PC) %>%
+    ggplot(aes(PC, variance_explained)) +
+    geom_point() +
+    facet_wrap(~ metric, ncol = 1, scales = "free")
+```
+
+```{r glrm-get-archetypes}
+t(basic_glrm@model$archetypes)[1:5, 1:5]
+```
+
+```{r glrm-plot-archetypes, fig.width=11, fig.height=5, fig.cap="Feature contribution for archetype 1 and 2."}
+p1 <- t(basic_glrm@model$archetypes) %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(Arch1, reorder(feature, Arch1))) +
+  geom_point()
+
+p2 <- t(basic_glrm@model$archetypes) %>% 
+  as.data.frame() %>% 
+  mutate(feature = row.names(.)) %>%
+  ggplot(aes(Arch1, Arch2, label = feature)) +
+  geom_text()
+
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+```{r glrm-reconstruct}
+# Re-run model with k = 8
+k8_glrm <- h2o.glrm(
+  training_frame = my_basket.h2o,
+  k = 8, 
+  loss = "Quadratic",
+  regularization_x = "None", 
+  regularization_y = "None", 
+  transform = "STANDARDIZE", 
+  max_iterations = 2000,
+  seed = 123
+)
+
+# Reconstruct to see how well the model did
+my_reconstruction <- h2o.reconstruct(k8_glrm, my_basket.h2o, reverse_transform = TRUE)
+
+# Raw predicted values
+my_reconstruction[1:5, 1:5]
+
+# Round values to whole integers
+my_reconstruction[1:5, 1:5] %>% round(0)
+```
+
+### Tuning to optimize for unseen data
+
+```{r}
+# Use non-negative regularization
+k8_glrm_regularized <- h2o.glrm(
+  training_frame = my_basket.h2o,
+  k = 8, 
+  loss = "Quadratic",
+  regularization_x = "NonNegative", 
+  regularization_y = "NonNegative",
+  gamma_x = 0.5,
+  gamma_y = 0.5,
+  transform = "STANDARDIZE", 
+  max_iterations = 2000,
+  seed = 123
+)
+
+# Show predicted values
+predict(k8_glrm_regularized, my_basket.h2o)[1:5, 1:5]
+
+# Compare regularized versus non-regularized loss
+par(mfrow = c(1, 2))
+plot(k8_glrm)
+plot(k8_glrm_regularized)
+```
+
+```{r}
+# Split data into train & validation
+split <- h2o.splitFrame(my_basket.h2o, ratios = 0.75, seed = 123)
+train <- split[[1]]
+valid <- split[[2]]
+
+# Create hyperparameter search grid
+params <- expand.grid(
+  regularization_x = c("None", "NonNegative", "L1"),
+  regularization_y = c("None", "NonNegative", "L1"),
+  gamma_x = seq(0, 1, by = .25),
+  gamma_y = seq(0, 1, by = .25),
+  error = 0,
+  stringsAsFactors = FALSE
+  )
+
+# Perform grid search
+for(i in seq_len(nrow(params))) {
+  
+  # Create model
+  glrm_model <- h2o.glrm(
+    training_frame = train,
+    k = 8, 
+    loss = "Quadratic",
+    regularization_x = params$regularization_x[i], 
+    regularization_y = params$regularization_y[i],
+    gamma_x = params$gamma_x[i],
+    gamma_y = params$gamma_y[i],
+    transform = "STANDARDIZE", 
+    max_runtime_secs = 1000,
+    seed = 123
+  )
+  
+  # Predict on validation set and extract error
+  validate <- h2o.performance(glrm_model, valid)
+  params$error[i] <- validate@metrics$numerr
+}
+
+# Look at the top 10 models with the lowest error rate
+params %>%
+  arrange(error) %>%
+  head(10)
+```
+
+```{r final-model-scoring}
+# Apply final model with optimal hyperparamters
+final_glrm_model <- h2o.glrm(
+  training_frame = my_basket.h2o,
+  k = 8, 
+  loss = "Quadratic",
+  regularization_x = "L1", 
+  regularization_y = "NonNegative",
+  gamma_x = 1,
+  gamma_y = 0.25,
+  transform = "STANDARDIZE", 
+  max_iterations = 2000,
+  seed = 123
+)
+
+# New observations to score
+new_observations <- as.h2o(sample_n(my_basket, 2))
+
+# Basic scoring
+predict(final_glrm_model, new_observations) %>% round(0)
+```
+
+```{r glrm-shutdown-h2o}
+h2o.shutdown(prompt = FALSE)
+```

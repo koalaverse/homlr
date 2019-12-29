@@ -44,7 +44,9 @@ navbar:
       - text: --------
       - text: "Dimension reduction:"
       - text: Princicpal component analysis
+        href: https://koalaverse.github.io/homlr/notebooks/17-pca.nb.html
       - text: Generalized low rank models
+        href: https://koalaverse.github.io/homlr/notebooks/18-glrm.nb.html
       - text: Autoencoders
       - text: --------
       - text: "Clustering:"
