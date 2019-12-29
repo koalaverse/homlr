@@ -52,6 +52,7 @@ navbar:
       - text: --------
       - text: "Clustering:"
       - text: K-means clustering
+        href: https://koalaverse.github.io/homlr/notebooks/20-kmeans.nb.html
       - text: Hierarchical clustering
       - text: Model-based clustering
     - text: Exercises

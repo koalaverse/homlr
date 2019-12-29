@@ -487,3 +487,8 @@ for (i in seq_len(nrow(original_vs_big_errors))) {
         main = title)
 }  
 ```
+
+```{r}
+h2o.shutdown(prompt = FALSE)
+```
+

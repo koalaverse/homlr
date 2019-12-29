@@ -1,0 +1,305 @@
+---
+title: "Chapter 20: K-means Clustering"
+output: html_notebook
+---
+
+__Note__: Some results may differ from the hard copy book due to the changing of
+sampling procedures introduced in R 3.6.0. See http://bit.ly/35D1SW7 for more
+details. Access and run the source code for this notebook [here](https://rstudio.cloud/project/801185).
+
+Hidden chapter requirements used in the book to set the plotting theme and load
+packages used in hidden code chunks:
+
+```{r setup}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  cache = FALSE
+)
+
+# Set the graphical theme
+ggplot2::theme_set(ggplot2::theme_light())
+
+# Load required packages
+library(tidyr)
+library(purrr)
+```
+
+## Prerequisites
+
+For this chapter we’ll use the following packages:
+
+```{r kmeans-pkgs}
+# Helper packages
+library(dplyr)       # for data manipulation
+library(ggplot2)     # for data visualization
+library(stringr)     # for string functionality
+
+# Modeling packages
+library(cluster)     # for general clustering algorithms
+library(factoextra)  # for visualizing cluster results
+```
+
+To illustrate _k_-means concepts we'll use the `mnist` and `my_basket` data sets:
+
+```{r kmeans-data}
+mnist <- dslabs::read_mnist()
+
+url <- "https://koalaverse.github.io/homlr/data/my_basket.csv"
+my_basket <- readr::read_csv(url)
+```
+
+## Distance measures
+
+Figure 20.1:
+
+```{r correlation-distance-example, fig.width=7, fig.cap='Correlation-based distance measures will capture the correlation between two observations better than a non-correlation-based distance measure; regardless of magnitude differences.'}
+# generate data
+corr_ex <- tibble(
+  v = 1:20,
+  obs_1 = sample(5:7, 20, replace = TRUE),
+  obs_2 = sample(4:10, 20, replace = TRUE)
+) %>%
+  mutate(obs_3 = obs_2 * 2 + sample(0:1, 1))
+
+corr_ex %>%
+  gather(Observation, value, obs_1:obs_3) %>%
+  ggplot(aes(v, value, color = Observation)) +
+  geom_line(size = 1) +
+  scale_colour_manual(values = c("#00AFBB", "#E7B800", "#FC4E07")) +
+  scale_x_continuous("Variable index") +
+  scale_y_continuous("Some arbitrary measure")
+```
+
+
+## Defining clusters
+
+Figure 20.2:
+
+```{r kmeans-clusters-good-better-best, fig.height=3.5, fig.width=10, fig.cap="Total within-cluster variation captures the total distances between a cluster's centroid and the individual observations assigned to that cluster. The more compact the these distances, the more defined and isolated the clusters are."}
+# Generate data
+create_data <- function(sd) {
+  data_frame(
+    x1 = c(rnorm(100, sd = sd), rnorm(100, sd = sd) + 3),
+    x2 = c(rnorm(100, sd = sd), rnorm(100, sd = sd) - 2)
+  ) %>%
+    mutate(`W(Ck)` = case_when(
+      sd == 0.5  ~ "Best",
+      sd == 0.75 ~ "Better",
+      sd == 1   ~ "Good"
+    ))
+}
+df <- map(c(0.5, 0.75, 1), create_data)
+
+# Compute and add cluster info to data
+k2 <- map(df, ~ kmeans(.x[, 1:2], 2, nstart = 20))
+df <- map2(df, k2, ~ mutate(.x, cluster = .y$cluster)) %>%
+  map2_dfr(k2, ~ inner_join(.x, .y$centers %>% 
+                          as.data.frame() %>% 
+                          mutate(cluster = row_number()), by = "cluster")
+       ) %>%
+  rename(x1 = x1.x, x2 = x2.x, x_center = x1.y, y_center = x2.y) %>%
+  mutate(`W(Ck)` = factor(`W(Ck)`, levels = c("Good", "Better", "Best")))
+
+# Plot results
+df %>%
+  ggplot(aes(colour = factor(cluster))) +
+  facet_wrap(~ `W(Ck)`) +
+  geom_segment(aes(x = x1, xend = x_center, y = x2, yend = y_center), lty = "dashed", alpha = .5) +
+  geom_point(aes(x_center, y_center), size = 4) +
+  geom_point(aes(x1, x2), show.legend = FALSE, alpha = .5) +
+  scale_x_continuous(bquote(X[1]), breaks = NULL, labels = NULL) +
+  scale_y_continuous(bquote(X[2]), breaks = NULL, labels = NULL) +
+  theme(legend.position = "none")
+```
+
+Figure 20.3:
+
+```{r non-linear-boundaries, fig.cap='The assumptions of k-means lends it ineffective in capturing complex geometric groupings; however, spectral clustering allows you to cluster data that is connected but not necessarily clustered within convex boundaries.'}
+# Generate data
+set.seed(111)
+obj <- mlbench::mlbench.spirals(200, 1, 0.025)
+df <- data.frame(
+  x = obj$x[, 1],
+  y = obj$x[, 2],
+  class = obj$classes
+)
+
+# Plot data
+p1 <- ggplot(df, aes(x, y)) +
+  geom_point() +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle('(A) Original spiral data')
+
+# Run k-means
+kmeans_on_spiral <- kmeans(df[, 1:2], 2)
+df$kmeans_clusters <- kmeans_on_spiral$cluster
+p2 <- ggplot(df, aes(x, y, color = kmeans_clusters)) +
+  geom_point(show.legend = FALSE) +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle('(B) k-means clusters')
+
+# Plot results
+sc <- kernlab::specc(as.matrix(df[, 1:2]), centers = 2)
+df$spec_clusters <- sc@.Data
+p3 <- ggplot(df, aes(x, y, color = spec_clusters)) +
+  geom_point(show.legend = FALSE) +
+  xlab(NULL) +
+  ylab(NULL) +
+  ggtitle('(C) Spectral clusters')
+
+# Display plots side by side
+gridExtra::grid.arrange(p1, p2, p3, nrow = 1)
+```
+
+
+## _k_-means algorithm
+
+Figure 20.4:
+
+```{r random-starts, fig.height=6, fig.width=10, fig.cap='Each application of the k-means algorithm can achieve slight differences in the final results based on the random start.'}
+# Generate data
+df <- data_frame(
+    x1 = c(rnorm(100), rnorm(100) + 3),
+    x2 = c(rnorm(100), rnorm(100) - 2)
+)
+
+# Compute and plot results
+map(1:6, ~ kmeans(df, 3)) %>%
+  map2_dfr(1:6, ~ df %>% mutate(
+    cluster = .x$cluster,
+    name = paste0("Iteration: ", .y, ";  W(Ck): ", round(.x$tot.withinss, 2))
+    )) %>%
+  ggplot(aes(x1, x2, colour = cluster)) +
+  geom_point(show.legend = FALSE, size = 1) +
+  facet_wrap(~ name, nrow = 2)
+```
+
+## Clustering digits
+
+```{r mnist-kmeans}
+features <- mnist$train$images
+
+# Use k-means model with 10 centers and 10 random starts
+mnist_clustering <- kmeans(features, centers = 10, nstart = 10)
+
+# Print contents of the model output
+str(mnist_clustering)
+```
+
+```{r plot-kmeans-mnist-centers, fig.height=4, fig.width=12, fig.cap='Cluster centers for the 10 clusters identified in the MNIST training data.'}
+# Extract cluster centers
+mnist_centers <- mnist_clustering$centers
+
+# Plot typical cluster digits
+par(mfrow = c(2, 5), mar = c(0.5, 0.5, 0.5, 0.5))
+layout(matrix(seq_len(nrow(mnist_centers)), 2, 5, byrow = FALSE))
+for (i in seq_len(nrow(mnist_centers))) {
+  image(matrix(mnist_centers[i, ], 28, 28)[, 28:1], 
+        col = gray.colors(12, rev = TRUE), xaxt = "n", yaxt = "n")
+}
+```
+
+```{r mnist-clustering-confusion-matrix, fig.cap='Confusion matrix illustrating how the k-means algorithm clustered the digits (x-axis) and the actual labels (y-axis).'}
+# Create mode function
+mode_fun <- function(x){  
+  which.max(tabulate(x))
+}
+
+mnist_comparison <- data.frame(
+  cluster = mnist_clustering$cluster,
+  actual = mnist$train$labels
+) %>%
+  group_by(cluster) %>%
+  mutate(mode = mode_fun(actual)) %>%
+  ungroup() %>%
+  mutate_all(factor, levels = 0:9)
+
+# Create confusion matrix and plot results
+yardstick::conf_mat(
+  mnist_comparison, 
+  truth = actual, 
+  estimate = mode
+) %>%
+  autoplot(type = 'heatmap')
+```
+
+## How many clusters? 
+
+```{r elbow-method, fig.cap="Using the elbow method to identify the preferred number of clusters in the my basket data set."}
+fviz_nbclust(
+  my_basket, 
+  kmeans, 
+  k.max = 25,
+  method = "wss",
+  diss = get_dist(my_basket, method = "spearman")
+)
+```
+
+## Clustering with mixed data
+
+```{r}
+# Full ames data set --> recode ordinal variables to numeric
+ames_full <- AmesHousing::make_ames() %>%
+  mutate_if(str_detect(names(.), 'Qual|Cond|QC|Qu'), as.numeric)
+
+# One-hot encode --> retain only the features and not sale price
+full_rank  <- caret::dummyVars(Sale_Price ~ ., data = ames_full, 
+                               fullRank = TRUE)
+ames_1hot <- predict(full_rank, ames_full)
+
+# Scale data
+ames_1hot_scaled <- scale(ames_1hot)
+
+# New dimensions
+dim(ames_1hot_scaled)
+```
+
+```{r kmeans-silhouette-mixed, fig.width=7, fig.height=4, fig.cap="Suggested number of clusters for one-hot encoded Ames data using k-means clustering and the elbow criterion."}
+set.seed(123)
+
+fviz_nbclust(
+  ames_1hot_scaled, 
+  kmeans, 
+  method = "wss", 
+  k.max = 25, 
+  verbose = FALSE
+)
+```
+
+```{r}
+# Original data minus Sale_Price
+ames_full <- AmesHousing::make_ames() %>% select(-Sale_Price)
+
+# Compute Gower distance for original data
+gower_dst <- daisy(ames_full, metric = "gower")
+```
+
+```{r gower-based-clustering, eval=FALSE}
+# You can supply the Gower distance matrix to several clustering algos
+pam_gower <- pam(x = gower_dst, k = 8, diss = TRUE)
+diana_gower <- diana(x = gower_dst, diss = TRUE)
+agnes_gower <- agnes(x = gower_dst, diss = TRUE)
+```
+
+## Alternative partitioning methods
+
+```{r pam, fig.width=7, fig.height=4, fig.cap="Total within sum of squares for 1-25 clusters using PAM clustering."}
+fviz_nbclust(
+  ames_1hot_scaled, 
+  pam, 
+  method = "wss", 
+  k.max = 25, 
+  verbose = FALSE
+)
+```
+
+```{r clara}
+# k-means computation time on MNIST data
+system.time(kmeans(features, centers = 10))
+
+# CLARA computation time on MNIST data
+system.time(clara(features, k = 10))
+```
