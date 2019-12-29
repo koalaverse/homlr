@@ -48,6 +48,7 @@ navbar:
       - text: Generalized low rank models
         href: https://koalaverse.github.io/homlr/notebooks/18-glrm.nb.html
       - text: Autoencoders
+        href: https://koalaverse.github.io/homlr/notebooks/19-autoencoders.nb.html
       - text: --------
       - text: "Clustering:"
       - text: K-means clustering
