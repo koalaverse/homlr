@@ -1,0 +1,281 @@
+---
+title: "Chapter 21: Model-based Clustering"
+output: html_notebook
+---
+
+__Note__: Some results may differ from the hard copy book due to the changing of
+sampling procedures introduced in R 3.6.0. See http://bit.ly/35D1SW7 for more
+details. Access and run the source code for this notebook [here](https://rstudio.cloud/project/801185).
+
+Hidden chapter requirements used in the book to set the plotting theme and load
+packages used in hidden code chunks:
+
+```{r setup}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  cache = FALSE
+)
+
+# Set the graphical theme
+ggplot2::theme_set(ggplot2::theme_light())
+
+# packages used behind the scenes
+library(knitr)
+library(kableExtra)
+```
+
+## Prerequisites
+
+For this chapter we'll use the following packages:
+
+```{r model-clustering-pkgs}
+# Helper packages
+library(dplyr)    # for data manipulation
+library(ggplot2)  # for data visualization
+
+# Modeling packages
+library(mclust)   # for fitting clustering algorithms
+```
+
+To illustrate the main concepts of model-based clustering we'll use the `geyser` data provided by the __MASS__ package along with the `my_basket` data:
+
+```{r model-clustering-data}
+data(geyser, package = 'MASS')
+
+url <- "https://koalaverse.github.io/homlr/data/my_basket.csv"
+my_basket <- readr::read_csv(url)
+```
+
+
+## Measuring probability and uncertainty
+
+Figure 22.1:
+
+```{r multivariate-density-plot, fig.cap='Data points across two features (X and Y) appear to come from three multivariate normal distributions.', fig.height=3, fig.width=3.5}
+ggplot(geyser, aes(waiting, duration)) +
+  geom_point(size = 0.75, alpha = 0.5) +
+  geom_density2d(aes(alpha = ..level..), show.legend = FALSE) +
+  scale_x_continuous("X") +
+  scale_y_continuous("Y") +
+  theme(
+    axis.ticks = element_blank(),
+    axis.text = element_blank()
+  )
+```
+
+```{r geyser-mc1-plot, out.width="48%", fig.asp=1, fig.show='hold', fig.cap='Multivariate density plot (left) highlighting three clusters in the `geyser` data and an uncertainty plot (right) highlighting observations with high uncertainty of which cluster they are a member of.'}
+# Apply GMM model with 3 components
+geyser_mc <- Mclust(geyser, G = 3, verbose = FALSE)
+
+# Plot results
+plot(geyser_mc, what = "density")
+plot(geyser_mc, what = "uncertainty")
+```
+
+```{r geyser-mc-high-uncertainty-obs}
+# Observations with high uncertainty
+sort(geyser_mc$uncertainty, decreasing = TRUE) %>% head()
+```
+
+## Covariance types
+
+Table 22.1:
+
+```{r covariance-parameterization, fig.cap='Parameterizations of the covariance matrix.'}
+readr::read_csv('data/GMM-covariances.csv') %>%
+  knitr::kable(caption = 'Parameterizations of the covariance matrix',
+                align = c('c', 'c', 'c', 'c', 'c', 'c')) %>%
+  kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+Figure 22.3:
+
+```{r visualize-different-covariance-models, fig.cap='Graphical representation of how different covariance models allow GMMs to capture different cluster structures.', fig.height=4.5, fig.width=10}
+par(
+  mfrow = c(2, 5), mar = c(0.5, 0.5, 2.5, 0.5),
+  cex = .4,
+  pch = 19,
+  col = alpha('black', 0.25),
+  xaxt = 'n', yaxt = 'n', ann = FALSE, cex.main = 3
+  )
+
+# EII
+set.seed(111)
+obj <- mlbench::mlbench.hypercube(n = 400)
+df <- data.frame(
+    x = obj$x[, 1],
+    y = obj$x[, 2]
+)
+m <- Mclust(df, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# VII
+df <- data_frame(
+    x1 = c(rnorm(100, sd = .75), rnorm(100, sd = .25) + 5),
+    x2 = c(rnorm(100, sd = .75), rnorm(100, sd = .25))
+)
+m <- Mclust(df, G = 2, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# EEI
+df <- data_frame(
+    x1 = c(rnorm(100, sd = .75), rnorm(100, sd = .75)),
+    x2 = c(rnorm(100, sd = .75), rnorm(100, sd = .75) - 5)
+)
+m <- Mclust(df, G = 2, modelNames = "EEI", verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# VVI
+set.seed(111)
+obj <- mlbench::mlbench.cuboids(300)
+df <- data.frame(
+    x = obj$x[, 1],
+    y = obj$x[, 2]
+)
+m <- Mclust(df, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# VVE
+m <- Mclust(faithful, G = 2, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(faithful)
+title(main = m$modelName)
+
+# EEE
+set.seed(111)
+obj <- mlbench::mlbench.cassini(200)
+df <- data.frame(
+    x = obj$x[, 1],
+    y = obj$x[, 2]
+)
+m <- Mclust(df, G = 20, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# EEV
+set.seed(111)
+obj <- mlbench::mlbench.spirals(200, 1, 0.025)
+df <- data.frame(
+    x = obj$x[, 1],
+    y = obj$x[, 2]
+)
+m <- Mclust(df, G = 20, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# VEV
+m <- Mclust(mtcars[, c('mpg', 'wt')], G = 2, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(mtcars[, c('mpg', 'wt')])
+title(main = m$modelName)
+
+# EEV
+set.seed(111)
+obj <- mlbench::mlbench.smiley()
+df <- data.frame(
+    x = obj$x[, 1],
+    y = obj$x[, 2]
+)
+m <- Mclust(df, G = 20, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+
+# EVE
+set.seed(111)
+obj <- mlbench::mlbench.1spiral(300, sd = .15)
+df <- data.frame(
+    x = obj[, 1],
+    y = obj[, 2]
+)
+m <- Mclust(df, verbose = FALSE)
+plot(m, what = "density", type = "hdr")
+points(df)
+title(main = m$modelName)
+```
+
+## Model selection
+
+```{r geyser-model-family, linewidth = 70}
+summary(geyser_mc)
+```
+
+```{r geyser-mc2-plot, out.width="32%", fig.asp=1, fig.show='hold', fig.cap='Identifying the optimal GMM model and number of clusters for the `geyser` data (left). The classification (center) and uncertainty (right) plots illustrate which observations are assigned to each cluster and their level of assignment uncertainty.', linewidth = 70}
+geyser_optimal_mc <- Mclust(geyser, verbose = FALSE)
+
+summary(geyser_optimal_mc)
+
+legend_args <- list(x = "bottomright", ncol = 5)
+plot(geyser_optimal_mc, what = 'BIC', legendArgs = legend_args)
+plot(geyser_optimal_mc, what = 'classification')
+plot(geyser_optimal_mc, what = 'uncertainty')
+```
+
+
+## My basket example
+
+```{r my-basket-BIC, fig.cap='BIC scores for clusters (components) ranging from 1-20', fig.height=4.5, linewidth = 70}
+my_basket_mc <- Mclust(my_basket, 1:20, verbose = FALSE)
+
+summary(my_basket_mc)
+
+plot(my_basket_mc, what = 'BIC', 
+     legendArgs = list(x = "bottomright", ncol = 5))
+```
+
+```{r my-basket-probabilities, fig.cap='Distribution of probabilities for all observations aligning to each of the six clusters.', fig.height=4}
+probabilities <- my_basket_mc$z 
+colnames(probabilities) <- paste0('C', 1:6)
+
+probabilities <- probabilities %>%
+  as.data.frame() %>%
+  mutate(id = row_number()) %>%
+  tidyr::gather(cluster, probability, -id)
+
+ggplot(probabilities, aes(probability)) +
+  geom_histogram() +
+  facet_wrap(~ cluster, nrow = 2)
+```
+
+```{r cluster-uncertainty, fig.width=10, fig.cap='Observations that are aligned to each cluster but their uncertainty of membership is greater than 0.25.'}
+uncertainty <- data.frame(
+  id = 1:nrow(my_basket),
+  cluster = my_basket_mc$classification,
+  uncertainty = my_basket_mc$uncertainty
+)
+
+uncertainty %>%
+  group_by(cluster) %>%
+  filter(uncertainty > 0.25) %>%
+  ggplot(aes(uncertainty, reorder(id, uncertainty))) +
+  geom_point() +
+  facet_wrap(~ cluster, scales = 'free_y', nrow = 1)
+```
+
+```{r cluster2-consumption, fig.height=5, fig.cap='Average standardized consumption for cluster 2 observations compared to all observations.'}
+cluster2 <- my_basket %>%
+  scale() %>%
+  as.data.frame() %>%
+  mutate(cluster = my_basket_mc$classification) %>%
+  filter(cluster == 2) %>%
+  select(-cluster)
+
+cluster2 %>%
+  tidyr::gather(product, std_count) %>%
+  group_by(product) %>%
+  summarize(avg = mean(std_count)) %>%
+  ggplot(aes(avg, reorder(product, avg))) +
+  geom_point() +
+  labs(x = "Average standardized consumption", y = NULL)
+```

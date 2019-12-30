@@ -1,0 +1,15 @@
+Model,Family,Volume,Shape,Orientation,Identifier
+1,Spherical,Equal,Equal,NA,EII
+2,Spherical,Variable,Equal,NA,VII
+3,Diagonal,Equal,Equal,Axes,EEI
+4,Diagonal,Variable,Equal,Axes,VEI
+5,Diagonal,Equal,Variable,Axes,EVI
+6,Diagonal,Variable,Variable,Axes,VVI
+7,General,Equal,Equal,Equal,EEE
+8,General,Equal,Variable,Equal,EVE
+9,General,Variable,Equal,Equal,VEE
+10,General,Variable,Variable,Equal,VVE
+11,General,Equal,Equal,Variable,EEV
+12,General,Variable,Equal,Variable,VEV
+13,General,Equal,Variable,Variable,EVV
+14,General,Variable,Variable,Variable,VVV
