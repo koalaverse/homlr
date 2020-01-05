@@ -8,7 +8,7 @@ chapter's code chunks should not be ran on RStudio Cloud.
 
 Hidden chapter requirements used in the book to set the plotting theme and load packages used in hidden code chunks:
 
-```{r setup}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(
   message = FALSE, 
   warning = FALSE, 
@@ -171,7 +171,7 @@ h2o.getGrid(
 
 ```{r}
 # Grab the model_id for the top model, chosen by validation error
-best_model_id <- random_grid_perf@model_ids[[1]]
+best_model_id <- random_grid@model_ids[[1]]
 best_model <- h2o.getModel(best_model_id)
 h2o.performance(best_model, newdata = test_h2o)
 ```
@@ -197,9 +197,11 @@ auto_ml <- h2o.automl(
   keep_cross_validation_predictions = TRUE, sort_metric = "RMSE", seed = 123,
   stopping_rounds = 50, stopping_metric = "RMSE", stopping_tolerance = 0
 )
+```
 
+```{r}
 # Assess the leader board; the following truncates the results to show the top 
-# and bottom 15 models. You can get the top model with auto_ml@leader
+# 25 models. You can get the top model with auto_ml@leader
 auto_ml@leaderboard %>% 
   as.data.frame() %>%
   dplyr::select(model_id, rmse) %>%

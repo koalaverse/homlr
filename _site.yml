@@ -40,6 +40,7 @@ navbar:
       - text: Support vector machines
         href: https://koalaverse.github.io/homlr/notebooks/14-svm.nb.html
       - text: Stacked models
+        href: https://koalaverse.github.io/homlr/notebooks/15-stacking-models.nb.html
       - text: Interpretable machine learning
       - text: --------
       - text: "Dimension reduction:"
