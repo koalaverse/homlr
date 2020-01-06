@@ -42,6 +42,7 @@ navbar:
       - text: Stacked models
         href: https://koalaverse.github.io/homlr/notebooks/15-stacking-models.nb.html
       - text: Interpretable machine learning
+        href: https://koalaverse.github.io/homlr/notebooks/16-iml.nb.html
       - text: --------
       - text: "Dimension reduction:"
       - text: Princicpal component analysis
