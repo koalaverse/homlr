@@ -57,7 +57,8 @@ ames <- AmesHousing::make_ames()
 ames.h2o <- as.h2o(ames)
 
 # Job attrition data
-churn <- rsample::attrition %>% 
+library(modeldata)
+churn <- data(attrition) %>% 
   mutate_if(is.ordered, .funs = factor, ordered = FALSE)
 churn.h2o <- as.h2o(churn)
 ```
