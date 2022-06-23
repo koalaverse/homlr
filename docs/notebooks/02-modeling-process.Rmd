@@ -1,0 +1,543 @@
+---
+title: "Chapter 2: Modeling Process"
+output: html_notebook
+---
+
+__Note__: Some results may differ from the hard copy book due to the changing of sampling procedures introduced in R 3.6.0. See http://bit.ly/35D1SW7 for more details. Access and run the source code for this notebook [here](https://rstudio.cloud/project/801185). 
+
+Hidden chapter requirements used in the book to set the plotting theme and load packages used in hidden code chunks.
+
+```{r setup, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.align = "center",
+  message = FALSE,
+  warning = FALSE,
+  collapse = TRUE,
+  cache = FALSE
+)
+
+# underlying code dependencies
+library(tidyverse)
+
+# Set the graphical theme
+theme_set(theme_light())
+```
+
+Figure 2.1:
+
+```{r modeling-process-modeling-process, echo=TRUE, out.height="90%", out.width="90%", fig.cap="General predictive machine learning process."}
+knitr::include_graphics("images/modeling_process.png")
+```
+
+## Prerequisites
+
+This chapter leverages the following packages.
+
+```{r modeling-process-pkg-prereqs, results="hide"}
+# Helper packages
+library(dplyr)     # for data manipulation
+library(ggplot2)   # for awesome graphics
+
+# Modeling process packages
+library(rsample)   # for resampling procedures
+library(caret)     # for resampling and model training
+library(h2o)       # for resampling and model training
+
+# h2o set-up 
+h2o.no_progress()  # turn off h2o progress bars
+h2o.init()         # launch h2o
+```
+
+Data used:
+
+```{r modeling-process-load-data}
+# Ames housing data
+ames <- AmesHousing::make_ames()
+ames.h2o <- as.h2o(ames)
+
+# Job attrition data
+churn <- rsample::attrition %>% 
+  mutate_if(is.ordered, .funs = factor, ordered = FALSE)
+churn.h2o <- as.h2o(churn)
+```
+
+
+## Data splitting
+
+Figure 2.2:
+
+```{r modeling-process-split, echo=TRUE, fig.align='center', fig.cap="Splitting data into training and test sets.", out.height="30%", out.width="30%"}
+knitr::include_graphics("images/data_split.png")
+```
+
+### Simple random sampling
+
+```{r modeling-process-splitting-applied}
+# Using base R
+set.seed(123)  # for reproducibility
+index_1 <- sample(1:nrow(ames), round(nrow(ames) * 0.7))
+train_1 <- ames[index_1, ]
+test_1  <- ames[-index_1, ]
+
+# Using caret package
+set.seed(123)  # for reproducibility
+index_2 <- createDataPartition(ames$Sale_Price, p = 0.7, 
+                               list = FALSE)
+train_2 <- ames[index_2, ]
+test_2  <- ames[-index_2, ]
+
+# Using rsample package
+set.seed(123)  # for reproducibility
+split_1  <- initial_split(ames, prop = 0.7)
+train_3  <- training(split_1)
+test_3   <- testing(split_1)
+
+# Using h2o package
+split_2 <- h2o.splitFrame(ames.h2o, ratios = 0.7, 
+                          seed = 123)
+train_4 <- split_2[[1]]
+test_4  <- split_2[[2]]
+```
+
+Figure 2.3:
+
+```{r modeling-process-distributions, echo=TRUE, fig.cap="Training (black) vs. test (red) response distribution.", fig.height=3, fig.width=9}
+p1 <- ggplot(train_1, aes(x = Sale_Price)) + 
+    geom_density(trim = TRUE) + 
+    geom_density(data = test_1, trim = TRUE, col = "red") +
+  ggtitle("Base R")
+
+p2 <- ggplot(train_2, aes(x = Sale_Price)) + 
+    geom_density(trim = TRUE) + 
+    geom_density(data = test_2, trim = TRUE, col = "red") +
+    theme(axis.title.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank()) +
+    ggtitle("caret") 
+
+p3 <- ggplot(train_3, aes(x = Sale_Price)) + 
+    geom_density(trim = TRUE) + 
+    geom_density(data = test_3, trim = TRUE, col = "red") +
+    theme(axis.title.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank()) +
+    ggtitle("rsample")
+
+p4 <- ggplot(as.data.frame(train_4), aes(x = Sale_Price)) + 
+    geom_density(trim = TRUE) + 
+    geom_density(data = as.data.frame(test_4), trim = TRUE, col = "red") +
+    theme(axis.title.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank()) +
+    ggtitle("h2o")
+
+# Side-by-side plots
+gridExtra::grid.arrange(p1, p2, p3, p4, nrow = 1)
+
+# clean up
+rm(p1, p2, p3, p4)
+```
+
+### Stratified sampling
+
+```{r modeling-process-stratified-sampling}
+# orginal response distribution
+table(churn$Attrition) %>% prop.table()
+
+# stratified sampling with the rsample package
+set.seed(123)
+split_strat  <- initial_split(churn, prop = 0.7, 
+                              strata = "Attrition")
+train_strat  <- training(split_strat)
+test_strat   <- testing(split_strat)
+
+# consistent response ratio between train & test
+table(train_strat$Attrition) %>% prop.table()
+table(test_strat$Attrition) %>% prop.table()
+```
+
+
+### Many formula interfaces
+
+This code chunk is for illustrative purposes only; it is not designed to execute. 
+
+```{r modeling-process-formula-interface, eval=FALSE}
+# Sale price as function of neighborhood and year sold
+model_fn(Sale_Price ~ Neighborhood + Year_Sold, 
+         data = ames)
+
+# Variables + interactions
+model_fn(Sale_Price ~ Neighborhood + Year_Sold + 
+           Neighborhood:Year_Sold, data = ames)
+
+# Shorthand for all predictors
+model_fn(Sale_Price ~ ., data = ames)
+
+# Inline functions / transformations
+model_fn(log10(Sale_Price) ~ ns(Longitude, df = 3) + 
+           ns(Latitude, df = 3), data = ames)
+```
+
+This code chunk is for illustrative purposes only; it is not designed to execute.
+
+```{r modeling-process-non-forumal-interface, eval=FALSE}
+# Use separate inputs for X and Y
+features <- c("Year_Sold", "Longitude", "Latitude")
+model_fn(x = ames[, features], y = ames$Sale_Price)
+```
+
+This code chunk is for illustrative purposes only; it is not designed to execute.
+
+```{r modeling-process-name-interface, eval=FALSE}
+model_fn(
+  x = c("Year_Sold", "Longitude", "Latitude"),
+  y = "Sale_Price",
+  data = ames.h2o
+)
+```
+
+### Many engines
+
+```{r modeling-process-many-engines, warning=FALSE, message=FALSE}
+lm_lm <- lm(Sale_Price ~ ., data = ames)
+lm_glm <- glm(Sale_Price ~ ., data = ames, family = gaussian)
+lm_caret <- train(Sale_Price ~ ., data = ames, method = "lm")
+```
+
+Table 1:
+
+| Algorithm | Package | Code |
+| --------- | ------- | ------------- |
+| Linear discriminant analysis | __MASS__ | `predict(obj)` |
+| Generalized linear model |	__stats__	| `predict(obj, type = "response")` |
+| Mixture discriminant analysis |	__mda__	|	`predict(obj, type = "posterior")` |
+| Decision tree |	__rpart__	|	`predict(obj, type = "prob")` |
+| Random Forest |	__ranger__ |	`predict(obj)$predictions` |
+| Gradient boosting machine |	__gbm__ |	`predict(obj, type = "response", n.trees)` |
+
+Table: Table 1: Syntax for computing predicted class probabilities with direct engines.
+
+
+## Resampling methods
+
+### _k_-fold cross validation
+
+Figure 2.4:
+
+```{r modeling-process-cv-diagram, echo=TRUE, fig.cap="Illustration of the k-fold cross validation process.", out.width='90%', out.height='90%'}
+knitr::include_graphics("images/cv.png")
+```
+
+Figure 2.5:
+
+```{r modeling-process-cv, echo=TRUE, fig.cap="10-fold cross validation on 32 observations. Each observation is used once for validation and nine times for training."}
+cv <- vfold_cv(mtcars, 10)
+cv_plot <- cv$splits %>%
+  purrr::map2_dfr(seq_along(cv$splits), ~ mtcars %>% mutate(
+    Resample = paste0("Fold_", stringr::str_pad(.y, 2, pad = 0)),
+    ID = row_number(),
+    Data = ifelse(ID %in% .x$in_id, "Training", "Validation"))
+    ) %>%
+  ggplot(aes(Resample, ID, fill = Data)) +
+  geom_tile() +
+  scale_fill_manual(values = c("#f2f2f2", "#AAAAAA")) +
+  scale_y_reverse("Observation ID", breaks = 1:nrow(mtcars), expand = c(0, 0)) +
+  scale_x_discrete(NULL, expand = c(0, 0)) +
+  theme_classic() +
+  theme(legend.title=element_blank())
+
+cv_plot
+```
+
+This code chunk is for illustrative purposes only; it is not designed to execute.
+
+```{r modeling-process-direct-cv, eval=FALSE}
+# Example using h2o
+h2o.cv <- h2o.glm(
+  x = x, 
+  y = y, 
+  training_frame = ames.h2o,
+  nfolds = 10  # perform 10-fold CV
+)
+```
+
+### Bootstrapping
+
+Figure 2.6:
+
+```{r modeling-process-bootstrapscheme, echo=TRUE, out.width='70%', out.height='70%', fig.cap="Illustration of the bootstrapping process."}
+knitr::include_graphics("images/bootstrap-scheme.png")
+```
+
+Figure 2.7:
+
+```{r modeling-process-sampling-comparison, echo=TRUE, fig.cap="Bootstrap sampling (left) versus 10-fold cross validation (right) on 32 observations. For bootstrap sampling, warning=FALSE, the observations that have zero replications (white) are the out-of-bag observations used for validation.", message=FALSE}
+boots <- rsample::bootstraps(mtcars, 10)
+boots_plot <- boots$splits %>%
+  purrr::map2_dfr(seq_along(boots$splits), ~ mtcars %>% 
+             mutate(
+               Resample = paste0("Bootstrap_", stringr::str_pad(.y, 2, pad = 0)),
+               ID = row_number()
+             ) %>%
+             group_by(ID) %>%
+             mutate(Replicates = factor(sum(ID == .x$in_id)))) %>%
+  ggplot(aes(Resample, ID, fill = Replicates)) +
+  geom_tile() +
+  scale_fill_manual(values = c("#FFFFFF", "#F5F5F5", "#C8C8C8", "#A0A0A0", "#707070", "#505050", "#000000")) +
+  scale_y_reverse("Observation ID", breaks = 1:nrow(mtcars), expand = c(0, 0)) +
+  scale_x_discrete(NULL, expand = c(0, 0)) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Bootstrap sampling") 
+
+cv_plot <- cv_plot + 
+  ggtitle("10-fold cross validation") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+
+cowplot::plot_grid(boots_plot, cv_plot, align = "h", nrow = 1)
+
+# clean up
+rm(boots, boots_plot, cv_plot)
+```
+
+## Bias variance trade-off
+
+### Bias
+
+Figure 2.8:
+
+```{r modeling-process-bias-model, echo=TRUE, fig.height=4, fig.width=10, fig.cap="A biased polynomial model fit to a single data set does not capture the underlying non-linear, non-monotonic data structure (left).  Models fit to 25 bootstrapped replicates of the data are underterred by the noise and generates similar, yet still biased, predictions (right).", message=FALSE, warning=FALSE}
+# Simulate some nonlinear monotonic data
+set.seed(123)  # for reproducibility
+x <- seq(from = 0, to = 2 * pi, length = 500)
+y <- sin(x) + rnorm(length(x), sd = 0.3)
+df <- data.frame(x, y) %>%
+  filter(x < 4.5)
+
+# Single model fit
+bias_model <- lm(y ~ I(x^3), data = df)
+df$predictions <- predict(bias_model, df)
+p1 <- ggplot(df, aes(x, y)) +
+  geom_point(alpha = .3) +
+  geom_line(aes(x, predictions), size = 1.5, color = "dodgerblue") +
+  scale_y_continuous("Response", limits = c(-1.75, 1.75), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 4.5), expand = c(0, 0)) +
+  ggtitle("Single biased model fit")
+
+# Bootstrapped model fit
+bootstrap_n <- 25
+bootstrap_results <- NULL
+for(i in seq_len(bootstrap_n)) {
+  set.seed(i)  # for reproducibility
+  index <- sample(seq_len(nrow(df)), nrow(df), replace = TRUE)
+  df_sim <- df[index, ]
+  fit <- lm(y ~ I(x^3), data = df_sim)
+  df_sim$predictions <- predict(fit, df_sim)
+  df_sim$model <- paste0("model", i)
+  df_sim$ob <- index
+  bootstrap_results <- rbind(bootstrap_results, df_sim)
+}
+
+p2 <- ggplot(bootstrap_results, aes(x, predictions, color = model)) +
+  geom_line(show.legend = FALSE, size = .5) +
+  scale_y_continuous("Response", limits = c(-1.75, 1.75), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 4.5), expand = c(0, 0)) +
+  ggtitle("25 biased models fit to bootstrap samples")
+
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+### Variance
+
+Figure 2.9:
+
+```{r modeling-process-variance-model, echo=TRUE, fig.height=4, fig.width=10, fig.cap="A high variance _k_-nearest neighbor model fit to a single data set captures the underlying non-linear, non-monotonic data structure well but also overfits to individual data points (left).  Models fit to 25 bootstrapped replicates of the data are deterred by the noise and generate highly variable predictions (right).", message=FALSE, warning=FALSE}
+# Simulate some nonlinear monotonic data
+set.seed(123)  # for reproducibility
+x <- seq(from = 0, to = 2 * pi, length = 500)
+y <- sin(x) + rnorm(length(x), sd = 0.3)
+df <- data.frame(x, y) %>%
+  filter(x < 4.5)
+
+# Single model fit
+variance_model <- knnreg(y ~ x, k = 3, data = df)
+df$predictions <- predict(variance_model, df)
+p1 <- ggplot(df, aes(x, y)) +
+  geom_point(alpha = .3) +
+  geom_line(aes(x, predictions), size = 1.5, color = "dodgerblue") +
+  scale_y_continuous("Response", limits = c(-1.75, 1.75), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 4.5), expand = c(0, 0)) +
+  ggtitle("Single high variance model fit")
+
+# Bootstrapped model fit
+bootstrap_n <- 25
+bootstrap_results <- NULL
+for(i in seq_len(bootstrap_n)) {
+  set.seed(i)  # for reproducibility
+  index <- sample(seq_len(nrow(df)), nrow(df), replace = TRUE)
+  df_sim <- df[index, ]
+  fit <- knnreg(y ~ x, k = 3, data = df_sim)
+  df_sim$predictions <- predict(fit, df_sim)
+  df_sim$model <- paste0("model", i)
+  df_sim$ob <- index
+  bootstrap_results <- rbind(bootstrap_results, df_sim)
+}
+
+p2 <- ggplot(bootstrap_results, aes(x, predictions, color = model)) +
+  geom_line(show.legend = FALSE) +
+  scale_y_continuous("Response", limits = c(-1.75, 1.75), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 4.5), expand = c(0, 0)) +
+  ggtitle("25 high variance models fit to bootstrap samples")
+
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+### Hyperparameter tuning
+
+Figure 2.10:
+
+```{r modeling-process-knn-options, fig.width=10, echo=TRUE, fig.cap="_k_-nearest neighbor model with differing values for _k_.", message=FALSE, warning=FALSE}
+k_results <- NULL
+k <- c(2, 5, 10, 20, 50, 150)
+
+# Fit many different models
+for(i in seq_along(k)) {
+  df_sim <- df
+  fit <- knnreg(y ~ x, k = k[i], data = df_sim)
+  df_sim$predictions <- predict(fit, df_sim)
+  df_sim$model <- paste0("k = ", stringr::str_pad(k[i], 3, pad = " "))
+  k_results <- rbind(k_results, df_sim)
+}
+
+ggplot() +
+  geom_point(data = df, aes(x, y), alpha = .3) +
+  geom_line(data = k_results, aes(x, predictions), color = "dodgerblue", size = 1.5) +
+  scale_y_continuous("Response", limits = c(-1.75, 1.75), expand = c(0, 0)) +
+  scale_x_continuous(limits = c(0, 4.5), expand = c(0, 0)) +
+  facet_wrap(~ model)
+```
+
+Figure 2.11:
+
+```{r modeling-process-knn-tune, fig.height=3, echo=TRUE, fig.cap="Results from a grid search for a _k_-nearest neighbor model assessing values for _k_ ranging from 2-150.  We see high error values due to high model variance when _k_ is small and we also see high errors values due to high model bias when _k_ is large.  The optimal model is found at _k_ = 46."}
+cv <- trainControl(method = "repeatedcv", number = 10, repeats = 10, returnResamp = "all")
+hyper_grid <- expand.grid(k = seq(2, 150, by = 2))
+knn_fit <- train(x ~ y, data = df, method = "knn", trControl = cv, tuneGrid = hyper_grid)
+
+ggplot() +
+  geom_line(data = knn_fit$results, aes(k, RMSE)) +
+  geom_point(data = knn_fit$results, aes(k, RMSE)) +
+  geom_point(data = filter(knn_fit$results, k == as.numeric(knn_fit$bestTune)),
+             aes(k, RMSE),
+             shape = 21,
+             fill = "yellow",
+             color = "black",
+             stroke = 1,
+             size = 2) +
+  scale_y_continuous("Error (RMSE)")
+
+# clean up
+rm(cv, hyper_grid, knn_fit)
+```
+
+### Classification models
+
+Figure 2.12
+
+```{r modeling-process-confusion-matrix1, echo=TRUE, out.height="100%", out.width="100%", fig.cap="Confusion matrix and relationships to terms such as true-positive and false-negative."}
+knitr::include_graphics("images/confusion-matrix.png")
+```
+
+
+Figure 2.13:
+
+```{r modeling-process-confusion-matrix2, echo=TRUE, out.height="50%", out.width="50%", fig.cap="Example confusion matrix."}
+knitr::include_graphics("images/confusion-matrix2.png")
+```
+
+Figure 2.14:
+
+```{r modeling-process-roc, echo=TRUE, fig.cap="ROC curve.", fig.height=3.5, fig.width=5}
+library(plotROC)
+
+# Generate data
+set.seed(123)
+response <- rbinom(200, size = 1, prob = .5)
+
+set.seed(123)
+curve1   <- rnorm(200, mean = response, sd = .40)
+
+set.seed(123)
+curve2   <- rnorm(200, mean = response, sd = .75)
+
+set.seed(123)
+curve3   <- rnorm(200, mean = response, sd = 2.0)
+
+df <- tibble(response, curve1, curve2, curve3)
+
+ggplot(df) + 
+  geom_roc(aes(d = response, m = curve1), n.cuts = 0, size = .5, color = "#1E56F9") + 
+  geom_roc(aes(d = response, m = curve2), n.cuts = 0, size = .5, color = "#7194F9") + 
+  geom_roc(aes(d = response, m = curve3), n.cuts = 0, size = .5, color = "#B6C7F9") +
+  geom_abline(lty = 'dashed') +
+  annotate("text", x = .48, y = .46, label = c("No better than guessing"), 
+           vjust = 1, angle = 34) +
+  annotate("text", x = .3, y = .6, label = c("Ok"), 
+           vjust = 1, angle = 33, color = "#B6C7F9") +
+  annotate("text", x = .20, y = .75, label = c("Better"), 
+           vjust = 1, angle = 33, color = "#7194F9") +
+  annotate("text", x = .10, y = .96, label = c("Best"), 
+           vjust = 1, angle = 33, color = "#1E56F9") +
+  xlab("False positive rate") +
+  ylab("True positive rate")
+```
+
+## Putting the processes together
+
+```{r modeling-process-example-process-splitting}
+# Stratified sampling with the rsample package
+set.seed(123)
+split <- initial_split(ames, prop = 0.7, strata = "Sale_Price")
+ames_train  <- training(split)
+ames_test   <- testing(split)
+```
+
+This grid search takes approximately 3.5 minutes:
+
+```{r modeling-process-example-process-training}
+# Specify resampling strategy
+cv <- trainControl(
+  method = "repeatedcv", 
+  number = 10, 
+  repeats = 5
+)
+
+# Create grid of hyperparameter values
+hyper_grid <- expand.grid(k = seq(2, 25, by = 1))
+
+# Tune a knn model using grid search
+knn_fit <- train(
+  Sale_Price ~ ., 
+  data = ames_train, 
+  method = "knn", 
+  trControl = cv, 
+  tuneGrid = hyper_grid,
+  metric = "RMSE"
+)
+```
+
+Figure 2.15:
+
+```{r modeling-process-example-process-assess, fig.height=3, fig.cap="Results from a grid search for a _k_-nearest neighbor model on the Ames housing data assessing values for _k_ ranging from 2-25."}
+# Print and plot the CV results
+knn_fit
+ggplot(knn_fit)
+```
+
+Shutdown H2O and clean up
+
+```{r}
+h2o.shutdown(prompt = FALSE)
+rm(list = ls())
+```
